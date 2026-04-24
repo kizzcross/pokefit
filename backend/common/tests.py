@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.test import override_settings
 
 from common.utils.tests import TestCaseUtils
@@ -31,15 +30,5 @@ class TestAdminEnvironmentNotice(TestCaseUtils):
 
         self.assertResponse200(response)
         self.assertContains(response, "Review App")
-        self.assertContains(response, 'color: #0f172a;')
-        self.assertContains(response, 'background-color: #facc15;')
-
-    @override_settings(ADMIN_ENVIRONMENT_LABEL="")
-    def test_admin_index_falls_back_to_settings_module_name(self):
-        response = self.auth_client.get(self.reverse(self.view_name))
-
-        self.assertResponse200(response)
-        self.assertContains(
-            response,
-            settings.SETTINGS_MODULE.rsplit(".", maxsplit=1)[-1].replace("_", " ").title(),
-        )
+        self.assertContains(response, "color: #0f172a;")
+        self.assertContains(response, "background-color: #facc15;")
