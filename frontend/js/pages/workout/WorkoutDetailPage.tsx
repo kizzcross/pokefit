@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
 import { exercisesList, workoutsFinishCreate, workoutsRetrieve } from '@/js/api';
-import type { PokemonSpecies } from '@/js/api/types.gen';
+import type { WorkoutDetail } from '@/js/api/types.gen';
 import GameIcon from '@/js/components/game/GameIcon';
 import MobileHeader from '@/js/components/layout/MobileHeader';
 import PixelButton from '@/js/components/ui/PixelButton';
@@ -33,21 +33,6 @@ import { formatDate } from '@/js/lib/utils';
 import { useGameStore } from '@/js/stores/game-store';
 import { cn } from '@/js/lib/utils';
 
-type WorkoutDetail = {
-  id: number;
-  status?: string;
-  workout_type?: string;
-  total_volume?: string | number;
-  exercises?: WorkoutExerciseEntry[];
-  started_at?: string;
-  ended_at?: string;
-  duration_minutes?: number | null;
-  proof_photo_url?: string | null;
-  proof_caption?: string;
-  encounter_species?: PokemonSpecies | null;
-  weekly_goal_reward?: boolean;
-};
-
 const fieldClass =
   'w-full rounded-sm border-4 border-[var(--color-game-border)] bg-[var(--color-game-bg)] px-3 py-3 text-sm outline-none focus:border-[var(--color-game-accent)]';
 
@@ -71,7 +56,7 @@ const WorkoutDetailPage = () => {
 
   const workoutQuery = useQuery({
     queryKey: ['workouts', workoutId],
-    queryFn: async () => (await workoutsRetrieve({ path: { id: String(workoutId) } })).data as WorkoutDetail,
+    queryFn: async () => (await workoutsRetrieve({ path: { id: String(workoutId) } })).data,
     enabled: Number.isFinite(workoutId),
   });
 
@@ -188,7 +173,7 @@ const WorkoutDetailPage = () => {
           body: { perceived_effort: effort },
           throwOnError: true,
         })
-      ).data as WorkoutDetail,
+      ).data,
     onSuccess: (finished) => {
       queryClient.invalidateQueries({ queryKey: ['workouts'] });
       queryClient.invalidateQueries({ queryKey: ['calendar'] });

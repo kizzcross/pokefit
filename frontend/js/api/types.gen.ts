@@ -13,6 +13,13 @@ export type BlankEnum = '';
  */
 export type DifficultyEnum = 'beginner' | 'intermediate' | 'advanced';
 
+/**
+ * * `pending` - Pending
+ * * `captured` - Captured
+ * * `fled` - Fled
+ */
+export type EncounterStatusEnum = 'pending' | 'captured' | 'fled';
+
 export type Exercise = {
     readonly id: number;
     name: string;
@@ -87,6 +94,36 @@ export type ExerciseSummary = {
     readonly video_url: string;
 };
 
+export type FriendRequestCreate = {
+    email: string;
+};
+
+export type Friendship = {
+    readonly id: number;
+    from_user: UserBrief;
+    to_user: UserBrief;
+    status: FriendshipStatusEnum;
+    readonly created: string;
+    readonly modified: string;
+};
+
+/**
+ * * `pending` - Pending
+ * * `accepted` - Accepted
+ * * `declined` - Declined
+ * * `blocked` - Blocked
+ */
+export type FriendshipStatusEnum = 'pending' | 'accepted' | 'declined' | 'blocked';
+
+export type LastWorkoutByType = {
+    readonly id: number;
+    workout_type: WorkoutTypeEnum;
+    readonly ended_at: string | null;
+    readonly duration_minutes: number | null;
+    readonly total_volume: string;
+    readonly exercises: Array<WorkoutExercise>;
+};
+
 export type Message = {
     message: string;
 };
@@ -147,6 +184,13 @@ export type PaginatedPokemonSpeciesList = {
     results: Array<PokemonSpecies>;
 };
 
+export type PaginatedUserBriefList = {
+    count: number;
+    next?: string | null;
+    previous?: string | null;
+    results: Array<UserBrief>;
+};
+
 export type PaginatedUserList = {
     count: number;
     next?: string | null;
@@ -205,6 +249,12 @@ export type PatchedExercise = {
 export type PatchedUser = {
     readonly id?: number;
     email?: string;
+    readonly display_name?: string;
+    /**
+     * Slug do sprite de treinador (Pokémon Showdown).
+     */
+    trainer_sprite?: string;
+    readonly trainer_sprite_url?: string;
     /**
      * Designates whether this user should be treated as active. Unselect this instead of deleting accounts.
      */
@@ -229,6 +279,48 @@ export type PatchedUserPokemonTeamUpdate = {
      * Team position 1-6 when assigned to the active roster.
      */
     active_team_slot?: number | null;
+};
+
+export type PatchedWorkoutDetail = {
+    readonly id?: number;
+    workout_type?: WorkoutTypeEnum;
+    readonly started_at?: string;
+    readonly ended_at?: string | null;
+    readonly duration_minutes?: number | null;
+    /**
+     * Rate of perceived exertion from 1 to 10.
+     */
+    readonly perceived_effort?: number | null;
+    validation_type?: ValidationTypeEnum;
+    readonly quality_score?: number;
+    readonly progress_score?: number;
+    status?: Status31eEnum;
+    encounter_status?: EncounterStatusEnum;
+    encounter_species?: PokemonSpecies | null;
+    /**
+     * Encontro lendário/ultra raro por bater a meta semanal neste treino.
+     */
+    readonly weekly_goal_reward?: boolean;
+    readonly proof_photo_url?: string;
+    readonly proof_caption?: string;
+    readonly proof_uploaded_at?: string | null;
+    readonly exercises?: Array<WorkoutExercise>;
+    readonly total_volume?: string;
+    readonly created?: string;
+    readonly modified?: string;
+};
+
+export type PatchedWorkoutExerciseUpdate = {
+    sets?: number;
+    reps?: number;
+    weight?: string;
+    is_pr?: boolean;
+};
+
+export type PendingEncounter = {
+    workout_id: number;
+    encounter_status: string;
+    readonly species: string;
 };
 
 export type PokemonIv = {
@@ -266,12 +358,16 @@ export type PokemonSpecies = {
  */
 export type RarityEnum = 'common' | 'rare' | 'super_rare' | 'legendary';
 
+export type SaveWeeklyGoal = {
+    target: number;
+};
+
 /**
  * * `draft` - Draft
  * * `finished` - Finished
  * * `cancelled` - Cancelled
  */
-export type StatusEnum = 'draft' | 'finished' | 'cancelled';
+export type Status31eEnum = 'draft' | 'finished' | 'cancelled';
 
 /**
  * * `normal` - Normal
@@ -320,6 +416,12 @@ export type Type2Enum = 'normal' | 'fire' | 'water' | 'electric' | 'grass' | 'ic
 export type User = {
     readonly id: number;
     email: string;
+    readonly display_name: string;
+    /**
+     * Slug do sprite de treinador (Pokémon Showdown).
+     */
+    trainer_sprite?: string;
+    readonly trainer_sprite_url: string;
     /**
      * Designates whether this user should be treated as active. Unselect this instead of deleting accounts.
      */
@@ -337,6 +439,24 @@ export type User = {
     readonly created: string;
     readonly modified: string;
     readonly last_login: string | null;
+};
+
+export type UserBrief = {
+    readonly id: number;
+    readonly email: string;
+    readonly display_name: string;
+    /**
+     * Slug do sprite de treinador (Pokémon Showdown).
+     */
+    readonly trainer_sprite: string;
+    readonly trainer_sprite_url: string;
+};
+
+export type UserPokemonCapture = {
+    species_id: number;
+    nickname?: string;
+    shiny?: boolean;
+    source_workout_id: number;
 };
 
 export type UserPokemonDetail = {
@@ -385,11 +505,31 @@ export type UserPokemonTeamUpdate = {
 
 /**
  * * `manual` - Manual
+ * * `photo` - Photo proof
  * * `health_app` - Health app
  * * `location` - Location
  * * `wearable_location` - Wearable + location
  */
-export type ValidationTypeEnum = 'manual' | 'health_app' | 'location' | 'wearable_location';
+export type ValidationTypeEnum = 'manual' | 'photo' | 'health_app' | 'location' | 'wearable_location';
+
+export type WeeklyGoalStatus = {
+    has_active_goal: boolean;
+    target: number | null;
+    suggested_target: number;
+    current: number;
+    hp_current: number;
+    hp_max: number;
+    week_start: string;
+    week_end: string;
+    iso_year: number;
+    iso_week: number;
+    progress_percent: number;
+    goal_met: boolean;
+    reward_claimed: boolean;
+    reward_workout_id: number | null;
+    pending_legendary_encounter: boolean;
+    goal_locked: boolean;
+};
 
 export type WorkoutCreate = {
     readonly id: number;
@@ -400,7 +540,7 @@ export type WorkoutCreate = {
      */
     perceived_effort?: number | null;
     validation_type?: ValidationTypeEnum;
-    status: StatusEnum;
+    status: Status31eEnum;
     readonly created: string;
     readonly modified: string;
 };
@@ -418,7 +558,16 @@ export type WorkoutDetail = {
     validation_type: ValidationTypeEnum;
     readonly quality_score: number;
     readonly progress_score: number;
-    status: StatusEnum;
+    status: Status31eEnum;
+    encounter_status: EncounterStatusEnum;
+    encounter_species: PokemonSpecies | null;
+    /**
+     * Encontro lendário/ultra raro por bater a meta semanal neste treino.
+     */
+    readonly weekly_goal_reward: boolean;
+    readonly proof_photo_url: string;
+    readonly proof_caption: string;
+    readonly proof_uploaded_at: string | null;
     readonly exercises: Array<WorkoutExercise>;
     readonly total_volume: string;
     readonly created: string;
@@ -439,6 +588,17 @@ export type WorkoutExercise = {
     is_pr?: boolean;
     readonly created: string;
     readonly modified: string;
+};
+
+export type WorkoutExerciseBulkCreate = {
+    exercises: Array<WorkoutExerciseBulkItem>;
+};
+
+export type WorkoutExerciseBulkItem = {
+    exercise: number;
+    sets: number;
+    reps: number;
+    weight: string;
 };
 
 export type WorkoutExerciseCreate = {
@@ -474,11 +634,16 @@ export type WorkoutList = {
     validation_type: ValidationTypeEnum;
     readonly quality_score: number;
     readonly progress_score: number;
-    status: StatusEnum;
+    status: Status31eEnum;
     readonly exercise_count: number;
     readonly total_volume: string;
     readonly created: string;
     readonly modified: string;
+};
+
+export type WorkoutProof = {
+    photo: string;
+    caption?: string;
 };
 
 /**
@@ -520,7 +685,18 @@ export type ExerciseWritable = {
     is_active?: boolean;
 };
 
+export type LastWorkoutByTypeWritable = {
+    [key: string]: unknown;
+};
+
 export type PaginatedExerciseListListWritable = {
+    count: number;
+    next?: string | null;
+    previous?: string | null;
+    results: Array<unknown>;
+};
+
+export type PaginatedUserBriefListWritable = {
     count: number;
     next?: string | null;
     previous?: string | null;
@@ -564,9 +740,22 @@ export type PatchedExerciseWritable = {
 export type PatchedUserWritable = {
     email?: string;
     /**
+     * Slug do sprite de treinador (Pokémon Showdown).
+     */
+    trainer_sprite?: string;
+    /**
      * Designates whether this user should be treated as active. Unselect this instead of deleting accounts.
      */
     is_active?: boolean;
+};
+
+export type PatchedWorkoutDetailWritable = {
+    [key: string]: unknown;
+};
+
+export type PendingEncounterWritable = {
+    workout_id: number;
+    encounter_status: string;
 };
 
 export type PokemonSpeciesWritable = {
@@ -587,6 +776,10 @@ export type PokemonSpeciesWritable = {
 
 export type UserWritable = {
     email: string;
+    /**
+     * Slug do sprite de treinador (Pokémon Showdown).
+     */
+    trainer_sprite?: string;
     /**
      * Designates whether this user should be treated as active. Unselect this instead of deleting accounts.
      */
@@ -760,6 +953,121 @@ export type ExercisesUpdateResponses = {
 
 export type ExercisesUpdateResponse = ExercisesUpdateResponses[keyof ExercisesUpdateResponses];
 
+export type FriendsAcceptCreateData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/friends/{id}/accept/';
+};
+
+export type FriendsAcceptCreateResponses = {
+    /**
+     * No response body
+     */
+    200: unknown;
+};
+
+export type FriendsBlockCreateData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/friends/{id}/block/';
+};
+
+export type FriendsBlockCreateResponses = {
+    /**
+     * No response body
+     */
+    200: unknown;
+};
+
+export type FriendsDeclineCreateData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/friends/{id}/decline/';
+};
+
+export type FriendsDeclineCreateResponses = {
+    /**
+     * No response body
+     */
+    200: unknown;
+};
+
+export type FriendsRemoveDestroyData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/friends/{id}/remove/';
+};
+
+export type FriendsRemoveDestroyResponses = {
+    /**
+     * No response body
+     */
+    204: void;
+};
+
+export type FriendsRemoveDestroyResponse = FriendsRemoveDestroyResponses[keyof FriendsRemoveDestroyResponses];
+
+export type FriendsListListData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Number of results to return per page.
+         */
+        limit?: number;
+        /**
+         * The initial index from which to return the results.
+         */
+        offset?: number;
+    };
+    url: '/api/friends/list/';
+};
+
+export type FriendsListListResponses = {
+    200: PaginatedUserBriefList;
+};
+
+export type FriendsListListResponse = FriendsListListResponses[keyof FriendsListListResponses];
+
+export type FriendsRequestsRetrieveData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/friends/requests/';
+};
+
+export type FriendsRequestsRetrieveResponses = {
+    /**
+     * No response body
+     */
+    200: unknown;
+};
+
+export type FriendsRequestsSendCreateData = {
+    body: FriendRequestCreate;
+    path?: never;
+    query?: never;
+    url: '/api/friends/requests/send/';
+};
+
+export type FriendsRequestsSendCreateResponses = {
+    200: Friendship;
+};
+
+export type FriendsRequestsSendCreateResponse = FriendsRequestsSendCreateResponses[keyof FriendsRequestsSendCreateResponses];
+
 export type MyPokemonListData = {
     body?: never;
     path?: never;
@@ -797,6 +1105,24 @@ export type MyPokemonRetrieveResponses = {
 
 export type MyPokemonRetrieveResponse = MyPokemonRetrieveResponses[keyof MyPokemonRetrieveResponses];
 
+export type MyPokemonReleaseCreateData = {
+    body: UserPokemonListWritable;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/my-pokemon/{id}/release/';
+};
+
+export type MyPokemonReleaseCreateResponses = {
+    /**
+     * No response body
+     */
+    204: void;
+};
+
+export type MyPokemonReleaseCreateResponse = MyPokemonReleaseCreateResponses[keyof MyPokemonReleaseCreateResponses];
+
 export type MyPokemonTeamSlotPartialUpdateData = {
     body?: PatchedUserPokemonTeamUpdate;
     path: {
@@ -811,6 +1137,19 @@ export type MyPokemonTeamSlotPartialUpdateResponses = {
 };
 
 export type MyPokemonTeamSlotPartialUpdateResponse = MyPokemonTeamSlotPartialUpdateResponses[keyof MyPokemonTeamSlotPartialUpdateResponses];
+
+export type MyPokemonCaptureCreateData = {
+    body: UserPokemonCapture;
+    path?: never;
+    query?: never;
+    url: '/api/my-pokemon/capture/';
+};
+
+export type MyPokemonCaptureCreateResponses = {
+    200: UserPokemonDetail;
+};
+
+export type MyPokemonCaptureCreateResponse = MyPokemonCaptureCreateResponses[keyof MyPokemonCaptureCreateResponses];
 
 export type MyPokemonRandomEncounterRetrieveData = {
     body?: never;
@@ -896,6 +1235,20 @@ export type RestRestCheckRetrieveResponses = {
 };
 
 export type RestRestCheckRetrieveResponse = RestRestCheckRetrieveResponses[keyof RestRestCheckRetrieveResponses];
+
+export type TimelineRetrieveData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/timeline/';
+};
+
+export type TimelineRetrieveResponses = {
+    /**
+     * No response body
+     */
+    200: unknown;
+};
 
 export type UsersListData = {
     body?: never;
@@ -1007,6 +1360,42 @@ export type UsersUpdateResponses = {
 
 export type UsersUpdateResponse = UsersUpdateResponses[keyof UsersUpdateResponses];
 
+export type UsersCalendarRetrieveData = {
+    body?: never;
+    path: {
+        /**
+         * A unique integer value identifying this user.
+         */
+        id: number;
+    };
+    query?: never;
+    url: '/api/users/{id}/calendar/';
+};
+
+export type UsersCalendarRetrieveResponses = {
+    200: User;
+};
+
+export type UsersCalendarRetrieveResponse = UsersCalendarRetrieveResponses[keyof UsersCalendarRetrieveResponses];
+
+export type UsersTimelineRetrieveData = {
+    body?: never;
+    path: {
+        /**
+         * A unique integer value identifying this user.
+         */
+        id: number;
+    };
+    query?: never;
+    url: '/api/users/{id}/timeline/';
+};
+
+export type UsersTimelineRetrieveResponses = {
+    200: User;
+};
+
+export type UsersTimelineRetrieveResponse = UsersTimelineRetrieveResponses[keyof UsersTimelineRetrieveResponses];
+
 export type UsersLoginCreateData = {
     body: UserWritable;
     path?: never;
@@ -1049,6 +1438,19 @@ export type UsersMeRetrieveResponses = {
 
 export type UsersMeRetrieveResponse = UsersMeRetrieveResponses[keyof UsersMeRetrieveResponses];
 
+export type UsersMePartialUpdateData = {
+    body?: PatchedUserWritable;
+    path?: never;
+    query?: never;
+    url: '/api/users/me/';
+};
+
+export type UsersMePartialUpdateResponses = {
+    200: User;
+};
+
+export type UsersMePartialUpdateResponse = UsersMePartialUpdateResponses[keyof UsersMePartialUpdateResponses];
+
 export type UsersRegisterCreateData = {
     body: UserWritable;
     path?: never;
@@ -1061,6 +1463,45 @@ export type UsersRegisterCreateResponses = {
 };
 
 export type UsersRegisterCreateResponse = UsersRegisterCreateResponses[keyof UsersRegisterCreateResponses];
+
+export type UsersTrainerSpritesRetrieveData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/users/trainer-sprites/';
+};
+
+export type UsersTrainerSpritesRetrieveResponses = {
+    200: User;
+};
+
+export type UsersTrainerSpritesRetrieveResponse = UsersTrainerSpritesRetrieveResponses[keyof UsersTrainerSpritesRetrieveResponses];
+
+export type WeeklyGoalListData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/weekly-goal/';
+};
+
+export type WeeklyGoalListResponses = {
+    200: Array<WeeklyGoalStatus>;
+};
+
+export type WeeklyGoalListResponse = WeeklyGoalListResponses[keyof WeeklyGoalListResponses];
+
+export type WeeklyGoalCreateData = {
+    body: SaveWeeklyGoal;
+    path?: never;
+    query?: never;
+    url: '/api/weekly-goal/';
+};
+
+export type WeeklyGoalCreateResponses = {
+    201: WeeklyGoalStatus;
+};
+
+export type WeeklyGoalCreateResponse = WeeklyGoalCreateResponses[keyof WeeklyGoalCreateResponses];
 
 export type WorkoutsListData = {
     body?: never;
@@ -1097,6 +1538,24 @@ export type WorkoutsCreateResponses = {
 
 export type WorkoutsCreateResponse = WorkoutsCreateResponses[keyof WorkoutsCreateResponses];
 
+export type WorkoutsDestroyData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/workouts/{id}/';
+};
+
+export type WorkoutsDestroyResponses = {
+    /**
+     * No response body
+     */
+    204: void;
+};
+
+export type WorkoutsDestroyResponse = WorkoutsDestroyResponses[keyof WorkoutsDestroyResponses];
+
 export type WorkoutsRetrieveData = {
     body?: never;
     path: {
@@ -1111,6 +1570,36 @@ export type WorkoutsRetrieveResponses = {
 };
 
 export type WorkoutsRetrieveResponse = WorkoutsRetrieveResponses[keyof WorkoutsRetrieveResponses];
+
+export type WorkoutsPartialUpdateData = {
+    body?: PatchedWorkoutDetailWritable;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/workouts/{id}/';
+};
+
+export type WorkoutsPartialUpdateResponses = {
+    200: WorkoutDetail;
+};
+
+export type WorkoutsPartialUpdateResponse = WorkoutsPartialUpdateResponses[keyof WorkoutsPartialUpdateResponses];
+
+export type WorkoutsDeclineEncounterCreateData = {
+    body?: WorkoutDetailWritable;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/workouts/{id}/decline-encounter/';
+};
+
+export type WorkoutsDeclineEncounterCreateResponses = {
+    200: WorkoutDetail;
+};
+
+export type WorkoutsDeclineEncounterCreateResponse = WorkoutsDeclineEncounterCreateResponses[keyof WorkoutsDeclineEncounterCreateResponses];
 
 export type WorkoutsExercisesCreateData = {
     body: WorkoutExerciseCreateWritable;
@@ -1127,6 +1616,56 @@ export type WorkoutsExercisesCreateResponses = {
 
 export type WorkoutsExercisesCreateResponse = WorkoutsExercisesCreateResponses[keyof WorkoutsExercisesCreateResponses];
 
+export type WorkoutsExercisesDestroyData = {
+    body?: never;
+    path: {
+        entry_id: string;
+        id: string;
+    };
+    query?: never;
+    url: '/api/workouts/{id}/exercises/{entry_id}/';
+};
+
+export type WorkoutsExercisesDestroyResponses = {
+    /**
+     * No response body
+     */
+    204: void;
+};
+
+export type WorkoutsExercisesDestroyResponse = WorkoutsExercisesDestroyResponses[keyof WorkoutsExercisesDestroyResponses];
+
+export type WorkoutsExercisesPartialUpdateData = {
+    body?: PatchedWorkoutExerciseUpdate;
+    path: {
+        entry_id: string;
+        id: string;
+    };
+    query?: never;
+    url: '/api/workouts/{id}/exercises/{entry_id}/';
+};
+
+export type WorkoutsExercisesPartialUpdateResponses = {
+    200: WorkoutExercise;
+};
+
+export type WorkoutsExercisesPartialUpdateResponse = WorkoutsExercisesPartialUpdateResponses[keyof WorkoutsExercisesPartialUpdateResponses];
+
+export type WorkoutsExercisesBulkCreateData = {
+    body: WorkoutExerciseBulkCreate;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/workouts/{id}/exercises/bulk/';
+};
+
+export type WorkoutsExercisesBulkCreateResponses = {
+    200: WorkoutExerciseBulkCreate;
+};
+
+export type WorkoutsExercisesBulkCreateResponse = WorkoutsExercisesBulkCreateResponses[keyof WorkoutsExercisesBulkCreateResponses];
+
 export type WorkoutsFinishCreateData = {
     body?: WorkoutFinish;
     path: {
@@ -1137,7 +1676,76 @@ export type WorkoutsFinishCreateData = {
 };
 
 export type WorkoutsFinishCreateResponses = {
-    200: WorkoutFinish;
+    200: WorkoutDetail;
 };
 
 export type WorkoutsFinishCreateResponse = WorkoutsFinishCreateResponses[keyof WorkoutsFinishCreateResponses];
+
+export type WorkoutsProofCreateData = {
+    body: WorkoutProof;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/workouts/{id}/proof/';
+};
+
+export type WorkoutsProofCreateResponses = {
+    200: WorkoutDetail;
+};
+
+export type WorkoutsProofCreateResponse = WorkoutsProofCreateResponses[keyof WorkoutsProofCreateResponses];
+
+export type WorkoutsActiveDraftRetrieveData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/workouts/active-draft/';
+};
+
+export type WorkoutsActiveDraftRetrieveResponses = {
+    200: WorkoutDetail;
+};
+
+export type WorkoutsActiveDraftRetrieveResponse = WorkoutsActiveDraftRetrieveResponses[keyof WorkoutsActiveDraftRetrieveResponses];
+
+export type WorkoutsCalendarRetrieveData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/workouts/calendar/';
+};
+
+export type WorkoutsCalendarRetrieveResponses = {
+    200: {
+        [key: string]: unknown;
+    };
+};
+
+export type WorkoutsCalendarRetrieveResponse = WorkoutsCalendarRetrieveResponses[keyof WorkoutsCalendarRetrieveResponses];
+
+export type WorkoutsLastByTypeRetrieveData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/workouts/last-by-type/';
+};
+
+export type WorkoutsLastByTypeRetrieveResponses = {
+    200: LastWorkoutByType;
+};
+
+export type WorkoutsLastByTypeRetrieveResponse = WorkoutsLastByTypeRetrieveResponses[keyof WorkoutsLastByTypeRetrieveResponses];
+
+export type WorkoutsPendingEncounterRetrieveData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/workouts/pending-encounter/';
+};
+
+export type WorkoutsPendingEncounterRetrieveResponses = {
+    200: PendingEncounter;
+};
+
+export type WorkoutsPendingEncounterRetrieveResponse = WorkoutsPendingEncounterRetrieveResponses[keyof WorkoutsPendingEncounterRetrieveResponses];

@@ -156,6 +156,133 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/friends/{id}/accept/:
+    post:
+      operationId: friends_accept_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - friends
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/friends/{id}/block/:
+    post:
+      operationId: friends_block_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - friends
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/friends/{id}/decline/:
+    post:
+      operationId: friends_decline_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - friends
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/friends/{id}/remove/:
+    delete:
+      operationId: friends_remove_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - friends
+      security:
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/friends/list/:
+    get:
+      operationId: friends_list_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - friends
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserBriefList'
+          description: ''
+  /api/friends/requests/:
+    get:
+      operationId: friends_requests_retrieve
+      tags:
+      - friends
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/friends/requests/send/:
+    post:
+      operationId: friends_requests_send_create
+      tags:
+      - friends
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FriendRequestCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FriendRequestCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FriendRequestCreate'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Friendship'
+          description: ''
   /api/my-pokemon/:
     get:
       operationId: my_pokemon_list
@@ -203,6 +330,34 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserPokemonDetail'
           description: ''
+  /api/my-pokemon/{id}/release/:
+    post:
+      operationId: my_pokemon_release_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - my-pokemon
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPokemonList'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserPokemonList'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserPokemonList'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/my-pokemon/{id}/team-slot/:
     patch:
       operationId: my_pokemon_team_slot_partial_update
@@ -233,6 +388,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserPokemonTeamUpdate'
+          description: ''
+  /api/my-pokemon/capture/:
+    post:
+      operationId: my_pokemon_capture_create
+      tags:
+      - my-pokemon
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPokemonCapture'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserPokemonCapture'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserPokemonCapture'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPokemonDetail'
           description: ''
   /api/my-pokemon/random-encounter/:
     get:
@@ -348,6 +529,16 @@ paths:
                       this, the REST API is working!
                   summary: Successful Response
           description: ''
+  /api/timeline/:
+    get:
+      operationId: timeline_retrieve
+      tags:
+      - timeline
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
   /api/users/:
     get:
       operationId: users_list
@@ -500,6 +691,48 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/users/{id}/calendar/:
+    get:
+      operationId: users_calendar_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/{id}/timeline/:
+    get:
+      operationId: users_timeline_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
   /api/users/login/:
     post:
       operationId: users_login_create
@@ -551,6 +784,30 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
           description: ''
+    patch:
+      operationId: users_me_partial_update
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
   /api/users/register/:
     post:
       operationId: users_register_create
@@ -577,6 +834,61 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/trainer-sprites/:
+    get:
+      operationId: users_trainer_sprites_retrieve
+      tags:
+      - users
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/weekly-goal/:
+    get:
+      operationId: weekly_goal_list
+      tags:
+      - weekly-goal
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WeeklyGoalStatus'
+          description: ''
+    post:
+      operationId: weekly_goal_create
+      tags:
+      - weekly-goal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveWeeklyGoal'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SaveWeeklyGoal'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SaveWeeklyGoal'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeeklyGoalStatus'
           description: ''
   /api/workouts/:
     get:
@@ -649,6 +961,82 @@ paths:
               schema:
                 $ref: '#/components/schemas/WorkoutDetail'
           description: ''
+    patch:
+      operationId: workouts_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - workouts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedWorkoutDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedWorkoutDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedWorkoutDetail'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutDetail'
+          description: ''
+    delete:
+      operationId: workouts_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - workouts
+      security:
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/workouts/{id}/decline-encounter/:
+    post:
+      operationId: workouts_decline_encounter_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - workouts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkoutDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WorkoutDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WorkoutDetail'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutDetail'
+          description: ''
   /api/workouts/{id}/exercises/:
     post:
       operationId: workouts_exercises_create
@@ -681,6 +1069,96 @@ paths:
               schema:
                 $ref: '#/components/schemas/WorkoutExerciseCreate'
           description: ''
+  /api/workouts/{id}/exercises/{entry_id}/:
+    patch:
+      operationId: workouts_exercises_partial_update
+      parameters:
+      - in: path
+        name: entry_id
+        schema:
+          type: string
+          pattern: ^[0-9]+$
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - workouts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedWorkoutExerciseUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedWorkoutExerciseUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedWorkoutExerciseUpdate'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutExercise'
+          description: ''
+    delete:
+      operationId: workouts_exercises_destroy
+      parameters:
+      - in: path
+        name: entry_id
+        schema:
+          type: string
+          pattern: ^[0-9]+$
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - workouts
+      security:
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/workouts/{id}/exercises/bulk/:
+    post:
+      operationId: workouts_exercises_bulk_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - workouts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkoutExerciseBulkCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WorkoutExerciseBulkCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WorkoutExerciseBulkCreate'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutExerciseBulkCreate'
+          description: ''
   /api/workouts/{id}/finish/:
     post:
       operationId: workouts_finish_create
@@ -710,7 +1188,96 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WorkoutFinish'
+                $ref: '#/components/schemas/WorkoutDetail'
+          description: ''
+  /api/workouts/{id}/proof/:
+    post:
+      operationId: workouts_proof_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - workouts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkoutProof'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WorkoutProof'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WorkoutProof'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutDetail'
+          description: ''
+  /api/workouts/active-draft/:
+    get:
+      operationId: workouts_active_draft_retrieve
+      tags:
+      - workouts
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutDetail'
+          description: ''
+  /api/workouts/calendar/:
+    get:
+      operationId: workouts_calendar_retrieve
+      tags:
+      - workouts
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/workouts/last-by-type/:
+    get:
+      operationId: workouts_last_by_type_retrieve
+      tags:
+      - workouts
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LastWorkoutByType'
+          description: ''
+  /api/workouts/pending-encounter/:
+    get:
+      operationId: workouts_pending_encounter_retrieve
+      tags:
+      - workouts
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingEncounter'
           description: ''
 components:
   schemas:
@@ -727,6 +1294,16 @@ components:
         * `beginner` - Beginner
         * `intermediate` - Intermediate
         * `advanced` - Advanced
+    EncounterStatusEnum:
+      enum:
+      - pending
+      - captured
+      - fled
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `captured` - Captured
+        * `fled` - Fled
     Exercise:
       type: object
       properties:
@@ -895,6 +1472,95 @@ components:
       - name
       - slug
       - video_url
+    FriendRequestCreate:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    Friendship:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        from_user:
+          allOf:
+          - $ref: '#/components/schemas/UserBrief'
+          readOnly: true
+        to_user:
+          allOf:
+          - $ref: '#/components/schemas/UserBrief'
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/FriendshipStatusEnum'
+          readOnly: true
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        modified:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created
+      - from_user
+      - id
+      - modified
+      - status
+      - to_user
+    FriendshipStatusEnum:
+      enum:
+      - pending
+      - accepted
+      - declined
+      - blocked
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `accepted` - Accepted
+        * `declined` - Declined
+        * `blocked` - Blocked
+    LastWorkoutByType:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        workout_type:
+          allOf:
+          - $ref: '#/components/schemas/WorkoutTypeEnum'
+          readOnly: true
+        ended_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        duration_minutes:
+          type: integer
+          readOnly: true
+          nullable: true
+        total_volume:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        exercises:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkoutExercise'
+          readOnly: true
+      required:
+      - duration_minutes
+      - ended_at
+      - exercises
+      - id
+      - total_volume
+      - workout_type
     Message:
       type: object
       properties:
@@ -1024,6 +1690,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PokemonSpecies'
+    PaginatedUserBriefList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserBrief'
     PaginatedUserList:
       type: object
       required:
@@ -1164,6 +1853,16 @@ components:
           type: string
           format: email
           maxLength: 255
+        display_name:
+          type: string
+          readOnly: true
+        trainer_sprite:
+          type: string
+          description: Slug do sprite de treinador (Pokémon Showdown).
+          maxLength: 128
+        trainer_sprite_url:
+          type: string
+          readOnly: true
         is_active:
           type: boolean
           description: Designates whether this user should be treated as active. Unselect
@@ -1201,6 +1900,124 @@ components:
           format: int64
           nullable: true
           description: Team position 1-6 when assigned to the active roster.
+    PatchedWorkoutDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        workout_type:
+          allOf:
+          - $ref: '#/components/schemas/WorkoutTypeEnum'
+          readOnly: true
+        started_at:
+          type: string
+          format: date-time
+          readOnly: true
+        ended_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        duration_minutes:
+          type: integer
+          readOnly: true
+          nullable: true
+        perceived_effort:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: Rate of perceived exertion from 1 to 10.
+        validation_type:
+          allOf:
+          - $ref: '#/components/schemas/ValidationTypeEnum'
+          readOnly: true
+        quality_score:
+          type: integer
+          readOnly: true
+        progress_score:
+          type: integer
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status31eEnum'
+          readOnly: true
+        encounter_status:
+          allOf:
+          - $ref: '#/components/schemas/EncounterStatusEnum'
+          readOnly: true
+        encounter_species:
+          allOf:
+          - $ref: '#/components/schemas/PokemonSpecies'
+          readOnly: true
+          nullable: true
+        weekly_goal_reward:
+          type: boolean
+          readOnly: true
+          description: Encontro lendário/ultra raro por bater a meta semanal neste
+            treino.
+        proof_photo_url:
+          type: string
+          readOnly: true
+        proof_caption:
+          type: string
+          readOnly: true
+        proof_uploaded_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        exercises:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkoutExercise'
+          readOnly: true
+        total_volume:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        modified:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedWorkoutExerciseUpdate:
+      type: object
+      properties:
+        sets:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        reps:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        weight:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        is_pr:
+          type: boolean
+    PendingEncounter:
+      type: object
+      properties:
+        workout_id:
+          type: integer
+        encounter_status:
+          type: string
+        species:
+          type: string
+          readOnly: true
+      required:
+      - encounter_status
+      - species
+      - workout_id
     PokemonIV:
       type: object
       properties:
@@ -1322,7 +2139,16 @@ components:
         * `rare` - Rare
         * `super_rare` - Super Rare
         * `legendary` - Legendary
-    StatusEnum:
+    SaveWeeklyGoal:
+      type: object
+      properties:
+        target:
+          type: integer
+          maximum: 7
+          minimum: 1
+      required:
+      - target
+    Status31eEnum:
       enum:
       - draft
       - finished
@@ -1422,6 +2248,16 @@ components:
           type: string
           format: email
           maxLength: 255
+        display_name:
+          type: string
+          readOnly: true
+        trainer_sprite:
+          type: string
+          description: Slug do sprite de treinador (Pokémon Showdown).
+          maxLength: 128
+        trainer_sprite_url:
+          type: string
+          readOnly: true
         is_active:
           type: boolean
           description: Designates whether this user should be treated as active. Unselect
@@ -1451,12 +2287,56 @@ components:
           nullable: true
       required:
       - created
+      - display_name
       - email
       - id
       - is_staff
       - is_superuser
       - last_login
       - modified
+      - trainer_sprite_url
+    UserBrief:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        display_name:
+          type: string
+          readOnly: true
+        trainer_sprite:
+          type: string
+          readOnly: true
+          description: Slug do sprite de treinador (Pokémon Showdown).
+        trainer_sprite_url:
+          type: string
+          readOnly: true
+      required:
+      - display_name
+      - email
+      - id
+      - trainer_sprite
+      - trainer_sprite_url
+    UserPokemonCapture:
+      type: object
+      properties:
+        species_id:
+          type: integer
+        nickname:
+          type: string
+          default: ''
+        shiny:
+          type: boolean
+          default: false
+        source_workout_id:
+          type: integer
+      required:
+      - source_workout_id
+      - species_id
     UserPokemonDetail:
       type: object
       properties:
@@ -1583,15 +2463,73 @@ components:
     ValidationTypeEnum:
       enum:
       - manual
+      - photo
       - health_app
       - location
       - wearable_location
       type: string
       description: |-
         * `manual` - Manual
+        * `photo` - Photo proof
         * `health_app` - Health app
         * `location` - Location
         * `wearable_location` - Wearable + location
+    WeeklyGoalStatus:
+      type: object
+      properties:
+        has_active_goal:
+          type: boolean
+        target:
+          type: integer
+          nullable: true
+        suggested_target:
+          type: integer
+        current:
+          type: integer
+        hp_current:
+          type: integer
+        hp_max:
+          type: integer
+        week_start:
+          type: string
+          format: date
+        week_end:
+          type: string
+          format: date
+        iso_year:
+          type: integer
+        iso_week:
+          type: integer
+        progress_percent:
+          type: integer
+        goal_met:
+          type: boolean
+        reward_claimed:
+          type: boolean
+        reward_workout_id:
+          type: integer
+          nullable: true
+        pending_legendary_encounter:
+          type: boolean
+        goal_locked:
+          type: boolean
+      required:
+      - current
+      - goal_locked
+      - goal_met
+      - has_active_goal
+      - hp_current
+      - hp_max
+      - iso_week
+      - iso_year
+      - pending_legendary_encounter
+      - progress_percent
+      - reward_claimed
+      - reward_workout_id
+      - suggested_target
+      - target
+      - week_end
+      - week_start
     WorkoutCreate:
       type: object
       properties:
@@ -1613,7 +2551,7 @@ components:
           $ref: '#/components/schemas/ValidationTypeEnum'
         status:
           allOf:
-          - $ref: '#/components/schemas/StatusEnum'
+          - $ref: '#/components/schemas/Status31eEnum'
           readOnly: true
         created:
           type: string
@@ -1668,8 +2606,33 @@ components:
           readOnly: true
         status:
           allOf:
-          - $ref: '#/components/schemas/StatusEnum'
+          - $ref: '#/components/schemas/Status31eEnum'
           readOnly: true
+        encounter_status:
+          allOf:
+          - $ref: '#/components/schemas/EncounterStatusEnum'
+          readOnly: true
+        encounter_species:
+          allOf:
+          - $ref: '#/components/schemas/PokemonSpecies'
+          readOnly: true
+          nullable: true
+        weekly_goal_reward:
+          type: boolean
+          readOnly: true
+          description: Encontro lendário/ultra raro por bater a meta semanal neste
+            treino.
+        proof_photo_url:
+          type: string
+          readOnly: true
+        proof_caption:
+          type: string
+          readOnly: true
+        proof_uploaded_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
         exercises:
           type: array
           items:
@@ -1691,17 +2654,23 @@ components:
       required:
       - created
       - duration_minutes
+      - encounter_species
+      - encounter_status
       - ended_at
       - exercises
       - id
       - modified
       - perceived_effort
       - progress_score
+      - proof_caption
+      - proof_photo_url
+      - proof_uploaded_at
       - quality_score
       - started_at
       - status
       - total_volume
       - validation_type
+      - weekly_goal_reward
       - workout_type
     WorkoutExercise:
       type: object
@@ -1755,6 +2724,37 @@ components:
       - reps
       - sets
       - volume
+    WorkoutExerciseBulkCreate:
+      type: object
+      properties:
+        exercises:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkoutExerciseBulkItem'
+      required:
+      - exercises
+    WorkoutExerciseBulkItem:
+      type: object
+      properties:
+        exercise:
+          type: integer
+        sets:
+          type: integer
+          maximum: 99
+          minimum: 1
+        reps:
+          type: integer
+          maximum: 999
+          minimum: 1
+        weight:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+      required:
+      - exercise
+      - reps
+      - sets
+      - weight
     WorkoutExerciseCreate:
       type: object
       properties:
@@ -1853,7 +2853,7 @@ components:
           readOnly: true
         status:
           allOf:
-          - $ref: '#/components/schemas/StatusEnum'
+          - $ref: '#/components/schemas/Status31eEnum'
           readOnly: true
         exercise_count:
           type: integer
@@ -1886,6 +2886,18 @@ components:
       - total_volume
       - validation_type
       - workout_type
+    WorkoutProof:
+      type: object
+      properties:
+        photo:
+          type: string
+          format: uri
+        caption:
+          type: string
+          default: ''
+          maxLength: 140
+      required:
+      - photo
     WorkoutTypeEnum:
       enum:
       - chest_triceps

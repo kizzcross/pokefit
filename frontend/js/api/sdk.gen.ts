@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ExercisesCreateData, ExercisesCreateResponses, ExercisesDestroyData, ExercisesDestroyResponses, ExercisesListData, ExercisesListResponses, ExercisesPartialUpdateData, ExercisesPartialUpdateResponses, ExercisesRetrieveData, ExercisesRetrieveResponses, ExercisesUpdateData, ExercisesUpdateResponses, MyPokemonListData, MyPokemonListResponses, MyPokemonRandomEncounterRetrieveData, MyPokemonRandomEncounterRetrieveResponses, MyPokemonRetrieveData, MyPokemonRetrieveResponses, MyPokemonTeamListData, MyPokemonTeamListResponses, MyPokemonTeamSlotPartialUpdateData, MyPokemonTeamSlotPartialUpdateResponses, PokemonSpeciesListData, PokemonSpeciesListResponses, PokemonSpeciesRetrieveData, PokemonSpeciesRetrieveResponses, RestRestCheckRetrieveData, RestRestCheckRetrieveResponses, UsersCreateData, UsersCreateResponses, UsersDestroyData, UsersDestroyResponses, UsersListData, UsersListResponses, UsersLoginCreateData, UsersLoginCreateResponses, UsersLogoutCreateData, UsersLogoutCreateResponses, UsersMeRetrieveData, UsersMeRetrieveResponses, UsersPartialUpdateData, UsersPartialUpdateResponses, UsersRegisterCreateData, UsersRegisterCreateResponses, UsersRetrieveData, UsersRetrieveResponses, UsersUpdateData, UsersUpdateResponses, WorkoutsCreateData, WorkoutsCreateResponses, WorkoutsExercisesCreateData, WorkoutsExercisesCreateResponses, WorkoutsFinishCreateData, WorkoutsFinishCreateResponses, WorkoutsListData, WorkoutsListResponses, WorkoutsRetrieveData, WorkoutsRetrieveResponses } from './types.gen';
+import type { ExercisesCreateData, ExercisesCreateResponses, ExercisesDestroyData, ExercisesDestroyResponses, ExercisesListData, ExercisesListResponses, ExercisesPartialUpdateData, ExercisesPartialUpdateResponses, ExercisesRetrieveData, ExercisesRetrieveResponses, ExercisesUpdateData, ExercisesUpdateResponses, FriendsAcceptCreateData, FriendsAcceptCreateResponses, FriendsBlockCreateData, FriendsBlockCreateResponses, FriendsDeclineCreateData, FriendsDeclineCreateResponses, FriendsListListData, FriendsListListResponses, FriendsRemoveDestroyData, FriendsRemoveDestroyResponses, FriendsRequestsRetrieveData, FriendsRequestsRetrieveResponses, FriendsRequestsSendCreateData, FriendsRequestsSendCreateResponses, MyPokemonCaptureCreateData, MyPokemonCaptureCreateResponses, MyPokemonListData, MyPokemonListResponses, MyPokemonRandomEncounterRetrieveData, MyPokemonRandomEncounterRetrieveResponses, MyPokemonReleaseCreateData, MyPokemonReleaseCreateResponses, MyPokemonRetrieveData, MyPokemonRetrieveResponses, MyPokemonTeamListData, MyPokemonTeamListResponses, MyPokemonTeamSlotPartialUpdateData, MyPokemonTeamSlotPartialUpdateResponses, PokemonSpeciesListData, PokemonSpeciesListResponses, PokemonSpeciesRetrieveData, PokemonSpeciesRetrieveResponses, RestRestCheckRetrieveData, RestRestCheckRetrieveResponses, TimelineRetrieveData, TimelineRetrieveResponses, UsersCalendarRetrieveData, UsersCalendarRetrieveResponses, UsersCreateData, UsersCreateResponses, UsersDestroyData, UsersDestroyResponses, UsersListData, UsersListResponses, UsersLoginCreateData, UsersLoginCreateResponses, UsersLogoutCreateData, UsersLogoutCreateResponses, UsersMePartialUpdateData, UsersMePartialUpdateResponses, UsersMeRetrieveData, UsersMeRetrieveResponses, UsersPartialUpdateData, UsersPartialUpdateResponses, UsersRegisterCreateData, UsersRegisterCreateResponses, UsersRetrieveData, UsersRetrieveResponses, UsersTimelineRetrieveData, UsersTimelineRetrieveResponses, UsersTrainerSpritesRetrieveData, UsersTrainerSpritesRetrieveResponses, UsersUpdateData, UsersUpdateResponses, WeeklyGoalCreateData, WeeklyGoalCreateResponses, WeeklyGoalListData, WeeklyGoalListResponses, WorkoutsActiveDraftRetrieveData, WorkoutsActiveDraftRetrieveResponses, WorkoutsCalendarRetrieveData, WorkoutsCalendarRetrieveResponses, WorkoutsCreateData, WorkoutsCreateResponses, WorkoutsDeclineEncounterCreateData, WorkoutsDeclineEncounterCreateResponses, WorkoutsDestroyData, WorkoutsDestroyResponses, WorkoutsExercisesBulkCreateData, WorkoutsExercisesBulkCreateResponses, WorkoutsExercisesCreateData, WorkoutsExercisesCreateResponses, WorkoutsExercisesDestroyData, WorkoutsExercisesDestroyResponses, WorkoutsExercisesPartialUpdateData, WorkoutsExercisesPartialUpdateResponses, WorkoutsFinishCreateData, WorkoutsFinishCreateResponses, WorkoutsLastByTypeRetrieveData, WorkoutsLastByTypeRetrieveResponses, WorkoutsListData, WorkoutsListResponses, WorkoutsPartialUpdateData, WorkoutsPartialUpdateResponses, WorkoutsPendingEncounterRetrieveData, WorkoutsPendingEncounterRetrieveResponses, WorkoutsProofCreateData, WorkoutsProofCreateResponses, WorkoutsRetrieveData, WorkoutsRetrieveResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -119,6 +119,110 @@ export const exercisesUpdate = <ThrowOnError extends boolean = false>(options: O
     });
 };
 
+export const friendsAcceptCreate = <ThrowOnError extends boolean = false>(options: Options<FriendsAcceptCreateData, ThrowOnError>) => {
+    return (options.client ?? client).post<FriendsAcceptCreateResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/friends/{id}/accept/',
+        ...options
+    });
+};
+
+export const friendsBlockCreate = <ThrowOnError extends boolean = false>(options: Options<FriendsBlockCreateData, ThrowOnError>) => {
+    return (options.client ?? client).post<FriendsBlockCreateResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/friends/{id}/block/',
+        ...options
+    });
+};
+
+export const friendsDeclineCreate = <ThrowOnError extends boolean = false>(options: Options<FriendsDeclineCreateData, ThrowOnError>) => {
+    return (options.client ?? client).post<FriendsDeclineCreateResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/friends/{id}/decline/',
+        ...options
+    });
+};
+
+export const friendsRemoveDestroy = <ThrowOnError extends boolean = false>(options: Options<FriendsRemoveDestroyData, ThrowOnError>) => {
+    return (options.client ?? client).delete<FriendsRemoveDestroyResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/friends/{id}/remove/',
+        ...options
+    });
+};
+
+export const friendsListList = <ThrowOnError extends boolean = false>(options?: Options<FriendsListListData, ThrowOnError>) => {
+    return (options?.client ?? client).get<FriendsListListResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/friends/list/',
+        ...options
+    });
+};
+
+export const friendsRequestsRetrieve = <ThrowOnError extends boolean = false>(options?: Options<FriendsRequestsRetrieveData, ThrowOnError>) => {
+    return (options?.client ?? client).get<FriendsRequestsRetrieveResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/friends/requests/',
+        ...options
+    });
+};
+
+export const friendsRequestsSendCreate = <ThrowOnError extends boolean = false>(options: Options<FriendsRequestsSendCreateData, ThrowOnError>) => {
+    return (options.client ?? client).post<FriendsRequestsSendCreateResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/friends/requests/send/',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
 export const myPokemonList = <ThrowOnError extends boolean = false>(options?: Options<MyPokemonListData, ThrowOnError>) => {
     return (options?.client ?? client).get<MyPokemonListResponses, unknown, ThrowOnError>({
         responseType: 'json',
@@ -149,6 +253,24 @@ export const myPokemonRetrieve = <ThrowOnError extends boolean = false>(options:
     });
 };
 
+export const myPokemonReleaseCreate = <ThrowOnError extends boolean = false>(options: Options<MyPokemonReleaseCreateData, ThrowOnError>) => {
+    return (options.client ?? client).post<MyPokemonReleaseCreateResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/my-pokemon/{id}/release/',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
 export const myPokemonTeamSlotPartialUpdate = <ThrowOnError extends boolean = false>(options: Options<MyPokemonTeamSlotPartialUpdateData, ThrowOnError>) => {
     return (options.client ?? client).patch<MyPokemonTeamSlotPartialUpdateResponses, unknown, ThrowOnError>({
         responseType: 'json',
@@ -160,6 +282,25 @@ export const myPokemonTeamSlotPartialUpdate = <ThrowOnError extends boolean = fa
             }
         ],
         url: '/api/my-pokemon/{id}/team-slot/',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const myPokemonCaptureCreate = <ThrowOnError extends boolean = false>(options: Options<MyPokemonCaptureCreateData, ThrowOnError>) => {
+    return (options.client ?? client).post<MyPokemonCaptureCreateResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/my-pokemon/capture/',
         ...options,
         headers: {
             'Content-Type': 'application/json',
@@ -244,6 +385,20 @@ export const restRestCheckRetrieve = <ThrowOnError extends boolean = false>(opti
             }
         ],
         url: '/api/rest/rest-check/',
+        ...options
+    });
+};
+
+export const timelineRetrieve = <ThrowOnError extends boolean = false>(options?: Options<TimelineRetrieveData, ThrowOnError>) => {
+    return (options?.client ?? client).get<TimelineRetrieveResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/timeline/',
         ...options
     });
 };
@@ -349,6 +504,36 @@ export const usersUpdate = <ThrowOnError extends boolean = false>(options: Optio
     });
 };
 
+export const usersCalendarRetrieve = <ThrowOnError extends boolean = false>(options: Options<UsersCalendarRetrieveData, ThrowOnError>) => {
+    return (options.client ?? client).get<UsersCalendarRetrieveResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/users/{id}/calendar/',
+        ...options
+    });
+};
+
+export const usersTimelineRetrieve = <ThrowOnError extends boolean = false>(options: Options<UsersTimelineRetrieveData, ThrowOnError>) => {
+    return (options.client ?? client).get<UsersTimelineRetrieveResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/users/{id}/timeline/',
+        ...options
+    });
+};
+
 export const usersLoginCreate = <ThrowOnError extends boolean = false>(options: Options<UsersLoginCreateData, ThrowOnError>) => {
     return (options.client ?? client).post<UsersLoginCreateResponses, unknown, ThrowOnError>({
         responseType: 'json',
@@ -397,6 +582,25 @@ export const usersMeRetrieve = <ThrowOnError extends boolean = false>(options?: 
     });
 };
 
+export const usersMePartialUpdate = <ThrowOnError extends boolean = false>(options?: Options<UsersMePartialUpdateData, ThrowOnError>) => {
+    return (options?.client ?? client).patch<UsersMePartialUpdateResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/users/me/',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options?.headers
+        }
+    });
+};
+
 export const usersRegisterCreate = <ThrowOnError extends boolean = false>(options: Options<UsersRegisterCreateData, ThrowOnError>) => {
     return (options.client ?? client).post<UsersRegisterCreateResponses, unknown, ThrowOnError>({
         responseType: 'json',
@@ -408,6 +612,55 @@ export const usersRegisterCreate = <ThrowOnError extends boolean = false>(option
             }
         ],
         url: '/api/users/register/',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const usersTrainerSpritesRetrieve = <ThrowOnError extends boolean = false>(options?: Options<UsersTrainerSpritesRetrieveData, ThrowOnError>) => {
+    return (options?.client ?? client).get<UsersTrainerSpritesRetrieveResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/users/trainer-sprites/',
+        ...options
+    });
+};
+
+export const weeklyGoalList = <ThrowOnError extends boolean = false>(options?: Options<WeeklyGoalListData, ThrowOnError>) => {
+    return (options?.client ?? client).get<WeeklyGoalListResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/weekly-goal/',
+        ...options
+    });
+};
+
+export const weeklyGoalCreate = <ThrowOnError extends boolean = false>(options: Options<WeeklyGoalCreateData, ThrowOnError>) => {
+    return (options.client ?? client).post<WeeklyGoalCreateResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/weekly-goal/',
         ...options,
         headers: {
             'Content-Type': 'application/json',
@@ -450,6 +703,20 @@ export const workoutsCreate = <ThrowOnError extends boolean = false>(options?: O
     });
 };
 
+export const workoutsDestroy = <ThrowOnError extends boolean = false>(options: Options<WorkoutsDestroyData, ThrowOnError>) => {
+    return (options.client ?? client).delete<WorkoutsDestroyResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/workouts/{id}/',
+        ...options
+    });
+};
+
 export const workoutsRetrieve = <ThrowOnError extends boolean = false>(options: Options<WorkoutsRetrieveData, ThrowOnError>) => {
     return (options.client ?? client).get<WorkoutsRetrieveResponses, unknown, ThrowOnError>({
         responseType: 'json',
@@ -465,6 +732,44 @@ export const workoutsRetrieve = <ThrowOnError extends boolean = false>(options: 
     });
 };
 
+export const workoutsPartialUpdate = <ThrowOnError extends boolean = false>(options: Options<WorkoutsPartialUpdateData, ThrowOnError>) => {
+    return (options.client ?? client).patch<WorkoutsPartialUpdateResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/workouts/{id}/',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const workoutsDeclineEncounterCreate = <ThrowOnError extends boolean = false>(options: Options<WorkoutsDeclineEncounterCreateData, ThrowOnError>) => {
+    return (options.client ?? client).post<WorkoutsDeclineEncounterCreateResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/workouts/{id}/decline-encounter/',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
 export const workoutsExercisesCreate = <ThrowOnError extends boolean = false>(options: Options<WorkoutsExercisesCreateData, ThrowOnError>) => {
     return (options.client ?? client).post<WorkoutsExercisesCreateResponses, unknown, ThrowOnError>({
         responseType: 'json',
@@ -476,6 +781,58 @@ export const workoutsExercisesCreate = <ThrowOnError extends boolean = false>(op
             }
         ],
         url: '/api/workouts/{id}/exercises/',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const workoutsExercisesDestroy = <ThrowOnError extends boolean = false>(options: Options<WorkoutsExercisesDestroyData, ThrowOnError>) => {
+    return (options.client ?? client).delete<WorkoutsExercisesDestroyResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/workouts/{id}/exercises/{entry_id}/',
+        ...options
+    });
+};
+
+export const workoutsExercisesPartialUpdate = <ThrowOnError extends boolean = false>(options: Options<WorkoutsExercisesPartialUpdateData, ThrowOnError>) => {
+    return (options.client ?? client).patch<WorkoutsExercisesPartialUpdateResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/workouts/{id}/exercises/{entry_id}/',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const workoutsExercisesBulkCreate = <ThrowOnError extends boolean = false>(options: Options<WorkoutsExercisesBulkCreateData, ThrowOnError>) => {
+    return (options.client ?? client).post<WorkoutsExercisesBulkCreateResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/workouts/{id}/exercises/bulk/',
         ...options,
         headers: {
             'Content-Type': 'application/json',
@@ -500,5 +857,84 @@ export const workoutsFinishCreate = <ThrowOnError extends boolean = false>(optio
             'Content-Type': 'application/json',
             ...options.headers
         }
+    });
+};
+
+export const workoutsProofCreate = <ThrowOnError extends boolean = false>(options: Options<WorkoutsProofCreateData, ThrowOnError>) => {
+    return (options.client ?? client).post<WorkoutsProofCreateResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/workouts/{id}/proof/',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const workoutsActiveDraftRetrieve = <ThrowOnError extends boolean = false>(options?: Options<WorkoutsActiveDraftRetrieveData, ThrowOnError>) => {
+    return (options?.client ?? client).get<WorkoutsActiveDraftRetrieveResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/workouts/active-draft/',
+        ...options
+    });
+};
+
+export const workoutsCalendarRetrieve = <ThrowOnError extends boolean = false>(options?: Options<WorkoutsCalendarRetrieveData, ThrowOnError>) => {
+    return (options?.client ?? client).get<WorkoutsCalendarRetrieveResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/workouts/calendar/',
+        ...options
+    });
+};
+
+export const workoutsLastByTypeRetrieve = <ThrowOnError extends boolean = false>(options?: Options<WorkoutsLastByTypeRetrieveData, ThrowOnError>) => {
+    return (options?.client ?? client).get<WorkoutsLastByTypeRetrieveResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/workouts/last-by-type/',
+        ...options
+    });
+};
+
+export const workoutsPendingEncounterRetrieve = <ThrowOnError extends boolean = false>(options?: Options<WorkoutsPendingEncounterRetrieveData, ThrowOnError>) => {
+    return (options?.client ?? client).get<WorkoutsPendingEncounterRetrieveResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/workouts/pending-encounter/',
+        ...options
     });
 };

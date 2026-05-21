@@ -19,7 +19,7 @@ const ExerciseEditPage = () => {
 
   const { data: exercise, isPending, isError } = useQuery({
     queryKey: ['exercises', exerciseId],
-    queryFn: async () => (await exercisesRetrieve({ path: { id: String(exerciseId) } })).data,
+    queryFn: async () => (await exercisesRetrieve({ path: { id: exerciseId } })).data,
     enabled: Number.isFinite(exerciseId),
   });
 

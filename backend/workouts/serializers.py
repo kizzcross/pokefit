@@ -2,6 +2,8 @@ from rest_framework import serializers
 
 from django.utils import timezone
 
+from pokemon.serializers import PokemonSpeciesSerializer
+
 from .choices import ValidationType, WorkoutStatus
 from .models import EXERCISE_IMAGE_MAX_SIZE_BYTES, Exercise, Workout, WorkoutExercise
 
@@ -139,7 +141,7 @@ class WorkoutListSerializer(serializers.ModelSerializer):
 class WorkoutDetailSerializer(serializers.ModelSerializer):
     exercises = WorkoutExerciseSerializer(many=True, read_only=True)
     total_volume = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
-    encounter_species = serializers.SerializerMethodField()
+    encounter_species = PokemonSpeciesSerializer(read_only=True, allow_null=True)
 
     class Meta:
         model = Workout
@@ -176,17 +178,6 @@ class WorkoutDetailSerializer(serializers.ModelSerializer):
         if request is not None:
             return request.build_absolute_uri(obj.proof_photo.url)
         return obj.proof_photo.url
-
-    def get_encounter_species(self, obj):
-        if not obj.encounter_species_id:
-            return None
-        from pokemon.serializers import PokemonSpeciesSerializer
-
-        return PokemonSpeciesSerializer(
-            obj.encounter_species,
-            context=self.context,
-        ).data
-
 
 class PendingEncounterSerializer(serializers.Serializer):
     workout_id = serializers.IntegerField(source="id")
