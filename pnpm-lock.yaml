@@ -35,6 +35,9 @@ importers:
       '@sentry/utils':
         specifier: ^8.55.0
         version: 8.55.0
+      '@tanstack/query-core':
+        specifier: ^5.90.2
+        version: 5.100.11
       '@tanstack/react-query':
         specifier: ^5.90.2
         version: 5.100.11(react@19.2.0)

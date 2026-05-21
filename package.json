@@ -44,6 +44,7 @@
     "scheduler": "^0.27.0",
     "set-cookie-parser": "^2.7.1",
     "@hookform/resolvers": "^5.0.1",
+    "@tanstack/query-core": "^5.90.2",
     "@tanstack/react-query": "^5.90.2",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.24",
