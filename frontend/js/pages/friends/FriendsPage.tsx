@@ -9,6 +9,7 @@ import PixelButton from '@/js/components/ui/PixelButton';
 import { PageLoading, QueryRefetchBar } from '@/js/components/ui/GameLoading';
 import PixelCard from '@/js/components/ui/PixelCard';
 import { mergeQueryState } from '@/js/hooks/useQueryLoading';
+import { getApiErrorMessage } from '@/js/lib/api-errors';
 import {
   acceptFriendRequest,
   declineFriendRequest,
@@ -20,7 +21,7 @@ import {
 
 const FriendsPage = () => {
   const queryClient = useQueryClient();
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const friendsQuery = useQuery({
@@ -34,13 +35,14 @@ const FriendsPage = () => {
   });
 
   const sendMutation = useMutation({
-    mutationFn: () => sendFriendRequest(email.trim()),
+    mutationFn: () => sendFriendRequest(identifier.trim()),
     onSuccess: () => {
-      setEmail('');
+      setIdentifier('');
       setError(null);
       queryClient.invalidateQueries({ queryKey: ['friends'] });
     },
-    onError: () => setError('Não foi possível enviar. Confira o e-mail.'),
+    onError: (err) =>
+      setError(getApiErrorMessage(err, 'Não foi possível enviar. Confira o e-mail ou nickname.')),
   });
 
   const acceptMutation = useMutation({
@@ -75,17 +77,20 @@ const FriendsPage = () => {
         <>
         <PixelCard className="space-y-3 border-[var(--color-game-info)]">
           <h2 className="text-game-title text-[var(--color-game-info)]">Adicionar amigo</h2>
-          <p className="text-xs text-[var(--color-game-muted)]">Envie pedido pelo e-mail da conta.</p>
+          <p className="text-xs text-[var(--color-game-muted)]">
+            E-mail da conta ou nickname (ex: kizz_cross).
+          </p>
           <input
+            autoComplete="off"
             className="w-full rounded-sm border-4 border-[var(--color-game-border)] bg-[var(--color-game-bg)] px-3 py-2 text-sm"
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="email@exemplo.com"
-            type="email"
-            value={email}
+            onChange={(e) => setIdentifier(e.target.value)}
+            placeholder="email@exemplo.com ou nickname"
+            type="text"
+            value={identifier}
           />
           {error ? <p className="text-sm text-[var(--color-game-danger)]">{error}</p> : null}
           <PixelButton
-            disabled={!email.trim() || sendMutation.isPending}
+            disabled={!identifier.trim() || sendMutation.isPending}
             fullWidth
             onClick={() => sendMutation.mutate()}
           >

@@ -3,6 +3,8 @@ from rest_framework import serializers
 
 from social.choices import FriendshipStatus
 from social.models import Friendship, MAX_FRIENDS
+from users.nicknames import resolve_user_by_identifier
+
 from social.services.friends import can_send_friend_request, display_name
 
 User = get_user_model()
@@ -14,7 +16,7 @@ class UserBriefSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("id", "email", "display_name", "trainer_sprite", "trainer_sprite_url")
+        fields = ("id", "email", "nickname", "display_name", "trainer_sprite", "trainer_sprite_url")
         read_only_fields = fields
 
     def get_display_name(self, obj):
@@ -84,38 +86,50 @@ class TimelineFeedSerializer(serializers.Serializer):
 
 
 class FriendRequestCreateSerializer(serializers.Serializer):
-    email = serializers.EmailField()
+    """E-mail ou nickname: use `identifier` ou o campo legado `email`."""
 
-    def validate_email(self, value):
-        email = value.strip().lower()
+    email = serializers.CharField(required=False, allow_blank=True)
+    identifier = serializers.CharField(required=False, allow_blank=True)
+
+    def validate(self, attrs):
+        raw = (attrs.get("identifier") or attrs.get("email") or "").strip()
+        if not raw:
+            raise serializers.ValidationError(
+                {"identifier": "Informe o e-mail ou nickname do amigo."}
+            )
+
         try:
-            target = User.objects.get(email__iexact=email)
-        except User.DoesNotExist:
-            raise serializers.ValidationError("Usuário não encontrado com este e-mail.") from None
+            target = resolve_user_by_identifier(raw)
+        except ValueError as exc:
+            field = "email" if "@" in raw else "identifier"
+            raise serializers.ValidationError({field: str(exc)}) from exc
 
         requester = self.context["request"].user
         if target.pk == requester.pk:
-            raise serializers.ValidationError("Você não pode adicionar a si mesmo.")
+            raise serializers.ValidationError(
+                {"identifier": "Você não pode adicionar a si mesmo."}
+            )
 
         if Friendship.objects.filter(
             from_user=target,
             to_user=requester,
             status=FriendshipStatus.BLOCKED,
         ).exists():
-            raise serializers.ValidationError("Não foi possível enviar o pedido.")
+            raise serializers.ValidationError(
+                {"identifier": "Não foi possível enviar o pedido."}
+            )
 
-        self.context["target_user"] = target
-        return email
-
-    def validate(self, attrs):
-        requester = self.context["request"].user
         if not can_send_friend_request(requester):
-            raise serializers.ValidationError(f"Limite de {MAX_FRIENDS} amigos atingido.")
+            raise serializers.ValidationError(
+                {"identifier": f"Limite de {MAX_FRIENDS} amigos atingido."}
+            )
+
+        attrs["target_user"] = target
         return attrs
 
     def create(self, validated_data):
         requester = self.context["request"].user
-        target = self.context["target_user"]
+        target = validated_data["target_user"]
 
         existing = Friendship.objects.filter(from_user=requester, to_user=target).first()
         if existing:

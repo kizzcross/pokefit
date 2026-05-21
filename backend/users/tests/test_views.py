@@ -1,3 +1,5 @@
+import uuid
+
 from django.urls import reverse
 
 from common.utils.tests import TestCaseUtils
@@ -7,9 +9,14 @@ from rest_framework.test import APITestCase
 from ..models import User
 
 
+def _nickname() -> str:
+    return f"u{uuid.uuid4().hex[:10]}"
+
+
 class UserViewSetTest(TestCaseUtils, APITestCase):
     def test_list_users(self):
-        baker.make(User, _fill_optional=True, _quantity=5)
+        for _ in range(5):
+            baker.make(User, nickname=_nickname(), _fill_optional=True)
 
         response = self.auth_client.get(reverse("user-list"))
 
@@ -20,7 +27,8 @@ class UserViewSetTest(TestCaseUtils, APITestCase):
 
     def test_create_user(self):
         data = {
-            "email": "testuser@test.com",
+            "email": f"testuser-{_nickname()}@test.com",
+            "nickname": _nickname(),
             "password": "12345678",
         }
 
@@ -31,7 +39,7 @@ class UserViewSetTest(TestCaseUtils, APITestCase):
         self.assertEqual(user.email, data["email"])
 
     def test_retrieve_user(self):
-        user = baker.make(User, _fill_optional=True)
+        user = baker.make(User, nickname=_nickname(), _fill_optional=True)
 
         response = self.auth_client.get(reverse("user-detail", args=[user.id]))
 
@@ -40,9 +48,10 @@ class UserViewSetTest(TestCaseUtils, APITestCase):
         self.assertEqual(response.data["email"], user.email)
 
     def test_put_update_user(self):
-        user = baker.make(User, email="testuser@test.com", _fill_optional=True)
+        user = baker.make(User, email="testuser@test.com", nickname="testuser01", _fill_optional=True)
         data = {
             "email": "user@test.com",
+            "nickname": "usertest01",
             "password": "87654321",
         }
 
@@ -55,9 +64,10 @@ class UserViewSetTest(TestCaseUtils, APITestCase):
         self.assertEqual(user.email, data["email"])
 
     def test_patch_update_user(self):
-        user = baker.make(User, email="testuser@test.com", _fill_optional=True)
+        user = baker.make(User, email="testuser@test.com", nickname="testuser02", _fill_optional=True)
         data = {
             "email": "user@test.com",
+            "nickname": "usertest02",
         }
 
         response = self.auth_client.patch(
@@ -69,9 +79,38 @@ class UserViewSetTest(TestCaseUtils, APITestCase):
         self.assertEqual(user.email, data["email"])
 
     def test_delete_user(self):
-        user = baker.make(User, _fill_optional=True)
+        user = baker.make(User, nickname=_nickname(), _fill_optional=True)
 
         response = self.auth_client.delete(reverse("user-detail", args=[user.id]))
 
         self.assertResponse204(response)
         self.assertFalse(User.objects.filter(id=user.id).exists())
+
+    def test_patch_me_updates_nickname(self):
+        old_nick = _nickname()
+        new_nick = _nickname()
+        self.user.nickname = old_nick
+        self.user.save(update_fields=["nickname"])
+
+        response = self.auth_client.patch(
+            reverse("user-me"),
+            data={"nickname": new_nick},
+        )
+
+        self.assertResponse200(response)
+        self.assertEqual(response.data["nickname"], new_nick)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.nickname, new_nick)
+
+    def test_patch_me_rejects_taken_nickname(self):
+        taken = _nickname()
+        baker.make(User, nickname=taken, _fill_optional=True)
+
+        response = self.auth_client.patch(
+            reverse("user-me"),
+            data={"nickname": taken},
+        )
+
+        self.assertResponse400(response)
+        self.user.refresh_from_db()
+        self.assertNotEqual(self.user.nickname, taken)

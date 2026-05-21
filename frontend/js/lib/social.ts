@@ -3,6 +3,7 @@ import { client } from '@/js/lib/api';
 export type UserBrief = {
   id: number;
   email: string;
+  nickname: string;
   display_name: string;
   trainer_sprite?: string;
   trainer_sprite_url?: string | null;
@@ -29,8 +30,11 @@ export async function fetchFriendRequests() {
   return response.data;
 }
 
-export async function sendFriendRequest(email: string) {
-  const response = await client.instance.post<Friendship>('/api/friends/requests/send/', { email });
+export async function sendFriendRequest(identifier: string) {
+  const trimmed = identifier.trim();
+  const body =
+    trimmed.includes('@') ? { email: trimmed, identifier: trimmed } : { identifier: trimmed };
+  const response = await client.instance.post<Friendship>('/api/friends/requests/send/', body);
   return response.data;
 }
 

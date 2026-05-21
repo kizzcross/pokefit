@@ -8,6 +8,9 @@ User = get_user_model()
 
 
 def display_name(user) -> str:
+    nickname = getattr(user, "nickname", None) or ""
+    if nickname:
+        return nickname
     email = user.email or ""
     return email.split("@")[0] if "@" in email else email or f"Treinador {user.pk}"
 
@@ -17,6 +20,7 @@ def user_public_profile(user, *, include_email: bool = False) -> dict:
 
     payload = {
         "id": user.pk,
+        "nickname": getattr(user, "nickname", "") or display_name(user),
         "display_name": display_name(user),
         "trainer_sprite": trainer_sprite_for_user(user),
         "trainer_sprite_url": trainer_sprite_url(trainer_sprite_for_user(user)),

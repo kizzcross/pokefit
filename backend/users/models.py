@@ -10,6 +10,11 @@ from .trainer_sprites import DEFAULT_TRAINER_SPRITE
 
 class User(AbstractBaseUser, PermissionsMixin, IndexedTimeStampedModel):
     email = models.EmailField(max_length=255, unique=True)
+    nickname = models.CharField(
+        max_length=24,
+        unique=True,
+        help_text=_("Apelido único visível no app (3–24 caracteres, a-z, 0-9, _)."),
+    )
     is_staff = models.BooleanField(
         default=False, help_text=_("Designates whether the user can log into this admin site.")
     )

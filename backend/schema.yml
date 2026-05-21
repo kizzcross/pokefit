@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: Vinta Boilerplate API
+  title: Pokefit API
   version: 0.1.0
-  description: A Django project boilerplate with Vinta's best practices
+  description: Gamified workout tracker with Pokémon encounters and social features.
 paths:
   /api/exercises/:
     get:
@@ -163,15 +163,31 @@ paths:
       - in: path
         name: id
         schema:
-          type: string
+          type: integer
+        description: A unique integer value identifying this friendship.
         required: true
       tags:
       - friends
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserBrief'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserBrief'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserBrief'
       security:
       - cookieAuth: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserBrief'
+          description: ''
   /api/friends/{id}/block/:
     post:
       operationId: friends_block_create
@@ -179,15 +195,31 @@ paths:
       - in: path
         name: id
         schema:
-          type: string
+          type: integer
+        description: A unique integer value identifying this friendship.
         required: true
       tags:
       - friends
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserBrief'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserBrief'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserBrief'
       security:
       - cookieAuth: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserBrief'
+          description: ''
   /api/friends/{id}/decline/:
     post:
       operationId: friends_decline_create
@@ -195,15 +227,31 @@ paths:
       - in: path
         name: id
         schema:
-          type: string
+          type: integer
+        description: A unique integer value identifying this friendship.
         required: true
       tags:
       - friends
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserBrief'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserBrief'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserBrief'
       security:
       - cookieAuth: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserBrief'
+          description: ''
   /api/friends/{id}/remove/:
     delete:
       operationId: friends_remove_destroy
@@ -211,7 +259,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: string
+          type: integer
+        description: A unique integer value identifying this friendship.
         required: true
       tags:
       - friends
@@ -256,7 +305,11 @@ paths:
       - cookieAuth: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FriendRequestsResponse'
+          description: ''
   /api/friends/requests/send/:
     post:
       operationId: friends_requests_send_create
@@ -273,7 +326,6 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/FriendRequestCreate'
-        required: true
       security:
       - cookieAuth: []
       responses:
@@ -531,14 +583,20 @@ paths:
           description: ''
   /api/timeline/:
     get:
-      operationId: timeline_retrieve
+      operationId: timeline_list
       tags:
       - timeline
       security:
       - cookieAuth: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TimelineFeed'
+          description: ''
   /api/users/:
     get:
       operationId: users_list
@@ -1474,12 +1532,26 @@ components:
       - video_url
     FriendRequestCreate:
       type: object
+      description: 'E-mail ou nickname: use `identifier` ou o campo legado `email`.'
       properties:
         email:
           type: string
-          format: email
+        identifier:
+          type: string
+    FriendRequestsResponse:
+      type: object
+      properties:
+        incoming:
+          type: array
+          items:
+            $ref: '#/components/schemas/Friendship'
+        outgoing:
+          type: array
+          items:
+            $ref: '#/components/schemas/Friendship'
       required:
-      - email
+      - incoming
+      - outgoing
     Friendship:
       type: object
       properties:
@@ -1853,6 +1925,10 @@ components:
           type: string
           format: email
           maxLength: 255
+        nickname:
+          type: string
+          description: Apelido único visível no app (3–24 caracteres, a-z, 0-9, _).
+          maxLength: 24
         display_name:
           type: string
           readOnly: true
@@ -2067,7 +2143,7 @@ components:
           type: string
           maxLength: 64
         type_1:
-          $ref: '#/components/schemas/Type1Enum'
+          $ref: '#/components/schemas/Type2Enum'
         type_2:
           oneOf:
           - $ref: '#/components/schemas/Type2Enum'
@@ -2158,46 +2234,104 @@ components:
         * `draft` - Draft
         * `finished` - Finished
         * `cancelled` - Cancelled
-    Type1Enum:
-      enum:
-      - normal
-      - fire
-      - water
-      - electric
-      - grass
-      - ice
-      - fighting
-      - poison
-      - ground
-      - flying
-      - psychic
-      - bug
-      - rock
-      - ghost
-      - dragon
-      - dark
-      - steel
-      - fairy
-      type: string
-      description: |-
-        * `normal` - Normal
-        * `fire` - Fire
-        * `water` - Water
-        * `electric` - Electric
-        * `grass` - Grass
-        * `ice` - Ice
-        * `fighting` - Fighting
-        * `poison` - Poison
-        * `ground` - Ground
-        * `flying` - Flying
-        * `psychic` - Psychic
-        * `bug` - Bug
-        * `rock` - Rock
-        * `ghost` - Ghost
-        * `dragon` - Dragon
-        * `dark` - Dark
-        * `steel` - Steel
-        * `fairy` - Fairy
+    TimelineEncounter:
+      type: object
+      properties:
+        species_name:
+          type: string
+        species_pokedex_id:
+          type: integer
+        species_sprite:
+          type: string
+        status:
+          type: string
+        captured:
+          type: boolean
+        shiny:
+          type: boolean
+      required:
+      - species_name
+      - species_pokedex_id
+    TimelineEvent:
+      type: object
+      properties:
+        type:
+          type: string
+        at:
+          type: string
+        actor:
+          $ref: '#/components/schemas/UserBrief'
+        workout:
+          allOf:
+          - $ref: '#/components/schemas/TimelineWorkout'
+          nullable: true
+        encounter:
+          allOf:
+          - $ref: '#/components/schemas/TimelineEncounter'
+          nullable: true
+        pokemon:
+          allOf:
+          - $ref: '#/components/schemas/TimelinePokemon'
+          nullable: true
+      required:
+      - actor
+      - at
+      - type
+    TimelineFeed:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimelineEvent'
+        count:
+          type: integer
+      required:
+      - count
+      - results
+    TimelinePokemon:
+      type: object
+      properties:
+        id:
+          type: integer
+        display_name:
+          type: string
+        species_name:
+          type: string
+        species_pokedex_id:
+          type: integer
+        species_sprite:
+          type: string
+        shiny:
+          type: boolean
+      required:
+      - display_name
+      - id
+      - species_name
+      - species_pokedex_id
+    TimelineWorkout:
+      type: object
+      properties:
+        id:
+          type: integer
+        workout_type:
+          type: string
+        total_volume:
+          type: string
+        perceived_effort:
+          type: integer
+          nullable: true
+        proof_photo_url:
+          type: string
+          nullable: true
+        proof_caption:
+          type: string
+        duration_minutes:
+          type: integer
+          nullable: true
+      required:
+      - id
+      - workout_type
     Type2Enum:
       enum:
       - normal
@@ -2248,6 +2382,10 @@ components:
           type: string
           format: email
           maxLength: 255
+        nickname:
+          type: string
+          description: Apelido único visível no app (3–24 caracteres, a-z, 0-9, _).
+          maxLength: 24
         display_name:
           type: string
           readOnly: true
@@ -2294,6 +2432,7 @@ components:
       - is_superuser
       - last_login
       - modified
+      - nickname
       - trainer_sprite_url
     UserBrief:
       type: object
@@ -2305,6 +2444,10 @@ components:
           type: string
           format: email
           readOnly: true
+        nickname:
+          type: string
+          readOnly: true
+          description: Apelido único visível no app (3–24 caracteres, a-z, 0-9, _).
         display_name:
           type: string
           readOnly: true
@@ -2319,6 +2462,7 @@ components:
       - display_name
       - email
       - id
+      - nickname
       - trainer_sprite
       - trainer_sprite_url
     UserPokemonCapture:

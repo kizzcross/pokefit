@@ -89,15 +89,21 @@ const DashboardPage = () => {
       <MobileHeader
         action={
           user ? (
-            <TrainerAvatar
-              alt={user.display_name ?? user.email}
-              size="xs"
-              slug={user.trainer_sprite}
-              src={user.trainer_sprite_url}
-            />
+            <Link
+              aria-label="Abrir perfil"
+              className="block rounded-sm border-2 border-transparent transition hover:border-[var(--color-game-accent)]"
+              to="/profile"
+            >
+              <TrainerAvatar
+                alt={user.display_name ?? user.email}
+                size="xs"
+                slug={user.trainer_sprite}
+                src={user.trainer_sprite_url}
+              />
+            </Link>
           ) : null
         }
-        subtitle={user?.email}
+        subtitle={user?.nickname ? `@${user.nickname}` : user?.email}
         title="POKEFIT"
       />
 

@@ -5,12 +5,14 @@ import { useLocation } from 'react-router';
 import PixelButton from '@/js/components/ui/PixelButton';
 import PixelCard from '@/js/components/ui/PixelCard';
 import { useAuth } from '@/js/hooks/useAuth';
+import { getApiErrorMessage } from '@/js/lib/api-errors';
 
 const LoginPage = () => {
   const { login, register } = useAuth();
   const location = useLocation();
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
+  const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -23,10 +25,17 @@ const LoginPage = () => {
       if (mode === 'login') {
         await login({ email, password });
       } else {
-        await register({ email, password });
+        await register({ email, password, nickname: nickname.trim() });
       }
-    } catch {
-      setError('Não foi possível entrar. Verifique email e senha.');
+    } catch (err) {
+      setError(
+        getApiErrorMessage(
+          err,
+          mode === 'login'
+            ? 'Não foi possível entrar. Verifique email e senha.'
+            : 'Não foi possível criar a conta. Verifique os dados.',
+        ),
+      );
     } finally {
       setLoading(false);
     }
@@ -56,6 +65,24 @@ const LoginPage = () => {
                 value={email}
               />
             </div>
+            {mode === 'register' ? (
+              <div>
+                <label className="text-game-label mb-1 block">Nickname</label>
+                <input
+                  autoComplete="username"
+                  className="w-full rounded-sm border-4 border-[var(--color-game-border)] bg-[var(--color-game-bg)] px-3 py-3 text-sm outline-none focus:border-[var(--color-game-accent)]"
+                  maxLength={24}
+                  onChange={(e) => setNickname(e.target.value.toLowerCase())}
+                  placeholder="ex: kizz_cross"
+                  required
+                  type="text"
+                  value={nickname}
+                />
+                <p className="mt-1 text-[10px] text-[var(--color-game-muted)]">
+                  3–24 caracteres: letras minúsculas, números e _
+                </p>
+              </div>
+            ) : null}
             <div>
               <label className="text-game-label mb-1 block">Senha</label>
               <input

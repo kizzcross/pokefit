@@ -56,7 +56,8 @@ class UserViewSet(viewsets.ModelViewSet):
                 partial=True,
             )
             serializer.is_valid(raise_exception=True)
-            serializer.save()
+            user = serializer.save()
+            return Response(UserSerializer(user).data)
         return Response(UserSerializer(request.user).data)
 
     @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated], url_path="trainer-sprites")

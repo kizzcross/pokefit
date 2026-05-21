@@ -1,3 +1,5 @@
+import uuid
+
 from django.test import TestCase
 from django.urls import reverse
 
@@ -8,7 +10,11 @@ from rest_framework.test import APIClient
 class TestCaseUtils(TestCase):
     def setUp(self):
         self._user_password = "123456"
-        self.user = baker.prepare("users.User", email="user@email.com")
+        self.user = baker.prepare(
+            "users.User",
+            email="user@email.com",
+            nickname=f"tc_{uuid.uuid4().hex[:10]}",
+        )
         self.user.set_password(self._user_password)
         self.user.save()
 

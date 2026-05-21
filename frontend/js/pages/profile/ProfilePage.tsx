@@ -8,6 +8,8 @@ import PixelButton from '@/js/components/ui/PixelButton';
 import PixelCard from '@/js/components/ui/PixelCard';
 import { authQueryKey, useAuth } from '@/js/hooks/useAuth';
 import { isQueryRefetching } from '@/js/hooks/useQueryLoading';
+import { getApiErrorMessage } from '@/js/lib/api-errors';
+import { updateMyProfile } from '@/js/lib/profile';
 import { fetchTrainerSprites, updateMyTrainerSprite } from '@/js/lib/trainer-sprites';
 import { cn } from '@/js/lib/utils';
 
@@ -16,13 +18,22 @@ const ProfilePage = () => {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState(user?.trainer_sprite ?? 'red');
+  const [nickname, setNickname] = useState(user?.nickname ?? '');
   const [error, setError] = useState<string | null>(null);
+  const [nicknameError, setNicknameError] = useState<string | null>(null);
+  const [nicknameSuccess, setNicknameSuccess] = useState(false);
 
   useEffect(() => {
     if (user?.trainer_sprite) {
       setSelected(user.trainer_sprite);
     }
   }, [user?.trainer_sprite]);
+
+  useEffect(() => {
+    if (user?.nickname) {
+      setNickname(user.nickname);
+    }
+  }, [user?.nickname]);
 
   const featuredQuery = useQuery({
     queryKey: ['trainer-sprites', 'featured'],
@@ -36,6 +47,22 @@ const ProfilePage = () => {
     queryKey: ['trainer-sprites', 'search', searchTerm],
     queryFn: () => fetchTrainerSprites({ q: searchTerm }),
     enabled: isSearching,
+  });
+
+  const saveNicknameMutation = useMutation({
+    mutationFn: () => updateMyProfile({ nickname: nickname.trim() }),
+    onMutate: () => {
+      setNicknameError(null);
+      setNicknameSuccess(false);
+    },
+    onSuccess: (updatedUser) => {
+      queryClient.setQueryData(authQueryKey, updatedUser);
+      queryClient.invalidateQueries({ queryKey: ['timeline'] });
+      queryClient.invalidateQueries({ queryKey: ['friends'] });
+      setNicknameSuccess(true);
+    },
+    onError: (err) =>
+      setNicknameError(getApiErrorMessage(err, 'Não foi possível salvar o nickname.')),
   });
 
   const saveMutation = useMutation({
@@ -61,29 +88,52 @@ const ProfilePage = () => {
 
   return (
     <>
-      <MobileHeader backTo="/more" subtitle="Ícone de treinador" title="Perfil" />
+      <MobileHeader backTo="/more" subtitle="Nickname e ícone" title="Perfil" />
       <main className="space-y-4 px-4 pb-28 pt-4">
         <PixelCard className="border-[var(--color-game-accent)]">
           <p className="text-game-title text-[var(--color-game-accent)]">Seu treinador</p>
           <div className="mt-3 flex items-center gap-3">
             <TrainerAvatar alt={user?.display_name ?? 'Treinador'} size="md" slug={selected} />
             <div className="min-w-0">
-              <p className="font-semibold">{user?.display_name ?? user?.email}</p>
-              <p className="text-xs text-[var(--color-game-muted)]">{selected}</p>
+              <p className="font-semibold">{user?.display_name ?? user?.nickname ?? user?.email}</p>
+              <p className="text-xs text-[var(--color-game-muted)]">
+                {user?.nickname ? `@${user.nickname}` : null}
+                {user?.nickname ? ' · ' : null}
+                {selected}
+              </p>
             </div>
           </div>
-          <p className="mt-3 text-xs text-[var(--color-game-muted)]">
-            Sprites do{' '}
-            <a
-              className="text-[var(--color-game-info)]"
-              href="https://play.pokemonshowdown.com/sprites/trainers/"
-              rel="noreferrer"
-              target="_blank"
-            >
-              Pokémon Showdown
-            </a>
-            . Créditos aos artistas originais.
+        </PixelCard>
+
+        <PixelCard className="space-y-2 border-[var(--color-game-info)]">
+          <p className="text-game-title text-[var(--color-game-info)]">Nickname</p>
+          <p className="text-xs text-[var(--color-game-muted)]">
+            Nome público único. Amigos podem te achar por ele ou pelo e-mail.
           </p>
+          <input
+            autoComplete="off"
+            className="w-full rounded-sm border-4 border-[var(--color-game-border)] bg-[var(--color-game-bg)] px-3 py-2 text-sm outline-none focus:border-[var(--color-game-accent)]"
+            maxLength={24}
+            onChange={(e) => {
+              setNickname(e.target.value.toLowerCase());
+              setNicknameSuccess(false);
+            }}
+            placeholder="ex: kizz_cross"
+            value={nickname}
+          />
+          {nicknameSuccess ? (
+            <p className="text-sm text-[var(--color-game-success)]">Nickname salvo com sucesso!</p>
+          ) : null}
+          {nicknameError ? (
+            <p className="text-sm text-[var(--color-game-danger)]">{nicknameError}</p>
+          ) : null}
+          <PixelButton
+            disabled={saveNicknameMutation.isPending || nickname.trim() === (user?.nickname ?? '')}
+            fullWidth
+            onClick={() => saveNicknameMutation.mutate()}
+          >
+            {saveNicknameMutation.isPending ? 'Salvando...' : 'Salvar nickname'}
+          </PixelButton>
         </PixelCard>
 
         <PixelCard className="space-y-2">

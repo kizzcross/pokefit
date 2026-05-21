@@ -8,6 +8,7 @@ from users.trainer_sprites import (
 )
 
 from .models import User
+from .nicknames import nickname_is_available, normalize_nickname
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -19,6 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [  # noqa: RUF012
             "id",
             "email",
+            "nickname",
             "display_name",
             "trainer_sprite",
             "trainer_sprite_url",
@@ -50,9 +52,22 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer):
+    nickname = serializers.CharField(max_length=24, required=False)
+
     class Meta:
         model = User
-        fields = ("trainer_sprite",)
+        fields = ("nickname", "trainer_sprite")
+
+    def validate_nickname(self, value):
+        try:
+            normalized = normalize_nickname(value)
+        except ValueError as exc:
+            raise serializers.ValidationError(str(exc)) from exc
+        user = self.instance
+        exclude_id = user.pk if user is not None else None
+        if not nickname_is_available(normalized, exclude_user_id=exclude_id):
+            raise serializers.ValidationError("Este nickname já está em uso.")
+        return normalized
 
     def validate_trainer_sprite(self, value):
         try:
@@ -68,8 +83,18 @@ class LoginSerializer(serializers.Serializer):
 
 class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField()
+    nickname = serializers.CharField(max_length=24)
     password = serializers.CharField(min_length=8, write_only=True)
     trainer_sprite = serializers.CharField(required=False, allow_blank=True)
+
+    def validate_nickname(self, value):
+        try:
+            normalized = normalize_nickname(value)
+        except ValueError as exc:
+            raise serializers.ValidationError(str(exc)) from exc
+        if not nickname_is_available(normalized):
+            raise serializers.ValidationError("Este nickname já está em uso.")
+        return normalized
 
     def validate_trainer_sprite(self, value):
         if not value:
@@ -86,6 +111,7 @@ class RegisterSerializer(serializers.Serializer):
         user = User.objects.create_user(
             email=validated_data["email"],
             password=validated_data["password"],
+            nickname=validated_data["nickname"],
             trainer_sprite=trainer_sprite,
         )
         get_or_create_profile(user)

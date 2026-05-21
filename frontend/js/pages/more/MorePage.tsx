@@ -12,7 +12,7 @@ import { fetchPendingEncounter } from '@/js/lib/encounter';
 import { useGameStore } from '@/js/stores/game-store';
 
 const links: { to: string; label: string; icon: GameIconName }[] = [
-  { to: '/profile', label: 'Ícone de treinador', icon: 'team' },
+  { to: '/profile', label: 'Perfil', icon: 'team' },
   { to: '/workouts', label: 'Meus treinos', icon: 'workout' },
   { to: '/timeline', label: 'Timeline', icon: 'dex' },
   { to: '/friends', label: 'Amigos', icon: 'team' },
