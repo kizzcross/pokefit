@@ -145,6 +145,8 @@ App em http://localhost:8000. Logs: `make docker_logs backend`.
 
 Guia passo a passo: **[deploy/HETZNER.md](deploy/HETZNER.md)** (Docker Compose + Nginx + Certbot).
 
+Deploy automático no push em `main`: configure os secrets em **[deploy/GITHUB_ACTIONS.md](deploy/GITHUB_ACTIONS.md)**.
+
 ### Render.com
 
 Há suporte a [Render.com](https://render.com) via `render.yaml` e `render_build.sh`. Ajuste `ALLOWED_HOSTS`, `SECRET_KEY` e variáveis de ambiente conforme o ambiente.

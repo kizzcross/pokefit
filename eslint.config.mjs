@@ -129,6 +129,13 @@ export default defineConfig([
 
   // Ignores / files to skip
   {
-    ignores: ["node_modules/", "dist/", "build/", "frontend/js/api/", "openapi-ts.config.ts"],
+    ignores: [
+      "node_modules/",
+      "dist/",
+      "build/",
+      "frontend/webpack_bundles/",
+      "frontend/js/api/",
+      "openapi-ts.config.ts",
+    ],
   },
 ]);

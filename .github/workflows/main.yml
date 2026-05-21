@@ -1,15 +1,102 @@
 name: main
+
 on:
   push:
-    branches-ignore:
-      - boilerplate-release
+    branches: [main]
   pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build:
-    name: Build boilerplate code
+  ci:
+    name: CI
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: sqlite:///
+      REDIS_URL: redis://127.0.0.1:6379/0
+      SENDGRID_USERNAME: test
+      SENDGRID_PASSWORD: test
+      ALLOWED_HOSTS: localhost,pokefit.kizzcross.com.br
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
-      - uses: ./.github/workflows/shared-build
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+
+      - name: Install Poetry
+        run: pip install poetry==2.0.1
+
+      - name: Backend dependencies
+        run: poetry install --with dev --no-root --no-interaction --no-ansi
+
+      - name: Frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build frontend
+        run: pnpm run build
+
+      - name: Generate Django secret key
+        id: django_secrets
+        run: |
+          echo "key=$(python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')" >> "$GITHUB_OUTPUT"
+
+      - name: Check migrations
+        working-directory: backend
+        run: poetry run python manage.py makemigrations --check --dry-run
+        env:
+          DJANGO_SETTINGS_MODULE: pokefit.settings.test
+          SECRET_KEY: ${{ steps.django_secrets.outputs.key }}
+
+      - name: Django deploy checks
+        working-directory: backend
+        run: poetry run python manage.py check --deploy --fail-level WARNING
+        env:
+          DJANGO_SETTINGS_MODULE: pokefit.settings.production
+          SECRET_KEY: ${{ steps.django_secrets.outputs.key }}
+
+      - name: Backend tests
+        run: make test
+
+      - name: Frontend tests
+        run: pnpm run test
+
+  deploy:
+    name: Deploy to Hetzner
+    needs: ci
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true
+          command_timeout: 30m
+          script: |
+            set -euo pipefail
+            cd /opt/pokefit
+            git fetch origin main
+            git reset --hard origin/main
+            cd deploy
+            docker compose -f docker-compose.prod.yml up -d --build
+            docker compose -f docker-compose.prod.yml ps
