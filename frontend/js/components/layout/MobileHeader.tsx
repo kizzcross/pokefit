@@ -33,7 +33,9 @@ const MobileHeader = ({ title, subtitle, backTo, action }: MobileHeaderProps) =>
           <h1 className="text-game-title text-[var(--color-game-accent)]">{title}</h1>
           {subtitle ? <p className="text-game-muted">{subtitle}</p> : null}
         </div>
-        <div className={cn('min-w-10', !action && 'w-10')}>{action}</div>
+        <div className={cn('flex shrink-0 items-center justify-end', !action && 'w-10')}>
+          {action}
+        </div>
       </div>
     </header>
   );

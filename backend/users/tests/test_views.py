@@ -114,3 +114,67 @@ class UserViewSetTest(TestCaseUtils, APITestCase):
         self.assertResponse400(response)
         self.user.refresh_from_db()
         self.assertNotEqual(self.user.nickname, taken)
+
+    def test_gift_recipients_staff_can_search(self):
+        self.user.is_staff = True
+        self.user.save(update_fields=["is_staff"])
+        target = baker.make(
+            User,
+            email="player@test.com",
+            nickname="playerone",
+            is_active=True,
+            _fill_optional=True,
+        )
+
+        response = self.auth_client.get(
+            reverse("user-gift-recipients"),
+            data={"q": "player"},
+        )
+
+        self.assertResponse200(response)
+        ids = [row["id"] for row in response.data]
+        self.assertIn(target.id, ids)
+
+    def test_gift_recipients_includes_self(self):
+        self.user.is_staff = True
+        self.user.save(update_fields=["is_staff"])
+
+        response = self.auth_client.get(
+            reverse("user-gift-recipients"),
+            data={"q": self.user.nickname[:4]},
+        )
+
+        self.assertResponse200(response)
+        ids = [row["id"] for row in response.data]
+        self.assertIn(self.user.id, ids)
+
+    def test_gift_recipients_superuser_without_staff_can_search(self):
+        self.user.is_superuser = True
+        self.user.is_staff = False
+        self.user.save(update_fields=["is_superuser", "is_staff"])
+        target = baker.make(
+            User,
+            email="gifted@test.com",
+            nickname="giftedone",
+            is_active=True,
+            _fill_optional=True,
+        )
+
+        response = self.auth_client.get(
+            reverse("user-gift-recipients"),
+            data={"q": "gifted"},
+        )
+
+        self.assertResponse200(response)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["id"], target.id)
+
+    def test_gift_recipients_forbidden_for_regular_user(self):
+        other = baker.make(User, nickname=_nickname(), is_active=True, _fill_optional=True)
+
+        response = self.auth_client.get(
+            reverse("user-gift-recipients"),
+            data={"q": other.nickname[:4]},
+        )
+
+        self.assertResponse403(response)

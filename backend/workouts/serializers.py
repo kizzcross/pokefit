@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from django.utils import timezone
 
-from pokemon.serializers import PokemonSpeciesSerializer
+from pokemon.serializers import PokemonSpeciesSerializer, WorkoutTeamRewardsSerializer
 
 from .choices import ValidationType, WorkoutStatus
 from .models import EXERCISE_IMAGE_MAX_SIZE_BYTES, Exercise, Workout, WorkoutExercise
@@ -158,6 +158,7 @@ class WorkoutDetailSerializer(serializers.ModelSerializer):
             "status",
             "encounter_status",
             "encounter_species",
+            "encounter_level",
             "weekly_goal_reward",
             "proof_photo_url",
             "proof_caption",
@@ -182,6 +183,8 @@ class WorkoutDetailSerializer(serializers.ModelSerializer):
 class PendingEncounterSerializer(serializers.Serializer):
     workout_id = serializers.IntegerField(source="id")
     encounter_status = serializers.CharField()
+    encounter_level = serializers.IntegerField(allow_null=True)
+    weekly_goal_reward = serializers.BooleanField()
     species = serializers.SerializerMethodField()
 
     def get_species(self, obj):
@@ -209,6 +212,14 @@ class WorkoutCreateSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "status", "created", "modified")
 
 
+class WorkoutFinishResultSerializer(serializers.Serializer):
+    workout = serializers.SerializerMethodField()
+    team_rewards = serializers.DictField()
+
+    def get_workout(self, obj):
+        return WorkoutDetailSerializer(obj.workout, context=self.context).data
+
+
 class WorkoutFinishSerializer(serializers.Serializer):
     perceived_effort = serializers.IntegerField(
         min_value=1,
@@ -230,27 +241,40 @@ class WorkoutFinishSerializer(serializers.Serializer):
         return attrs
 
     def save(self, **kwargs):
+        from dataclasses import dataclass
+
+        from pokemon.services.encounter import assign_workout_encounter
+        from pokemon.services.progression import apply_workout_rewards
+        from profiles.services.weekly_goal import (
+            record_weekly_goal_reward,
+            should_grant_weekly_goal_encounter,
+        )
+
+        @dataclass
+        class WorkoutFinishResult:
+            workout: Workout
+            team_rewards: dict
+
         workout = self.context["workout"]
         perceived_effort = self.validated_data.get("perceived_effort")
         if perceived_effort is not None:
             workout.perceived_effort = perceived_effort
             workout.save(update_fields=["perceived_effort", "modified"])
         workout.finish()
-        from pokemon.services.encounter import assign_workout_encounter
-        from profiles.services.weekly_goal import (
-            record_weekly_goal_reward,
-            should_grant_weekly_goal_encounter,
-        )
-
+        team_rewards = apply_workout_rewards(workout.user, workout)
         weekly_bonus = should_grant_weekly_goal_encounter(workout.user, workout)
         assign_workout_encounter(workout, weekly_goal_bonus=weekly_bonus)
         if weekly_bonus:
             record_weekly_goal_reward(workout.user, workout)
-        return (
+        workout = (
             Workout.objects.filter(pk=workout.pk)
             .select_related("encounter_species")
             .prefetch_related("exercises__exercise")
             .get()
+        )
+        return WorkoutFinishResult(
+            workout=workout,
+            team_rewards=WorkoutTeamRewardsSerializer.from_rewards(team_rewards),
         )
 
 

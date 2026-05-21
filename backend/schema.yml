@@ -524,6 +524,12 @@ paths:
         description: The initial index from which to return the results.
         schema:
           type: integer
+      - name: search
+        required: false
+        in: query
+        description: Filter by name or Pokédex number (partial match).
+        schema:
+          type: string
       tags:
       - pokemon-species
       security:
@@ -1246,7 +1252,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WorkoutDetail'
+                $ref: '#/components/schemas/WorkoutFinishResult'
           description: ''
   /api/workouts/{id}/proof/:
     post:
@@ -2087,12 +2093,19 @@ components:
           type: integer
         encounter_status:
           type: string
+        encounter_level:
+          type: integer
+          nullable: true
+        weekly_goal_reward:
+          type: boolean
         species:
-          type: string
+          allOf:
+          - $ref: '#/components/schemas/PokemonSpecies'
           readOnly: true
       required:
       - encounter_status
       - species
+      - weekly_goal_reward
       - workout_id
     PokemonIV:
       type: object
@@ -2547,6 +2560,13 @@ components:
           maximum: 9223372036854775807
           minimum: 0
           format: int64
+        experience_to_next_level:
+          type: integer
+          nullable: true
+          readOnly: true
+        experience_progress_percent:
+          type: integer
+          readOnly: true
         nature:
           $ref: '#/components/schemas/NatureEnum'
         shiny:
@@ -2563,6 +2583,20 @@ components:
           maximum: 9223372036854775807
           minimum: 0
           format: int64
+        affection_max:
+          type: integer
+          readOnly: true
+        affection_progress_percent:
+          type: integer
+          readOnly: true
+        can_evolve:
+          type: boolean
+          readOnly: true
+        next_evolution:
+          allOf:
+          - $ref: '#/components/schemas/EvolutionPreview'
+          nullable: true
+          readOnly: true
         captured_at:
           type: string
           format: date-time
@@ -2586,6 +2620,76 @@ components:
       - ivs
       - modified
       - species
+    EvolutionPreview:
+      type: object
+      properties:
+        species_name:
+          type: string
+        pokedex_id:
+          type: integer
+        trigger:
+          type: string
+        requires_level:
+          type: integer
+          nullable: true
+        requires_affection:
+          type: integer
+          nullable: true
+      required:
+      - pokedex_id
+      - species_name
+      - trigger
+    TeamPokemonGain:
+      type: object
+      properties:
+        pokemon_id:
+          type: integer
+        display_name:
+          type: string
+        xp_added:
+          type: integer
+        affection_added:
+          type: integer
+        level_before:
+          type: integer
+        level_after:
+          type: integer
+        evolved:
+          type: boolean
+        evolved_to:
+          allOf:
+          - $ref: '#/components/schemas/EvolutionPreview'
+          nullable: true
+      required:
+      - affection_added
+      - display_name
+      - evolved
+      - level_after
+      - level_before
+      - pokemon_id
+      - xp_added
+    WorkoutTeamRewards:
+      type: object
+      properties:
+        gains:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamPokemonGain'
+        empty_team:
+          type: boolean
+      required:
+      - empty_team
+      - gains
+    WorkoutFinishResult:
+      type: object
+      properties:
+        workout:
+          $ref: '#/components/schemas/WorkoutDetail'
+        team_rewards:
+          $ref: '#/components/schemas/WorkoutTeamRewards'
+      required:
+      - team_rewards
+      - workout
     UserPokemonList:
       type: object
       properties:
@@ -2611,6 +2715,13 @@ components:
           maximum: 9223372036854775807
           minimum: 0
           format: int64
+        experience_to_next_level:
+          type: integer
+          nullable: true
+          readOnly: true
+        experience_progress_percent:
+          type: integer
+          readOnly: true
         nature:
           $ref: '#/components/schemas/NatureEnum'
         shiny:
@@ -2627,6 +2738,20 @@ components:
           maximum: 9223372036854775807
           minimum: 0
           format: int64
+        affection_max:
+          type: integer
+          readOnly: true
+        affection_progress_percent:
+          type: integer
+          readOnly: true
+        can_evolve:
+          type: boolean
+          readOnly: true
+        next_evolution:
+          allOf:
+          - $ref: '#/components/schemas/EvolutionPreview'
+          nullable: true
+          readOnly: true
         captured_at:
           type: string
           format: date-time

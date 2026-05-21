@@ -37,6 +37,13 @@ module.exports = (env, argv) => {
       },
       // Allow CORS when loading assets directly from :3000 (optional):
       headers: { 'Access-Control-Allow-Origin': '*' },
+      proxy: [
+        {
+          context: ['/api', '/admin', '/jsreverse'],
+          target: 'http://127.0.0.1:8001',
+          changeOrigin: true,
+        },
+      ],
     },
     context: __dirname,
     entry: ['./frontend/js/index.tsx'],

@@ -21,6 +21,7 @@ from .serializers import (
     WorkoutExerciseCreateSerializer,
     WorkoutExerciseSerializer,
     WorkoutExerciseUpdateSerializer,
+    WorkoutFinishResultSerializer,
     WorkoutFinishSerializer,
     WorkoutListSerializer,
     WorkoutProofSerializer,

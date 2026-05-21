@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router';
 import { myPokemonRetrieve } from '@/js/api';
 import GameIcon from '@/js/components/game/GameIcon';
 import PokemonSprite from '@/js/components/game/PokemonSprite';
+import PokemonProgressBars from '@/js/components/pokemon/PokemonProgressBars';
 import StatBar from '@/js/components/game/StatBar';
 import MobileHeader from '@/js/components/layout/MobileHeader';
 import PixelButton from '@/js/components/ui/PixelButton';
@@ -102,8 +103,11 @@ const PokemonDetailPage = () => {
         </PixelCard>
 
         <PixelCard>
-          <p className="text-sm">Carinho: {pokemon?.affection ?? 0}</p>
-          <p className="mt-1 text-sm text-[var(--color-game-muted)]">
+          <h2 className="text-game-title text-[var(--color-game-accent)]">Progresso</h2>
+          <div className="mt-3">
+            <PokemonProgressBars pokemon={pokemon ?? {}} />
+          </div>
+          <p className="mt-3 text-sm text-[var(--color-game-muted)]">
             Slot do time: {pokemon?.active_team_slot ?? 'reserva'}
           </p>
         </PixelCard>

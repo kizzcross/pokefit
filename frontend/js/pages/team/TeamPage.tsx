@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { myPokemonList, myPokemonTeamList, myPokemonTeamSlotPartialUpdate } from '@/js/api';
 import PokemonSprite from '@/js/components/game/PokemonSprite';
+import StatBar from '@/js/components/game/StatBar';
 import { resolvePokemonSpriteUrl } from '@/js/lib/pokemon-sprites';
 import MobileHeader from '@/js/components/layout/MobileHeader';
 import PixelButton from '@/js/components/ui/PixelButton';
@@ -52,6 +53,13 @@ const TeamPage = () => {
           <PageLoading label="Carregando time..." />
         ) : (
         <>
+        <PixelCard className="border-[var(--color-game-info)]">
+          <p className="text-sm text-[var(--color-game-muted)]">
+            Pokémon no time ganham <strong className="text-[var(--color-game-text)]">XP</strong> e{' '}
+            <strong className="text-[var(--color-game-text)]">carinho</strong> ao finalizar treinos.
+            Ao subir de nível, podem evoluir conforme a cadeia do Pokédex.
+          </p>
+        </PixelCard>
         <div className="grid grid-cols-2 gap-3">
           {Array.from({ length: 6 }).map((_, index) => {
             const slot = index + 1;
@@ -70,13 +78,24 @@ const TeamPage = () => {
                 </div>
                 <p className="text-xs font-semibold">{member?.display_name ?? 'Vazio'}</p>
                 {member ? (
-                  <PixelButton
-                    className="mt-2 w-full text-[8px]"
-                    onClick={() => assignMutation.mutate({ pokemonId: member.id, slot: null })}
-                    variant="secondary"
-                  >
-                    Remover
-                  </PixelButton>
+                  <>
+                    <p className="text-[10px] text-[var(--color-game-muted)]">Lv. {member.level}</p>
+                    <div className="mt-1 px-1">
+                      <StatBar
+                        color="bg-[var(--color-game-accent)]"
+                        label="XP"
+                        max={100}
+                        value={member.experience_progress_percent ?? 0}
+                      />
+                    </div>
+                    <PixelButton
+                      className="mt-2 w-full text-[8px]"
+                      onClick={() => assignMutation.mutate({ pokemonId: member.id, slot: null })}
+                      variant="secondary"
+                    >
+                      Remover
+                    </PixelButton>
+                  </>
                 ) : null}
               </PixelCard>
             );

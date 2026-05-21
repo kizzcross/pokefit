@@ -3,7 +3,8 @@ import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
 import { exercisesList, workoutsFinishCreate, workoutsRetrieve } from '@/js/api';
-import type { WorkoutDetail } from '@/js/api/types.gen';
+import type { WorkoutFinishResult } from '@/js/api/types.gen';
+import type { WorkoutDetailWithEncounter } from '@/js/lib/encounter';
 import GameIcon from '@/js/components/game/GameIcon';
 import MobileHeader from '@/js/components/layout/MobileHeader';
 import PixelButton from '@/js/components/ui/PixelButton';
@@ -173,23 +174,27 @@ const WorkoutDetailPage = () => {
           body: { perceived_effort: effort },
           throwOnError: true,
         })
-      ).data,
+      ).data as WorkoutFinishResult,
     onSuccess: (finished) => {
       queryClient.invalidateQueries({ queryKey: ['workouts'] });
       queryClient.invalidateQueries({ queryKey: ['calendar'] });
       queryClient.invalidateQueries({ queryKey: ['timeline'] });
       queryClient.invalidateQueries({ queryKey: ['workouts', 'pending-encounter'] });
       queryClient.invalidateQueries({ queryKey: ['weekly-goal'] });
+      queryClient.invalidateQueries({ queryKey: ['my-pokemon'] });
       queryClient.invalidateQueries({ queryKey: ['workouts', 'last-by-type', workoutType] });
-      const species = finished?.encounter_species;
-      if (species && finished?.id) {
-        setEncounter(species, finished.id);
+      const workoutData = finished?.workout as WorkoutDetailWithEncounter | undefined;
+      const species = workoutData?.encounter_species;
+      if (species && workoutData?.id) {
+        setEncounter(species, workoutData.id, workoutData.encounter_level ?? null);
         navigate('/encounter', {
           state: {
-            workoutId: finished.id,
+            workoutId: workoutData.id,
             species,
+            encounterLevel: workoutData.encounter_level ?? null,
             dayConquered: true,
-            weeklyGoalReward: Boolean(finished.weekly_goal_reward),
+            weeklyGoalReward: Boolean(workoutData.weekly_goal_reward),
+            teamRewards: finished.team_rewards,
           },
         });
       } else {

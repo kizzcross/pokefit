@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router';
 import GameIcon from '@/js/components/game/GameIcon';
 import TrainerAvatar from '@/js/components/game/TrainerAvatar';
 import MobileHeader from '@/js/components/layout/MobileHeader';
+import NotificationBell from '@/js/components/layout/NotificationBell';
 import PixelButton from '@/js/components/ui/PixelButton';
 import PixelCard from '@/js/components/ui/PixelCard';
 import PixelLink from '@/js/components/ui/PixelLink';
@@ -89,18 +90,21 @@ const DashboardPage = () => {
       <MobileHeader
         action={
           user ? (
-            <Link
-              aria-label="Abrir perfil"
-              className="block rounded-sm border-2 border-transparent transition hover:border-[var(--color-game-accent)]"
-              to="/profile"
-            >
-              <TrainerAvatar
-                alt={user.display_name ?? user.email}
-                size="xs"
-                slug={user.trainer_sprite}
-                src={user.trainer_sprite_url}
-              />
-            </Link>
+            <div className="flex items-center gap-2">
+              <NotificationBell />
+              <Link
+                aria-label="Abrir perfil"
+                className="block rounded-sm border-2 border-transparent transition hover:border-[var(--color-game-accent)]"
+                to="/profile"
+              >
+                <TrainerAvatar
+                  alt={user.display_name ?? user.email}
+                  size="xs"
+                  slug={user.trainer_sprite}
+                  src={user.trainer_sprite_url}
+                />
+              </Link>
+            </div>
           ) : null
         }
         subtitle={user?.nickname ? `@${user.nickname}` : user?.email}

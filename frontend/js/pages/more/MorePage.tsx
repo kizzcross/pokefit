@@ -9,9 +9,12 @@ import PixelLink from '@/js/components/ui/PixelLink';
 import { LoadingCardSkeleton } from '@/js/components/ui/GameLoading';
 import { useAuth } from '@/js/hooks/useAuth';
 import { fetchPendingEncounter } from '@/js/lib/encounter';
+import PixelBadge from '@/js/components/ui/PixelBadge';
+import { useAppNotifications } from '@/js/hooks/useAppNotifications';
 import { useGameStore } from '@/js/stores/game-store';
 
 const links: { to: string; label: string; icon: GameIconName }[] = [
+  { to: '/gifts', label: 'Caixa de entrada', icon: 'missions' },
   { to: '/profile', label: 'Perfil', icon: 'team' },
   { to: '/workouts', label: 'Meus treinos', icon: 'workout' },
   { to: '/timeline', label: 'Timeline', icon: 'dex' },
@@ -38,6 +41,8 @@ const MorePage = () => {
     queryFn: fetchPendingEncounter,
   });
   const pending = pendingQuery.data;
+
+  const { giftCount: giftPendingCount, friendRequestCount } = useAppNotifications();
 
   return (
     <>
@@ -75,6 +80,21 @@ const MorePage = () => {
           </PixelCard>
         ) : null}
 
+        {user?.is_superuser || user?.is_staff ? (
+          <section className="space-y-2">
+            <p className="text-game-label text-[var(--color-game-muted)]">Superuser</p>
+            <PixelCard className="border-[var(--color-game-danger)]">
+              <p className="text-game-title text-[var(--color-game-danger)]">Enviar presentes</p>
+              <p className="mt-1 text-xs text-[var(--color-game-muted)]">
+                Mensagem + 1 Pokémon ou escolha entre 2–3 para vários jogadores
+              </p>
+              <PixelLink className="mt-3" fullWidth to="/admin/gifts/send" variant="secondary">
+                Abrir painel
+              </PixelLink>
+            </PixelCard>
+          </section>
+        ) : null}
+
         {user?.is_staff ? (
           <section className="space-y-2">
             <p className="text-game-label text-[var(--color-game-muted)]">Catálogo (staff)</p>
@@ -104,16 +124,28 @@ const MorePage = () => {
 
         <section className="space-y-2">
           <p className="text-game-label text-[var(--color-game-muted)]">Menu</p>
-          {links.map((item) => (
+          {links.map((item) => {
+            const badgeCount =
+              item.to === '/gifts'
+                ? giftPendingCount
+                : item.to === '/friends'
+                  ? friendRequestCount
+                  : 0;
+
+            return (
             <Link
               key={item.to}
-              className="pixel-panel flex items-center justify-between gap-3 rounded-sm p-4 no-underline transition hover:border-[var(--color-game-accent)]"
+              className="pixel-panel relative flex items-center justify-between gap-3 rounded-sm p-4 no-underline transition hover:border-[var(--color-game-accent)]"
               to={item.to}
             >
               <span className="font-semibold text-[var(--color-game-text)]">{item.label}</span>
-              <GameIcon className="text-[var(--color-game-info)]" name={item.icon} size={28} />
+              <div className="relative">
+                <GameIcon className="text-[var(--color-game-info)]" name={item.icon} size={28} />
+                <PixelBadge count={badgeCount} />
+              </div>
             </Link>
-          ))}
+            );
+          })}
         </section>
 
         <footer className="border-t border-[var(--color-game-border)]/30 pt-6 text-center">

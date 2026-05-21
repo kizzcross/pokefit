@@ -83,6 +83,16 @@ Crie um usuário pelo app (`/login`) ou pelo admin:
 - Atualizar schema: `cd backend && ../.venv/bin/poetry run python manage.py spectacular --color --file schema.yml`
 - Regenerar client: `pnpm run openapi-ts`
 
+### Pokémon: evoluções (PokéAPI)
+
+Após importar o catálogo (`import_pokemon` ou `seed_gen1_pokemon`), importe as cadeias evolutivas:
+
+```bash
+cd backend && ../.venv/bin/poetry run python manage.py import_evolution_chains
+```
+
+O time ativo ganha XP e carinho ao **finalizar treinos**; evoluções por nível/carinho usam regras vindas da PokéAPI.
+
 ### Testes
 
 ```bash

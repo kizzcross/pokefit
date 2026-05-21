@@ -24,6 +24,8 @@ import FriendsPage from '@/js/pages/friends/FriendsPage';
 import FriendProfilePage from '@/js/pages/friends/FriendProfilePage';
 import TimelinePage from '@/js/pages/timeline/TimelinePage';
 import ProfilePage from '@/js/pages/profile/ProfilePage';
+import GiftsInboxPage from '@/js/pages/gifts/GiftsInboxPage';
+import GiftSendPage from '@/js/pages/gifts/GiftSendPage';
 
 const router = createBrowserRouter([
   {
@@ -55,6 +57,8 @@ const router = createBrowserRouter([
       { path: 'missions', Component: MissionsPage },
       { path: 'ranking', Component: RankingPage },
       { path: 'more', Component: MorePage },
+      { path: 'gifts', Component: GiftsInboxPage },
+      { path: 'admin/gifts/send', Component: GiftSendPage },
       { path: 'profile', Component: ProfilePage },
       { path: 'exercises', Component: ExerciseListPage },
       { path: 'exercises/new', Component: ExerciseCreatePage },

@@ -1,6 +1,4 @@
-import random
-
-from django.utils import timezone
+from django.db.models import Q
 from drf_spectacular.utils import extend_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -10,9 +8,8 @@ from rest_framework.response import Response
 from workouts.choices import EncounterStatus, WorkoutStatus
 from workouts.models import Workout
 
-from .choices import Nature
-from .constants import IV_MAX, IV_MIN
-from .models import PokemonIV, PokemonSpecies, UserPokemon
+from .models import PokemonSpecies, UserPokemon
+from .services.grant import grant_pokemon_from_workout_encounter
 from .serializers import (
     PokemonSpeciesSerializer,
     UserPokemonCaptureSerializer,
@@ -20,16 +17,20 @@ from .serializers import (
     UserPokemonListSerializer,
     UserPokemonTeamUpdateSerializer,
 )
-from .services.encounter import roll_shiny
-
-
 class PokemonSpeciesViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PokemonSpeciesSerializer
     lookup_field = "pokedex_id"
 
     def get_queryset(self):
-        return PokemonSpecies.objects.all().order_by("pokedex_id")
+        queryset = PokemonSpecies.objects.all().order_by("pokedex_id")
+        search = (self.request.query_params.get("search") or "").strip()
+        if search:
+            filters = Q(name__icontains=search)
+            if search.isdigit():
+                filters |= Q(pokedex_id=int(search))
+            queryset = queryset.filter(filters)
+        return queryset
 
 
 class UserPokemonViewSet(viewsets.ReadOnlyModelViewSet):
@@ -113,27 +114,12 @@ class UserPokemonViewSet(viewsets.ReadOnlyModelViewSet):
             )
 
         shiny = serializer.validated_data.get("shiny")
-        if shiny is None:
-            shiny = roll_shiny()
-
-        nature = random.choice(Nature.values)
-        user_pokemon = UserPokemon.objects.create(
-            user=request.user,
-            species=species,
+        user_pokemon = grant_pokemon_from_workout_encounter(
+            request.user,
+            species,
+            workout,
             nickname=serializer.validated_data.get("nickname", ""),
-            nature=nature,
             shiny=shiny,
-            captured_at=timezone.now(),
-            source_workout=workout,
-        )
-        PokemonIV.objects.create(
-            user_pokemon=user_pokemon,
-            hp=random.randint(IV_MIN, IV_MAX),
-            attack=random.randint(IV_MIN, IV_MAX),
-            defense=random.randint(IV_MIN, IV_MAX),
-            sp_attack=random.randint(IV_MIN, IV_MAX),
-            sp_defense=random.randint(IV_MIN, IV_MAX),
-            speed=random.randint(IV_MIN, IV_MAX),
         )
         workout.encounter_status = EncounterStatus.CAPTURED
         workout.save(update_fields=["encounter_status", "modified"])

@@ -16,6 +16,7 @@ from pokemon.routes import routes as pokemon_routes
 from social.routes import routes as social_routes
 from workouts.routes import routes as workouts_routes
 from profiles.routes import routes as profiles_routes
+from gifts.routes import routes as gifts_routes
 
 
 router = DefaultRouter()
@@ -27,6 +28,7 @@ routes = (
     + pokemon_routes
     + social_routes
     + profiles_routes
+    + gifts_routes
 )
 for route in routes:
     router.register(route["regex"], route["viewset"], basename=route["basename"])

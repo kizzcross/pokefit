@@ -1,6 +1,8 @@
 import { NavLink, useLocation } from 'react-router';
 
 import GameIcon, { type GameIconName } from '@/js/components/game/GameIcon';
+import PixelBadge from '@/js/components/ui/PixelBadge';
+import { useAppNotifications } from '@/js/hooks/useAppNotifications';
 import { cn } from '@/js/lib/utils';
 
 type NavItem = {
@@ -22,6 +24,7 @@ const items: NavItem[] = [
 const BottomNav = () => {
   const location = useLocation();
   const onWorkoutRoute = location.pathname.startsWith('/workout');
+  const { total: notificationTotal } = useAppNotifications();
 
   return (
     <nav
@@ -70,9 +73,14 @@ const BottomNav = () => {
                         isCenter &&
                           !isActive &&
                           'border-[var(--color-game-accent-dark)] bg-[var(--color-game-bg-light)]',
+                        item.to === '/more' &&
+                          notificationTotal > 0 &&
+                          !isActive &&
+                          'border-[var(--color-game-danger)]',
                       )}
                     >
                       <GameIcon name={item.icon} size={isCenter ? 24 : 20} />
+                      {item.to === '/more' ? <PixelBadge count={notificationTotal} /> : null}
                     </span>
 
                     <span

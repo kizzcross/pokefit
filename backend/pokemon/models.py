@@ -42,8 +42,64 @@ class PokemonSpecies(IndexedTimeStampedModel):
         verbose_name_plural = _("Pokémon species")
         ordering = ("pokedex_id",)
 
+    evolution_chain = models.ForeignKey(
+        "EvolutionChain",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="species",
+    )
+
     def __str__(self):
         return f"#{self.pokedex_id} {self.name}"
+
+
+class EvolutionChain(IndexedTimeStampedModel):
+    pokeapi_id = models.PositiveIntegerField(unique=True)
+    url = models.URLField(max_length=512, unique=True)
+
+    class Meta:
+        verbose_name = _("evolution chain")
+        verbose_name_plural = _("evolution chains")
+
+    def __str__(self):
+        return f"Evolution chain #{self.pokeapi_id}"
+
+
+class EvolutionRule(models.Model):
+    chain = models.ForeignKey(
+        EvolutionChain,
+        on_delete=models.CASCADE,
+        related_name="rules",
+    )
+    from_species = models.ForeignKey(
+        PokemonSpecies,
+        on_delete=models.CASCADE,
+        related_name="evolution_rules_from",
+    )
+    to_species = models.ForeignKey(
+        PokemonSpecies,
+        on_delete=models.CASCADE,
+        related_name="evolution_rules_to",
+    )
+    trigger = models.CharField(max_length=32, default="level-up")
+    min_level = models.PositiveSmallIntegerField(null=True, blank=True)
+    min_affection = models.PositiveSmallIntegerField(null=True, blank=True)
+    item_slug = models.CharField(max_length=64, blank=True, default="")
+    enabled = models.BooleanField(default=True)
+    priority = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ("priority", "id")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["from_species", "to_species", "trigger", "min_level", "min_affection", "item_slug"],
+                name="pokemon_evolution_rule_unique_edge",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.from_species.name} → {self.to_species.name} ({self.trigger})"
 
 
 class UserPokemon(IndexedTimeStampedModel):

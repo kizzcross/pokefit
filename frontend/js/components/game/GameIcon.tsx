@@ -16,7 +16,8 @@ export type GameIconName =
   | 'shiny'
   | 'back'
   | 'capture'
-  | 'dex';
+  | 'dex'
+  | 'bell';
 
 type GameIconProps = {
   name: GameIconName;
@@ -171,6 +172,20 @@ const icons: Record<GameIconName, SVGProps<SVGSVGElement>['children']> = {
       <rect fill="currentColor" height="2" width="2" x="7" y="2" />
       <rect fill="#5bc0eb" height="2" width="4" x="6" y="6" />
       <rect fill="#7ae582" height="2" width="2" x="5" y="9" />
+    </>
+  ),
+  bell: (
+    <>
+      <rect fill="currentColor" height="2" width="2" x="7" y="1" />
+      <rect fill="currentColor" height="2" width="2" x="5" y="2" />
+      <rect fill="currentColor" height="2" width="2" x="9" y="2" />
+      <rect fill="currentColor" height="2" width="8" x="4" y="4" />
+      <rect fill="currentColor" height="2" width="2" x="3" y="6" />
+      <rect fill="currentColor" height="2" width="2" x="11" y="6" />
+      <rect fill="currentColor" height="2" width="6" x="5" y="6" />
+      <rect fill="#f4d35e" height="2" width="4" x="6" y="8" />
+      <rect fill="currentColor" height="2" width="2" x="7" y="10" />
+      <rect fill="currentColor" height="2" width="4" x="6" y="12" />
     </>
   ),
   back: (

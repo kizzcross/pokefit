@@ -4,6 +4,7 @@ import random
 
 from pokemon.choices import Rarity
 from pokemon.models import PokemonSpecies, UserPokemon
+from pokemon.services.encounter_level import roll_encounter_level
 from workouts.choices import EncounterStatus
 from workouts.models import Workout
 
@@ -90,13 +91,14 @@ def assign_workout_encounter(workout: Workout, *, weekly_goal_bonus: bool = Fals
     else:
         species = roll_species_for_workout(workout, workout.user)
 
-    update_fields = ["encounter_species", "encounter_status", "modified"]
+    update_fields = ["encounter_species", "encounter_status", "encounter_level", "modified"]
     if weekly_goal_bonus:
         workout.weekly_goal_reward = True
         update_fields.append("weekly_goal_reward")
 
     workout.encounter_species = species
     workout.encounter_status = EncounterStatus.PENDING if species else ""
+    workout.encounter_level = roll_encounter_level(workout, species) if species else None
     workout.save(update_fields=update_fields)
     return species
 

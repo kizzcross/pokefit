@@ -155,6 +155,12 @@ class Workout(IndexedTimeStampedModel):
         blank=True,
         default="",
     )
+    encounter_level = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(100)],
+        help_text=_("Level of the wild Pokémon for this encounter."),
+    )
     weekly_goal_reward = models.BooleanField(
         default=False,
         help_text=_("Encontro lendário/ultra raro por bater a meta semanal neste treino."),

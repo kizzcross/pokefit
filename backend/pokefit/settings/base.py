@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "workouts",
     "pokemon",
     "social",
+    "gifts",
 ]
 
 MIDDLEWARE = [

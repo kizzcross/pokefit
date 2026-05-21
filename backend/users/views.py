@@ -1,11 +1,14 @@
 from django.contrib.auth import authenticate, login, logout
+from django.db.models import Q
 from django.utils import timezone
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
+from gifts.permissions import IsGiftAdmin
+from social.serializers import UserBriefSerializer
 from social.services.friends import are_friends, display_name, is_blocked, user_public_profile
 from workouts.services.calendar import build_calendar_month
 from workouts.services.timeline import build_timeline_events
@@ -24,6 +27,40 @@ from .serializers import (
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="q",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=True,
+                description="Nickname or e-mail fragment (min. 1 character).",
+            ),
+        ],
+        responses=UserBriefSerializer(many=True),
+    )
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=[IsAuthenticated, IsGiftAdmin],
+        url_path="gift-recipients",
+    )
+    def gift_recipients(self, request):
+        query = (request.query_params.get("q") or "").strip()
+        if len(query) < 1:
+            return Response([])
+        recipients = User.objects.filter(is_active=True)
+        if "@" in query:
+            recipients = recipients.filter(email__icontains=query.lower())
+        else:
+            term = query.lower()
+            recipients = recipients.filter(
+                Q(nickname__icontains=term) | Q(email__icontains=term)
+            )
+        recipients = recipients.order_by("nickname", "email")[:20]
+        serializer = UserBriefSerializer(recipients, many=True, context={"request": request})
+        return Response(serializer.data)
 
     @extend_schema(request=LoginSerializer, responses={200: UserSerializer})
     @action(detail=False, methods=["post"], permission_classes=[AllowAny], url_path="login")

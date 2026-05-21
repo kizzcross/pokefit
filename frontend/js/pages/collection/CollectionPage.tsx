@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router';
 
 import { myPokemonList } from '@/js/api';
 import PokemonSprite from '@/js/components/game/PokemonSprite';
+import StatBar from '@/js/components/game/StatBar';
 import { resolvePokemonSpriteUrl } from '@/js/lib/pokemon-sprites';
 import MobileHeader from '@/js/components/layout/MobileHeader';
 import { LoadingGridSkeleton, QueryRefetchBar } from '@/js/components/ui/GameLoading';
@@ -57,6 +58,14 @@ const CollectionPage = () => {
                     />
                     <p className="mt-2 text-sm font-semibold">{pokemon.display_name}</p>
                     <p className="text-xs text-[var(--color-game-muted)]">Lv. {pokemon.level}</p>
+                    <div className="mt-2 px-1">
+                      <StatBar
+                        color="bg-[var(--color-game-accent)]"
+                        label="XP"
+                        max={100}
+                        value={pokemon.experience_progress_percent ?? 0}
+                      />
+                    </div>
                   </PixelCard>
                 </Link>
               );

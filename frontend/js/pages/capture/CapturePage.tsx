@@ -21,6 +21,7 @@ const CapturePage = () => {
   const setLastCaptureId = useGameStore((s) => s.setLastCaptureId);
   const species = encounter.species;
   const workoutId = encounter.workoutId;
+  const encounterLevel = encounter.encounterLevel;
 
   const captureMutation = useMutation({
     mutationFn: async () => {

@@ -94,17 +94,9 @@ export type ExerciseSummary = {
     readonly video_url: string;
 };
 
-/**
- * E-mail ou nickname: use `identifier` ou o campo legado `email`.
- */
 export type FriendRequestCreate = {
     email?: string;
     identifier?: string;
-};
-
-export type FriendRequestsResponse = {
-    incoming: Array<Friendship>;
-    outgoing: Array<Friendship>;
 };
 
 export type Friendship = {
@@ -258,10 +250,6 @@ export type PatchedExercise = {
 export type PatchedUser = {
     readonly id?: number;
     email?: string;
-    /**
-     * Apelido único visível no app (3–24 caracteres, a-z, 0-9, _).
-     */
-    nickname?: string;
     readonly display_name?: string;
     /**
      * Slug do sprite de treinador (Pokémon Showdown).
@@ -349,7 +337,7 @@ export type PokemonSpecies = {
     readonly id: number;
     pokedex_id: number;
     name: string;
-    type_1: Type2Enum;
+    type_1: Type1Enum;
     type_2?: Type2Enum | BlankEnum;
     base_hp: number;
     base_attack: number;
@@ -382,47 +370,27 @@ export type SaveWeeklyGoal = {
  */
 export type Status31eEnum = 'draft' | 'finished' | 'cancelled';
 
-export type TimelineEncounter = {
-    species_name: string;
-    species_pokedex_id: number;
-    species_sprite?: string;
-    status?: string;
-    captured?: boolean;
-    shiny?: boolean;
-};
-
-export type TimelineEvent = {
-    type: string;
-    at: string;
-    actor: UserBrief;
-    workout?: TimelineWorkout | null;
-    encounter?: TimelineEncounter | null;
-    pokemon?: TimelinePokemon | null;
-};
-
-export type TimelineFeed = {
-    results: Array<TimelineEvent>;
-    count: number;
-};
-
-export type TimelinePokemon = {
-    id: number;
-    display_name: string;
-    species_name: string;
-    species_pokedex_id: number;
-    species_sprite?: string;
-    shiny?: boolean;
-};
-
-export type TimelineWorkout = {
-    id: number;
-    workout_type: string;
-    total_volume?: string;
-    perceived_effort?: number | null;
-    proof_photo_url?: string | null;
-    proof_caption?: string;
-    duration_minutes?: number | null;
-};
+/**
+ * * `normal` - Normal
+ * * `fire` - Fire
+ * * `water` - Water
+ * * `electric` - Electric
+ * * `grass` - Grass
+ * * `ice` - Ice
+ * * `fighting` - Fighting
+ * * `poison` - Poison
+ * * `ground` - Ground
+ * * `flying` - Flying
+ * * `psychic` - Psychic
+ * * `bug` - Bug
+ * * `rock` - Rock
+ * * `ghost` - Ghost
+ * * `dragon` - Dragon
+ * * `dark` - Dark
+ * * `steel` - Steel
+ * * `fairy` - Fairy
+ */
+export type Type1Enum = 'normal' | 'fire' | 'water' | 'electric' | 'grass' | 'ice' | 'fighting' | 'poison' | 'ground' | 'flying' | 'psychic' | 'bug' | 'rock' | 'ghost' | 'dragon' | 'dark' | 'steel' | 'fairy';
 
 /**
  * * `normal` - Normal
@@ -446,34 +414,9 @@ export type TimelineWorkout = {
  */
 export type Type2Enum = 'normal' | 'fire' | 'water' | 'electric' | 'grass' | 'ice' | 'fighting' | 'poison' | 'ground' | 'flying' | 'psychic' | 'bug' | 'rock' | 'ghost' | 'dragon' | 'dark' | 'steel' | 'fairy';
 
-export type Login = {
-    email: string;
-    password: string;
-};
-
-export type Register = {
-    email: string;
-    nickname: string;
-    trainer_sprite?: string;
-};
-
-export type PatchedUserProfileUpdate = {
-    /**
-     * Apelido único visível no app (3–24 caracteres, a-z, 0-9, _).
-     */
-    nickname?: string;
-    /**
-     * Slug do sprite de treinador (Pokémon Showdown).
-     */
-    trainer_sprite?: string;
-};
-
 export type User = {
     readonly id: number;
     email: string;
-    /**
-     * Apelido único visível no app (3–24 caracteres, a-z, 0-9, _).
-     */
     nickname: string;
     readonly display_name: string;
     /**
@@ -503,9 +446,6 @@ export type User = {
 export type UserBrief = {
     readonly id: number;
     readonly email: string;
-    /**
-     * Apelido único visível no app (3–24 caracteres, a-z, 0-9, _).
-     */
     readonly nickname: string;
     readonly display_name: string;
     /**
@@ -748,11 +688,6 @@ export type ExerciseWritable = {
     is_active?: boolean;
 };
 
-export type FriendRequestsResponseWritable = {
-    incoming: Array<unknown>;
-    outgoing: Array<unknown>;
-};
-
 export type LastWorkoutByTypeWritable = {
     [key: string]: unknown;
 };
@@ -807,9 +742,6 @@ export type PatchedExerciseWritable = {
 
 export type PatchedUserWritable = {
     email?: string;
-    /**
-     * Apelido único visível no app (3–24 caracteres, a-z, 0-9, _).
-     */
     nickname?: string;
     /**
      * Slug do sprite de treinador (Pokémon Showdown).
@@ -833,7 +765,7 @@ export type PendingEncounterWritable = {
 export type PokemonSpeciesWritable = {
     pokedex_id: number;
     name: string;
-    type_1: Type2Enum;
+    type_1: Type1Enum;
     type_2?: Type2Enum | BlankEnum;
     base_hp: number;
     base_attack: number;
@@ -846,27 +778,9 @@ export type PokemonSpeciesWritable = {
     rarity?: RarityEnum;
 };
 
-export type TimelineEventWritable = {
-    type: string;
-    at: string;
-    workout?: TimelineWorkout | null;
-    encounter?: TimelineEncounter | null;
-    pokemon?: TimelinePokemon | null;
-};
-
-export type RegisterWritable = {
-    email: string;
-    nickname: string;
-    password: string;
-    trainer_sprite?: string;
-};
-
 export type UserWritable = {
     email: string;
-    /**
-     * Apelido único visível no app (3–24 caracteres, a-z, 0-9, _).
-     */
-    nickname: string;
+    nickname?: string;
     /**
      * Slug do sprite de treinador (Pokémon Showdown).
      */
@@ -1045,66 +959,57 @@ export type ExercisesUpdateResponses = {
 export type ExercisesUpdateResponse = ExercisesUpdateResponses[keyof ExercisesUpdateResponses];
 
 export type FriendsAcceptCreateData = {
-    body?: UserBrief;
+    body?: never;
     path: {
-        /**
-         * A unique integer value identifying this friendship.
-         */
-        id: number;
+        id: string;
     };
     query?: never;
     url: '/api/friends/{id}/accept/';
 };
 
 export type FriendsAcceptCreateResponses = {
-    200: UserBrief;
+    /**
+     * No response body
+     */
+    200: unknown;
 };
 
-export type FriendsAcceptCreateResponse = FriendsAcceptCreateResponses[keyof FriendsAcceptCreateResponses];
-
 export type FriendsBlockCreateData = {
-    body?: UserBrief;
+    body?: never;
     path: {
-        /**
-         * A unique integer value identifying this friendship.
-         */
-        id: number;
+        id: string;
     };
     query?: never;
     url: '/api/friends/{id}/block/';
 };
 
 export type FriendsBlockCreateResponses = {
-    200: UserBrief;
+    /**
+     * No response body
+     */
+    200: unknown;
 };
 
-export type FriendsBlockCreateResponse = FriendsBlockCreateResponses[keyof FriendsBlockCreateResponses];
-
 export type FriendsDeclineCreateData = {
-    body?: UserBrief;
+    body?: never;
     path: {
-        /**
-         * A unique integer value identifying this friendship.
-         */
-        id: number;
+        id: string;
     };
     query?: never;
     url: '/api/friends/{id}/decline/';
 };
 
 export type FriendsDeclineCreateResponses = {
-    200: UserBrief;
+    /**
+     * No response body
+     */
+    200: unknown;
 };
-
-export type FriendsDeclineCreateResponse = FriendsDeclineCreateResponses[keyof FriendsDeclineCreateResponses];
 
 export type FriendsRemoveDestroyData = {
     body?: never;
     path: {
-        /**
-         * A unique integer value identifying this friendship.
-         */
-        id: number;
+        id: string;
     };
     query?: never;
     url: '/api/friends/{id}/remove/';
@@ -1149,13 +1054,14 @@ export type FriendsRequestsRetrieveData = {
 };
 
 export type FriendsRequestsRetrieveResponses = {
-    200: FriendRequestsResponse;
+    /**
+     * No response body
+     */
+    200: unknown;
 };
 
-export type FriendsRequestsRetrieveResponse = FriendsRequestsRetrieveResponses[keyof FriendsRequestsRetrieveResponses];
-
 export type FriendsRequestsSendCreateData = {
-    body?: FriendRequestCreate;
+    body: FriendRequestCreate;
     path?: never;
     query?: never;
     url: '/api/friends/requests/send/';
@@ -1335,18 +1241,19 @@ export type RestRestCheckRetrieveResponses = {
 
 export type RestRestCheckRetrieveResponse = RestRestCheckRetrieveResponses[keyof RestRestCheckRetrieveResponses];
 
-export type TimelineListData = {
+export type TimelineRetrieveData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/api/timeline/';
 };
 
-export type TimelineListResponses = {
-    200: Array<TimelineFeed>;
+export type TimelineRetrieveResponses = {
+    /**
+     * No response body
+     */
+    200: unknown;
 };
-
-export type TimelineListResponse = TimelineListResponses[keyof TimelineListResponses];
 
 export type UsersListData = {
     body?: never;
@@ -1495,7 +1402,7 @@ export type UsersTimelineRetrieveResponses = {
 export type UsersTimelineRetrieveResponse = UsersTimelineRetrieveResponses[keyof UsersTimelineRetrieveResponses];
 
 export type UsersLoginCreateData = {
-    body: Login;
+    body: UserWritable;
     path?: never;
     query?: never;
     url: '/api/users/login/';
@@ -1537,7 +1444,7 @@ export type UsersMeRetrieveResponses = {
 export type UsersMeRetrieveResponse = UsersMeRetrieveResponses[keyof UsersMeRetrieveResponses];
 
 export type UsersMePartialUpdateData = {
-    body?: PatchedUserProfileUpdate;
+    body?: PatchedUserWritable;
     path?: never;
     query?: never;
     url: '/api/users/me/';
@@ -1550,14 +1457,14 @@ export type UsersMePartialUpdateResponses = {
 export type UsersMePartialUpdateResponse = UsersMePartialUpdateResponses[keyof UsersMePartialUpdateResponses];
 
 export type UsersRegisterCreateData = {
-    body: RegisterWritable;
+    body: UserWritable;
     path?: never;
     query?: never;
     url: '/api/users/register/';
 };
 
 export type UsersRegisterCreateResponses = {
-    201: User;
+    200: User;
 };
 
 export type UsersRegisterCreateResponse = UsersRegisterCreateResponses[keyof UsersRegisterCreateResponses];

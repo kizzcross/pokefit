@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ExercisesCreateData, ExercisesCreateResponses, ExercisesDestroyData, ExercisesDestroyResponses, ExercisesListData, ExercisesListResponses, ExercisesPartialUpdateData, ExercisesPartialUpdateResponses, ExercisesRetrieveData, ExercisesRetrieveResponses, ExercisesUpdateData, ExercisesUpdateResponses, FriendsAcceptCreateData, FriendsAcceptCreateResponses, FriendsBlockCreateData, FriendsBlockCreateResponses, FriendsDeclineCreateData, FriendsDeclineCreateResponses, FriendsListListData, FriendsListListResponses, FriendsRemoveDestroyData, FriendsRemoveDestroyResponses, FriendsRequestsRetrieveData, FriendsRequestsRetrieveResponses, FriendsRequestsSendCreateData, FriendsRequestsSendCreateResponses, MyPokemonCaptureCreateData, MyPokemonCaptureCreateResponses, MyPokemonListData, MyPokemonListResponses, MyPokemonRandomEncounterRetrieveData, MyPokemonRandomEncounterRetrieveResponses, MyPokemonReleaseCreateData, MyPokemonReleaseCreateResponses, MyPokemonRetrieveData, MyPokemonRetrieveResponses, MyPokemonTeamListData, MyPokemonTeamListResponses, MyPokemonTeamSlotPartialUpdateData, MyPokemonTeamSlotPartialUpdateResponses, PokemonSpeciesListData, PokemonSpeciesListResponses, PokemonSpeciesRetrieveData, PokemonSpeciesRetrieveResponses, RestRestCheckRetrieveData, RestRestCheckRetrieveResponses, TimelineListData, TimelineListResponses, UsersCalendarRetrieveData, UsersCalendarRetrieveResponses, UsersCreateData, UsersCreateResponses, UsersDestroyData, UsersDestroyResponses, UsersListData, UsersListResponses, UsersLoginCreateData, UsersLoginCreateResponses, UsersLogoutCreateData, UsersLogoutCreateResponses, UsersMePartialUpdateData, UsersMePartialUpdateResponses, UsersMeRetrieveData, UsersMeRetrieveResponses, UsersPartialUpdateData, UsersPartialUpdateResponses, UsersRegisterCreateData, UsersRegisterCreateResponses, UsersRetrieveData, UsersRetrieveResponses, UsersTimelineRetrieveData, UsersTimelineRetrieveResponses, UsersTrainerSpritesRetrieveData, UsersTrainerSpritesRetrieveResponses, UsersUpdateData, UsersUpdateResponses, WeeklyGoalCreateData, WeeklyGoalCreateResponses, WeeklyGoalListData, WeeklyGoalListResponses, WorkoutsActiveDraftRetrieveData, WorkoutsActiveDraftRetrieveResponses, WorkoutsCalendarRetrieveData, WorkoutsCalendarRetrieveResponses, WorkoutsCreateData, WorkoutsCreateResponses, WorkoutsDeclineEncounterCreateData, WorkoutsDeclineEncounterCreateResponses, WorkoutsDestroyData, WorkoutsDestroyResponses, WorkoutsExercisesBulkCreateData, WorkoutsExercisesBulkCreateResponses, WorkoutsExercisesCreateData, WorkoutsExercisesCreateResponses, WorkoutsExercisesDestroyData, WorkoutsExercisesDestroyResponses, WorkoutsExercisesPartialUpdateData, WorkoutsExercisesPartialUpdateResponses, WorkoutsFinishCreateData, WorkoutsFinishCreateResponses, WorkoutsLastByTypeRetrieveData, WorkoutsLastByTypeRetrieveResponses, WorkoutsListData, WorkoutsListResponses, WorkoutsPartialUpdateData, WorkoutsPartialUpdateResponses, WorkoutsPendingEncounterRetrieveData, WorkoutsPendingEncounterRetrieveResponses, WorkoutsProofCreateData, WorkoutsProofCreateResponses, WorkoutsRetrieveData, WorkoutsRetrieveResponses } from './types.gen';
+import type { ExercisesCreateData, ExercisesCreateResponses, ExercisesDestroyData, ExercisesDestroyResponses, ExercisesListData, ExercisesListResponses, ExercisesPartialUpdateData, ExercisesPartialUpdateResponses, ExercisesRetrieveData, ExercisesRetrieveResponses, ExercisesUpdateData, ExercisesUpdateResponses, FriendsAcceptCreateData, FriendsAcceptCreateResponses, FriendsBlockCreateData, FriendsBlockCreateResponses, FriendsDeclineCreateData, FriendsDeclineCreateResponses, FriendsListListData, FriendsListListResponses, FriendsRemoveDestroyData, FriendsRemoveDestroyResponses, FriendsRequestsRetrieveData, FriendsRequestsRetrieveResponses, FriendsRequestsSendCreateData, FriendsRequestsSendCreateResponses, GiftsClaimCreateData, GiftsClaimCreateResponses, GiftsListData, GiftsListResponses, GiftsPendingCountRetrieveData, GiftsPendingCountRetrieveResponses, GiftsRetrieveData, GiftsRetrieveResponses, GiftsSendCreateData, GiftsSendCreateResponses, MyPokemonCaptureCreateData, MyPokemonCaptureCreateResponses, MyPokemonListData, MyPokemonListResponses, MyPokemonRandomEncounterRetrieveData, MyPokemonRandomEncounterRetrieveResponses, MyPokemonReleaseCreateData, MyPokemonReleaseCreateResponses, MyPokemonRetrieveData, MyPokemonRetrieveResponses, MyPokemonTeamListData, MyPokemonTeamListResponses, MyPokemonTeamSlotPartialUpdateData, MyPokemonTeamSlotPartialUpdateResponses, PokemonSpeciesListData, PokemonSpeciesListResponses, PokemonSpeciesRetrieveData, PokemonSpeciesRetrieveResponses, RestRestCheckRetrieveData, RestRestCheckRetrieveResponses, TimelineListData, TimelineListResponses, UsersCalendarRetrieveData, UsersCalendarRetrieveResponses, UsersCreateData, UsersCreateResponses, UsersDestroyData, UsersDestroyResponses, UsersGiftRecipientsListData, UsersGiftRecipientsListResponses, UsersListData, UsersListResponses, UsersLoginCreateData, UsersLoginCreateResponses, UsersLogoutCreateData, UsersLogoutCreateResponses, UsersMePartialUpdateData, UsersMePartialUpdateResponses, UsersMeRetrieveData, UsersMeRetrieveResponses, UsersPartialUpdateData, UsersPartialUpdateResponses, UsersRegisterCreateData, UsersRegisterCreateResponses, UsersRetrieveData, UsersRetrieveResponses, UsersTimelineRetrieveData, UsersTimelineRetrieveResponses, UsersTrainerSpritesRetrieveData, UsersTrainerSpritesRetrieveResponses, UsersUpdateData, UsersUpdateResponses, WeeklyGoalCreateData, WeeklyGoalCreateResponses, WeeklyGoalListData, WeeklyGoalListResponses, WorkoutsActiveDraftRetrieveData, WorkoutsActiveDraftRetrieveResponses, WorkoutsCalendarRetrieveData, WorkoutsCalendarRetrieveResponses, WorkoutsCreateData, WorkoutsCreateResponses, WorkoutsDeclineEncounterCreateData, WorkoutsDeclineEncounterCreateResponses, WorkoutsDestroyData, WorkoutsDestroyResponses, WorkoutsExercisesBulkCreateData, WorkoutsExercisesBulkCreateResponses, WorkoutsExercisesCreateData, WorkoutsExercisesCreateResponses, WorkoutsExercisesDestroyData, WorkoutsExercisesDestroyResponses, WorkoutsExercisesPartialUpdateData, WorkoutsExercisesPartialUpdateResponses, WorkoutsFinishCreateData, WorkoutsFinishCreateResponses, WorkoutsLastByTypeRetrieveData, WorkoutsLastByTypeRetrieveResponses, WorkoutsListData, WorkoutsListResponses, WorkoutsPartialUpdateData, WorkoutsPartialUpdateResponses, WorkoutsPendingEncounterRetrieveData, WorkoutsPendingEncounterRetrieveResponses, WorkoutsProofCreateData, WorkoutsProofCreateResponses, WorkoutsRetrieveData, WorkoutsRetrieveResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -235,6 +235,89 @@ export const friendsRequestsSendCreate = <ThrowOnError extends boolean = false>(
         headers: {
             'Content-Type': 'application/json',
             ...options?.headers
+        }
+    });
+};
+
+export const giftsList = <ThrowOnError extends boolean = false>(options?: Options<GiftsListData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GiftsListResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/gifts/',
+        ...options
+    });
+};
+
+export const giftsRetrieve = <ThrowOnError extends boolean = false>(options: Options<GiftsRetrieveData, ThrowOnError>) => {
+    return (options.client ?? client).get<GiftsRetrieveResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/gifts/{id}/',
+        ...options
+    });
+};
+
+export const giftsClaimCreate = <ThrowOnError extends boolean = false>(options: Options<GiftsClaimCreateData, ThrowOnError>) => {
+    return (options.client ?? client).post<GiftsClaimCreateResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/gifts/{id}/claim/',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const giftsPendingCountRetrieve = <ThrowOnError extends boolean = false>(options?: Options<GiftsPendingCountRetrieveData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GiftsPendingCountRetrieveResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/gifts/pending-count/',
+        ...options
+    });
+};
+
+export const giftsSendCreate = <ThrowOnError extends boolean = false>(options: Options<GiftsSendCreateData, ThrowOnError>) => {
+    return (options.client ?? client).post<GiftsSendCreateResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/gifts/send/',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
         }
     });
 };
@@ -547,6 +630,21 @@ export const usersTimelineRetrieve = <ThrowOnError extends boolean = false>(opti
             }
         ],
         url: '/api/users/{id}/timeline/',
+        ...options
+    });
+};
+
+export const usersGiftRecipientsList = <ThrowOnError extends boolean = false>(options?: Options<UsersGiftRecipientsListData, ThrowOnError>) => {
+    return (options?.client ?? client).get<UsersGiftRecipientsListResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/users/gift-recipients/',
         ...options
     });
 };

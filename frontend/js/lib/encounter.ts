@@ -1,10 +1,16 @@
 import { client } from '@/js/lib/api';
 
-import type { PokemonSpecies } from '@/js/api/types.gen';
+import type { PokemonSpecies, WorkoutDetail } from '@/js/api/types.gen';
+
+export type WorkoutDetailWithEncounter = WorkoutDetail & {
+  encounter_level?: number | null;
+};
 
 export type PendingEncounter = {
   workout_id: number;
   encounter_status: string;
+  encounter_level?: number | null;
+  weekly_goal_reward?: boolean;
   species: PokemonSpecies;
 };
 
@@ -12,6 +18,8 @@ export type WorkoutWithEncounter = {
   id: number;
   encounter_status?: string;
   encounter_species?: PokemonSpecies | null;
+  encounter_level?: number | null;
+  weekly_goal_reward?: boolean;
 };
 
 export async function fetchPendingEncounter(): Promise<PendingEncounter | null> {

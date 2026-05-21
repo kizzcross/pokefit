@@ -2,6 +2,8 @@ from rest_framework import serializers
 
 from .constants import TEAM_SLOT_MAX, TEAM_SLOT_MIN
 from .models import PokemonIV, PokemonSpecies, UserPokemon
+from .serializers_progress import EvolutionPreviewSerializer, PokemonProgressMixin
+from .services.progression import EvolutionPreview, TeamPokemonGain, WorkoutTeamRewards
 from .services.sprites import normalize_sprite_url
 
 
@@ -46,7 +48,7 @@ class PokemonIVSerializer(serializers.ModelSerializer):
         fields = ("hp", "attack", "defense", "sp_attack", "sp_defense", "speed")
 
 
-class UserPokemonListSerializer(serializers.ModelSerializer):
+class UserPokemonListSerializer(PokemonProgressMixin, serializers.ModelSerializer):
     species = PokemonSpeciesSerializer(read_only=True)
     display_name = serializers.SerializerMethodField()
 
@@ -59,10 +61,16 @@ class UserPokemonListSerializer(serializers.ModelSerializer):
             "display_name",
             "level",
             "experience",
+            "experience_to_next_level",
+            "experience_progress_percent",
             "nature",
             "shiny",
             "active_team_slot",
             "affection",
+            "affection_max",
+            "affection_progress_percent",
+            "can_evolve",
+            "next_evolution",
             "captured_at",
         ]
 
@@ -103,6 +111,45 @@ class UserPokemonCaptureSerializer(serializers.Serializer):
     nickname = serializers.CharField(required=False, allow_blank=True, default="")
     shiny = serializers.BooleanField(default=False)
     source_workout_id = serializers.IntegerField()
+
+
+class TeamPokemonGainSerializer(serializers.Serializer):
+    pokemon_id = serializers.IntegerField()
+    display_name = serializers.CharField()
+    xp_added = serializers.IntegerField()
+    affection_added = serializers.IntegerField()
+    level_before = serializers.IntegerField()
+    level_after = serializers.IntegerField()
+    evolved = serializers.BooleanField()
+    evolved_to = EvolutionPreviewSerializer(allow_null=True, required=False)
+
+    @classmethod
+    def from_gain(cls, gain: TeamPokemonGain):
+        data = {
+            "pokemon_id": gain.pokemon_id,
+            "display_name": gain.display_name,
+            "xp_added": gain.xp_added,
+            "affection_added": gain.affection_added,
+            "level_before": gain.level_before,
+            "level_after": gain.level_after,
+            "evolved": gain.evolved,
+            "evolved_to": (
+                EvolutionPreviewSerializer(gain.evolved_to).data if gain.evolved_to else None
+            ),
+        }
+        return data
+
+
+class WorkoutTeamRewardsSerializer(serializers.Serializer):
+    gains = TeamPokemonGainSerializer(many=True)
+    empty_team = serializers.BooleanField()
+
+    @classmethod
+    def from_rewards(cls, rewards: WorkoutTeamRewards):
+        return {
+            "gains": [TeamPokemonGainSerializer.from_gain(g) for g in rewards.gains],
+            "empty_team": rewards.empty_team,
+        }
 
 
 class UserPokemonTeamUpdateSerializer(serializers.ModelSerializer):
