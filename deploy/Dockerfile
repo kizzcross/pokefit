@@ -37,6 +37,7 @@ RUN poetry config virtualenvs.create false \
 
 COPY backend ./backend
 COPY --from=frontend-build /app/frontend/webpack_bundles ./frontend/webpack_bundles
+COPY --from=frontend-build /app/webpack-stats.json ./webpack-stats.json
 
 COPY deploy/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

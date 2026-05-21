@@ -165,3 +165,4 @@ O app funciona sem worker para o fluxo principal. Se precisar de filas depois, a
 | CSS/JS quebrado | `collectstatic` nos logs; pasta `/var/www/pokefit/static` |
 | Fotos não aparecem | permissões em `/var/www/pokefit/media` |
 | Redirect loop HTTPS | Nginx envia `X-Forwarded-Proto`; Certbot ativo |
+| 500 `webpack-stats.json` | Rebuild da imagem `web` (arquivo entra no Docker na build) |
