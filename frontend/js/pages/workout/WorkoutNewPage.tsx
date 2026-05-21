@@ -6,13 +6,12 @@ import PixelButton from '@/js/components/ui/PixelButton';
 import PixelCard from '@/js/components/ui/PixelCard';
 import { workoutsCreate } from '@/js/api';
 
-const workoutTypes = [
+const muscleWorkoutTypes = [
   { value: 'chest_triceps', label: 'Peito + Tríceps' },
   { value: 'back_biceps', label: 'Costas + Bíceps' },
   { value: 'legs', label: 'Pernas' },
   { value: 'shoulders', label: 'Ombros' },
   { value: 'arms', label: 'Braços' },
-  { value: 'cardio', label: 'Cardio' },
   { value: 'full_body', label: 'Corpo inteiro' },
   { value: 'mobility', label: 'Mobilidade' },
 ];
@@ -32,7 +31,11 @@ const WorkoutNewPage = () => {
     onSuccess: (workout) => {
       queryClient.invalidateQueries({ queryKey: ['workouts'] });
       queryClient.invalidateQueries({ queryKey: ['workouts', 'active-draft'] });
-      navigate(`/workout/${workout.id}`);
+      const path =
+        workout.workout_type === 'cardio'
+          ? `/workout/cardio/${workout.id}`
+          : `/workout/${workout.id}`;
+      navigate(path);
     },
   });
 
@@ -46,8 +49,20 @@ const WorkoutNewPage = () => {
             por vez — se você tinha um rascunho aberto, ele será descartado ao iniciar este.
           </p>
         </PixelCard>
+        <PixelButton
+          disabled={createMutation.isPending}
+          fullWidth
+          onClick={() => createMutation.mutate('cardio')}
+          variant="primary"
+        >
+          Cardio (corrida / pace)
+        </PixelButton>
+
+        <p className="text-center text-xs font-bold uppercase text-[var(--color-game-muted)]">
+          Musculação
+        </p>
         <div className="grid gap-3">
-          {workoutTypes.map((type) => (
+          {muscleWorkoutTypes.map((type) => (
             <PixelButton
               key={type.value}
               disabled={createMutation.isPending}

@@ -1207,6 +1207,120 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/workouts/{id}/cardio-preview/:
+    post:
+      operationId: workouts_cardio_preview_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - workouts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardioPreview'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CardioPreview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CardioPreview'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardioPreview'
+          description: ''
+  /api/workouts/{id}/cardio-reference/:
+    get:
+      operationId: workouts_cardio_reference_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - workouts
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardioReference'
+          description: ''
+  /api/workouts/{id}/cardio-session/:
+    post:
+      operationId: workouts_cardio_session_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - workouts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardioSession'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CardioSession'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CardioSession'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutDetail'
+          description: ''
+    patch:
+      operationId: workouts_cardio_session_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - workouts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCardioSession'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCardioSession'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCardioSession'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutDetail'
+          description: ''
   /api/workouts/{id}/decline-encounter/:
     post:
       operationId: workouts_decline_encounter_create
@@ -1391,6 +1505,37 @@ paths:
               schema:
                 $ref: '#/components/schemas/WorkoutFinishResult'
           description: ''
+  /api/workouts/{id}/finish-cardio/:
+    post:
+      operationId: workouts_finish_cardio_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - workouts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardioWorkoutFinish'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CardioWorkoutFinish'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CardioWorkoutFinish'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutFinishResult'
+          description: ''
   /api/workouts/{id}/proof/:
     post:
       operationId: workouts_proof_create
@@ -1485,6 +1630,90 @@ components:
     BlankEnum:
       enum:
       - ''
+    CardioPreview:
+      type: object
+      properties:
+        duration_minutes:
+          type: integer
+          maximum: 600
+          minimum: 1
+        pace_minutes:
+          type: integer
+          maximum: 20
+          minimum: 2
+        pace_seconds:
+          type: integer
+          maximum: 59
+          minimum: 0
+      required:
+      - duration_minutes
+      - pace_minutes
+      - pace_seconds
+    CardioReference:
+      type: object
+      properties:
+        reference_pace_seconds_per_km:
+          type: integer
+        reference_pace_display:
+          type: string
+        has_previous_cardio:
+          type: boolean
+        last_cardio_ended_at:
+          type: string
+          format: date-time
+          nullable: true
+        last_cardio_duration_minutes:
+          type: integer
+          nullable: true
+        last_cardio_pace_display:
+          type: string
+          nullable: true
+      required:
+      - has_previous_cardio
+      - last_cardio_duration_minutes
+      - last_cardio_ended_at
+      - last_cardio_pace_display
+      - reference_pace_display
+      - reference_pace_seconds_per_km
+    CardioSession:
+      type: object
+      properties:
+        duration_minutes:
+          type: integer
+          maximum: 600
+          minimum: 1
+        pace_minutes:
+          type: integer
+          maximum: 20
+          minimum: 2
+        pace_seconds:
+          type: integer
+          maximum: 59
+          minimum: 0
+      required:
+      - duration_minutes
+      - pace_minutes
+      - pace_seconds
+    CardioWorkoutFinish:
+      type: object
+      properties:
+        duration_minutes:
+          type: integer
+          maximum: 600
+          minimum: 1
+        pace_minutes:
+          type: integer
+          maximum: 20
+          minimum: 2
+        pace_seconds:
+          type: integer
+          maximum: 59
+          minimum: 0
+        perceived_effort:
+          type: integer
+          maximum: 10
+          minimum: 1
+          nullable: true
     DifficultyEnum:
       enum:
       - beginner
@@ -1916,12 +2145,28 @@ components:
           format: decimal
           pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
           readOnly: true
+        cardio_duration_minutes:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: Duration of the cardio session in minutes.
+        cardio_pace_seconds_per_km:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: Average pace in seconds per kilometer (lower is faster).
+        cardio_pace_display:
+          type: string
+          readOnly: true
         exercises:
           type: array
           items:
             $ref: '#/components/schemas/WorkoutExercise'
           readOnly: true
       required:
+      - cardio_duration_minutes
+      - cardio_pace_display
+      - cardio_pace_seconds_per_km
       - duration_minutes
       - ended_at
       - exercises
@@ -2160,6 +2405,21 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/WorkoutList'
+    PatchedCardioSession:
+      type: object
+      properties:
+        duration_minutes:
+          type: integer
+          maximum: 600
+          minimum: 1
+        pace_minutes:
+          type: integer
+          maximum: 20
+          minimum: 2
+        pace_seconds:
+          type: integer
+          maximum: 59
+          minimum: 0
     PatchedExercise:
       type: object
       properties:
@@ -2354,6 +2614,19 @@ components:
           format: date-time
           readOnly: true
           nullable: true
+        cardio_duration_minutes:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: Duration of the cardio session in minutes.
+        cardio_pace_seconds_per_km:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: Average pace in seconds per kilometer (lower is faster).
+        cardio_pace_display:
+          type: string
+          readOnly: true
         exercises:
           type: array
           items:
@@ -3176,6 +3449,19 @@ components:
           format: date-time
           readOnly: true
           nullable: true
+        cardio_duration_minutes:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: Duration of the cardio session in minutes.
+        cardio_pace_seconds_per_km:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: Average pace in seconds per kilometer (lower is faster).
+        cardio_pace_display:
+          type: string
+          readOnly: true
         exercises:
           type: array
           items:
@@ -3195,6 +3481,9 @@ components:
           format: date-time
           readOnly: true
       required:
+      - cardio_duration_minutes
+      - cardio_pace_display
+      - cardio_pace_seconds_per_km
       - created
       - duration_minutes
       - encounter_level
@@ -3368,6 +3657,10 @@ components:
           allOf:
           - $ref: '#/components/schemas/WorkoutTeamRewards'
           readOnly: true
+        cardio_summary:
+          type: object
+          additionalProperties: {}
+          nullable: true
       required:
       - team_rewards
       - workout
@@ -3421,6 +3714,19 @@ components:
           format: decimal
           pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
           readOnly: true
+        cardio_duration_minutes:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: Duration of the cardio session in minutes.
+        cardio_pace_seconds_per_km:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: Average pace in seconds per kilometer (lower is faster).
+        cardio_pace_display:
+          type: string
+          readOnly: true
         created:
           type: string
           format: date-time
@@ -3430,6 +3736,9 @@ components:
           format: date-time
           readOnly: true
       required:
+      - cardio_duration_minutes
+      - cardio_pace_display
+      - cardio_pace_seconds_per_km
       - created
       - duration_minutes
       - ended_at

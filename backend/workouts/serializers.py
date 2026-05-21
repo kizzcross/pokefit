@@ -4,8 +4,16 @@ from django.utils import timezone
 
 from pokemon.serializers import PokemonSpeciesSerializer, WorkoutTeamRewardsSerializer
 
-from .choices import ValidationType, WorkoutStatus
+from .choices import ValidationType, WorkoutStatus, WorkoutType
 from .models import EXERCISE_IMAGE_MAX_SIZE_BYTES, Exercise, Workout, WorkoutExercise
+from .services.cardio import (
+    cardio_performance_summary,
+    format_pace,
+    get_last_finished_cardio,
+    get_reference_pace_seconds,
+    pace_seconds_from_parts,
+    validate_pace_seconds,
+)
 
 
 class AbsoluteImageUrlMixin:
@@ -116,6 +124,7 @@ class WorkoutExerciseSerializer(serializers.ModelSerializer):
 class WorkoutListSerializer(serializers.ModelSerializer):
     exercise_count = serializers.IntegerField(read_only=True)
     total_volume = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
+    cardio_pace_display = serializers.SerializerMethodField()
 
     class Meta:
         model = Workout
@@ -132,16 +141,25 @@ class WorkoutListSerializer(serializers.ModelSerializer):
             "status",
             "exercise_count",
             "total_volume",
+            "cardio_duration_minutes",
+            "cardio_pace_seconds_per_km",
+            "cardio_pace_display",
             "created",
             "modified",
         ]
         read_only_fields = fields
+
+    def get_cardio_pace_display(self, obj):
+        if not obj.cardio_pace_seconds_per_km:
+            return None
+        return format_pace(obj.cardio_pace_seconds_per_km)
 
 
 class WorkoutDetailSerializer(serializers.ModelSerializer):
     exercises = WorkoutExerciseSerializer(many=True, read_only=True)
     total_volume = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
     encounter_species = PokemonSpeciesSerializer(read_only=True, allow_null=True)
+    cardio_pace_display = serializers.SerializerMethodField()
 
     class Meta:
         model = Workout
@@ -163,6 +181,9 @@ class WorkoutDetailSerializer(serializers.ModelSerializer):
             "proof_photo_url",
             "proof_caption",
             "proof_uploaded_at",
+            "cardio_duration_minutes",
+            "cardio_pace_seconds_per_km",
+            "cardio_pace_display",
             "exercises",
             "total_volume",
             "created",
@@ -171,6 +192,11 @@ class WorkoutDetailSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     proof_photo_url = serializers.SerializerMethodField()
+
+    def get_cardio_pace_display(self, obj):
+        if not obj.cardio_pace_seconds_per_km:
+            return None
+        return format_pace(obj.cardio_pace_seconds_per_km)
 
     def get_proof_photo_url(self, obj):
         if not obj.proof_photo:
@@ -215,6 +241,162 @@ class WorkoutCreateSerializer(serializers.ModelSerializer):
 class WorkoutFinishResultSerializer(serializers.Serializer):
     workout = WorkoutDetailSerializer(read_only=True)
     team_rewards = WorkoutTeamRewardsSerializer(read_only=True)
+    cardio_summary = serializers.DictField(required=False, allow_null=True)
+
+
+class CardioSessionSerializer(serializers.Serializer):
+    duration_minutes = serializers.IntegerField(min_value=1, max_value=600)
+    pace_minutes = serializers.IntegerField(min_value=2, max_value=20)
+    pace_seconds = serializers.IntegerField(min_value=0, max_value=59)
+
+    def validate(self, attrs):
+        try:
+            pace_total = validate_pace_seconds(
+                pace_seconds_from_parts(attrs["pace_minutes"], attrs["pace_seconds"])
+            )
+        except ValueError as exc:
+            raise serializers.ValidationError({"pace_minutes": str(exc)}) from exc
+        attrs["cardio_pace_seconds_per_km"] = pace_total
+        return attrs
+
+    def save(self, **kwargs):
+        workout = self.context["workout"]
+        workout.cardio_duration_minutes = self.validated_data["duration_minutes"]
+        workout.cardio_pace_seconds_per_km = self.validated_data["cardio_pace_seconds_per_km"]
+        workout.save(
+            update_fields=[
+                "cardio_duration_minutes",
+                "cardio_pace_seconds_per_km",
+                "modified",
+            ]
+        )
+        return workout
+
+
+class CardioReferenceSerializer(serializers.Serializer):
+    reference_pace_seconds_per_km = serializers.IntegerField()
+    reference_pace_display = serializers.CharField()
+    has_previous_cardio = serializers.BooleanField()
+    last_cardio_ended_at = serializers.DateTimeField(allow_null=True)
+    last_cardio_duration_minutes = serializers.IntegerField(allow_null=True)
+    last_cardio_pace_display = serializers.CharField(allow_null=True)
+
+
+class CardioPreviewSerializer(serializers.Serializer):
+    duration_minutes = serializers.IntegerField(min_value=1, max_value=600)
+    pace_minutes = serializers.IntegerField(min_value=2, max_value=20)
+    pace_seconds = serializers.IntegerField(min_value=0, max_value=59)
+
+    def validate(self, attrs):
+        try:
+            pace_total = validate_pace_seconds(
+                pace_seconds_from_parts(attrs["pace_minutes"], attrs["pace_seconds"])
+            )
+        except ValueError as exc:
+            raise serializers.ValidationError({"pace_minutes": str(exc)}) from exc
+        attrs["cardio_pace_seconds_per_km"] = pace_total
+        return attrs
+
+    def to_representation(self, instance):
+        return instance
+
+
+class CardioWorkoutFinishSerializer(serializers.Serializer):
+    duration_minutes = serializers.IntegerField(min_value=1, max_value=600, required=False)
+    pace_minutes = serializers.IntegerField(min_value=2, max_value=20, required=False)
+    pace_seconds = serializers.IntegerField(min_value=0, max_value=59, required=False)
+    perceived_effort = serializers.IntegerField(
+        min_value=1,
+        max_value=10,
+        required=False,
+        allow_null=True,
+    )
+
+    def validate(self, attrs):
+        workout = self.context["workout"]
+        if workout.status != WorkoutStatus.DRAFT:
+            raise serializers.ValidationError("Only draft workouts can be finished.")
+        if workout.workout_type != WorkoutType.CARDIO:
+            raise serializers.ValidationError("Use the standard finish endpoint for this workout.")
+        if not workout.proof_photo:
+            raise serializers.ValidationError(
+                "Envie uma foto de prova antes de finalizar o cardio."
+            )
+
+        if all(k in attrs for k in ("duration_minutes", "pace_minutes", "pace_seconds")):
+            try:
+                pace_total = validate_pace_seconds(
+                    pace_seconds_from_parts(attrs["pace_minutes"], attrs["pace_seconds"])
+                )
+            except ValueError as exc:
+                raise serializers.ValidationError({"pace_minutes": str(exc)}) from exc
+            attrs["cardio_pace_seconds_per_km"] = pace_total
+        elif not workout.cardio_pace_seconds_per_km or not workout.cardio_duration_minutes:
+            raise serializers.ValidationError(
+                "Informe duração e ritmo (pace) antes de finalizar."
+            )
+        return attrs
+
+    def save(self, **kwargs):
+        from dataclasses import dataclass
+
+        from pokemon.services.encounter import assign_workout_encounter
+        from pokemon.services.progression import apply_workout_rewards
+        from profiles.services.weekly_goal import (
+            record_weekly_goal_reward,
+            should_grant_weekly_goal_encounter,
+        )
+
+        @dataclass
+        class WorkoutFinishResult:
+            workout: Workout
+            team_rewards: dict
+            cardio_summary: dict | None = None
+
+        workout = self.context["workout"]
+        perceived_effort = self.validated_data.get("perceived_effort")
+        if perceived_effort is not None:
+            workout.perceived_effort = perceived_effort
+
+        if "cardio_pace_seconds_per_km" in self.validated_data:
+            workout.cardio_duration_minutes = self.validated_data["duration_minutes"]
+            workout.cardio_pace_seconds_per_km = self.validated_data["cardio_pace_seconds_per_km"]
+            workout.save(
+                update_fields=[
+                    "perceived_effort",
+                    "cardio_duration_minutes",
+                    "cardio_pace_seconds_per_km",
+                    "modified",
+                ]
+            )
+        elif perceived_effort is not None:
+            workout.save(update_fields=["perceived_effort", "modified"])
+
+        reference_pace = get_reference_pace_seconds(workout.user, exclude_workout_id=workout.pk)
+        has_previous = get_last_finished_cardio(workout.user, exclude_workout_id=workout.pk) is not None
+        summary = cardio_performance_summary(
+            current_pace=workout.cardio_pace_seconds_per_km,
+            reference_pace=reference_pace,
+            has_previous_cardio=has_previous,
+        )
+
+        workout.finish()
+        team_rewards = apply_workout_rewards(workout.user, workout)
+        weekly_bonus = should_grant_weekly_goal_encounter(workout.user, workout)
+        assign_workout_encounter(workout, weekly_goal_bonus=weekly_bonus)
+        if weekly_bonus:
+            record_weekly_goal_reward(workout.user, workout)
+        workout = (
+            Workout.objects.filter(pk=workout.pk)
+            .select_related("encounter_species")
+            .prefetch_related("exercises__exercise")
+            .get()
+        )
+        return WorkoutFinishResult(
+            workout=workout,
+            team_rewards=WorkoutTeamRewardsSerializer.from_rewards(team_rewards),
+            cardio_summary=summary,
+        )
 
 
 class WorkoutFinishSerializer(serializers.Serializer):
@@ -229,6 +411,10 @@ class WorkoutFinishSerializer(serializers.Serializer):
         workout = self.context["workout"]
         if workout.status != WorkoutStatus.DRAFT:
             raise serializers.ValidationError("Only draft workouts can be finished.")
+        if workout.workout_type == WorkoutType.CARDIO:
+            raise serializers.ValidationError(
+                "Treinos de cardio usam o endpoint de finalização de cardio."
+            )
         if workout.exercises.count() == 0:
             raise serializers.ValidationError("Add at least one exercise before finishing.")
         if not workout.proof_photo:
@@ -294,6 +480,7 @@ class WorkoutExerciseBulkCreateSerializer(serializers.Serializer):
 class LastWorkoutByTypeSerializer(serializers.ModelSerializer):
     exercises = WorkoutExerciseSerializer(many=True, read_only=True)
     total_volume = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
+    cardio_pace_display = serializers.SerializerMethodField()
 
     class Meta:
         model = Workout
@@ -303,9 +490,17 @@ class LastWorkoutByTypeSerializer(serializers.ModelSerializer):
             "ended_at",
             "duration_minutes",
             "total_volume",
+            "cardio_duration_minutes",
+            "cardio_pace_seconds_per_km",
+            "cardio_pace_display",
             "exercises",
         )
         read_only_fields = fields
+
+    def get_cardio_pace_display(self, obj):
+        if not obj.cardio_pace_seconds_per_km:
+            return None
+        return format_pace(obj.cardio_pace_seconds_per_km)
 
 
 class WorkoutExerciseCreateSerializer(serializers.ModelSerializer):

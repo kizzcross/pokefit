@@ -15,6 +15,7 @@ import { mergeQueryState } from '@/js/hooks/useQueryLoading';
 import { myPokemonList, myPokemonTeamList, workoutsList } from '@/js/api';
 import { fetchMyCalendar, localDateIso } from '@/js/lib/calendar';
 import { fetchPendingEncounter } from '@/js/lib/encounter';
+import { workoutDetailPath } from '@/js/lib/cardio';
 import { fetchActiveDraft } from '@/js/lib/workout';
 import { fetchWeeklyGoal } from '@/js/lib/weekly-goal';
 import WeeklyGoalCard from '@/js/components/weekly/WeeklyGoalCard';
@@ -194,7 +195,7 @@ const DashboardPage = () => {
             <div className="mt-4 flex flex-col gap-2">
               {activeDraft?.id ? (
                 <>
-                  <PixelLink fullWidth to={`/workout/${activeDraft.id}`} variant="primary">
+                  <PixelLink fullWidth to={workoutDetailPath(activeDraft)} variant="primary">
                     <GameIcon name="workout" size={18} />
                     <span>Continuar treino</span>
                   </PixelLink>
@@ -252,7 +253,7 @@ const DashboardPage = () => {
                 <li key={workout.id}>
                   <Link
                     className="flex items-center justify-between rounded-sm border-2 border-[var(--color-game-border)] bg-[var(--color-game-bg)] px-3 py-3 no-underline transition hover:border-[var(--color-game-accent)]"
-                    to={`/workout/${workout.id}`}
+                    to={workoutDetailPath(workout)}
                   >
                     <span className="text-sm capitalize text-[var(--color-game-text)]">
                       {workout.workout_type?.replaceAll('_', ' ')}

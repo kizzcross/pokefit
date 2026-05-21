@@ -6,6 +6,34 @@ export type ClientOptions = {
 
 export type BlankEnum = '';
 
+export type CardioPreview = {
+    duration_minutes: number;
+    pace_minutes: number;
+    pace_seconds: number;
+};
+
+export type CardioReference = {
+    reference_pace_seconds_per_km: number;
+    reference_pace_display: string;
+    has_previous_cardio: boolean;
+    last_cardio_ended_at: string | null;
+    last_cardio_duration_minutes: number | null;
+    last_cardio_pace_display: string | null;
+};
+
+export type CardioSession = {
+    duration_minutes: number;
+    pace_minutes: number;
+    pace_seconds: number;
+};
+
+export type CardioWorkoutFinish = {
+    duration_minutes?: number;
+    pace_minutes?: number;
+    pace_seconds?: number;
+    perceived_effort?: number | null;
+};
+
 /**
  * * `beginner` - Beginner
  * * `intermediate` - Intermediate
@@ -186,6 +214,15 @@ export type LastWorkoutByType = {
     readonly ended_at: string | null;
     readonly duration_minutes: number | null;
     readonly total_volume: string;
+    /**
+     * Duration of the cardio session in minutes.
+     */
+    readonly cardio_duration_minutes: number | null;
+    /**
+     * Average pace in seconds per kilometer (lower is faster).
+     */
+    readonly cardio_pace_seconds_per_km: number | null;
+    readonly cardio_pace_display: string;
     readonly exercises: Array<WorkoutExercise>;
 };
 
@@ -280,6 +317,12 @@ export type PaginatedWorkoutListList = {
     next?: string | null;
     previous?: string | null;
     results: Array<WorkoutList>;
+};
+
+export type PatchedCardioSession = {
+    duration_minutes?: number;
+    pace_minutes?: number;
+    pace_seconds?: number;
 };
 
 export type PatchedExercise = {
@@ -382,6 +425,15 @@ export type PatchedWorkoutDetail = {
     readonly proof_photo_url?: string;
     readonly proof_caption?: string;
     readonly proof_uploaded_at?: string | null;
+    /**
+     * Duration of the cardio session in minutes.
+     */
+    readonly cardio_duration_minutes?: number | null;
+    /**
+     * Average pace in seconds per kilometer (lower is faster).
+     */
+    readonly cardio_pace_seconds_per_km?: number | null;
+    readonly cardio_pace_display?: string;
     readonly exercises?: Array<WorkoutExercise>;
     readonly total_volume?: string;
     readonly created?: string;
@@ -703,6 +755,15 @@ export type WorkoutDetail = {
     readonly proof_photo_url: string;
     readonly proof_caption: string;
     readonly proof_uploaded_at: string | null;
+    /**
+     * Duration of the cardio session in minutes.
+     */
+    readonly cardio_duration_minutes: number | null;
+    /**
+     * Average pace in seconds per kilometer (lower is faster).
+     */
+    readonly cardio_pace_seconds_per_km: number | null;
+    readonly cardio_pace_display: string;
     readonly exercises: Array<WorkoutExercise>;
     readonly total_volume: string;
     readonly created: string;
@@ -759,6 +820,9 @@ export type WorkoutFinish = {
 export type WorkoutFinishResult = {
     workout: WorkoutDetail;
     team_rewards: WorkoutTeamRewards;
+    cardio_summary?: {
+        [key: string]: unknown;
+    } | null;
 };
 
 export type WorkoutList = {
@@ -777,6 +841,15 @@ export type WorkoutList = {
     status: Status31eEnum;
     readonly exercise_count: number;
     readonly total_volume: string;
+    /**
+     * Duration of the cardio session in minutes.
+     */
+    readonly cardio_duration_minutes: number | null;
+    /**
+     * Average pace in seconds per kilometer (lower is faster).
+     */
+    readonly cardio_pace_seconds_per_km: number | null;
+    readonly cardio_pace_display: string;
     readonly created: string;
     readonly modified: string;
 };
@@ -1027,7 +1100,9 @@ export type WorkoutExerciseCreateWritable = {
 };
 
 export type WorkoutFinishResultWritable = {
-    [key: string]: unknown;
+    cardio_summary?: {
+        [key: string]: unknown;
+    } | null;
 };
 
 export type ExercisesListData = {
@@ -1877,6 +1952,66 @@ export type WorkoutsPartialUpdateResponses = {
 
 export type WorkoutsPartialUpdateResponse = WorkoutsPartialUpdateResponses[keyof WorkoutsPartialUpdateResponses];
 
+export type WorkoutsCardioPreviewCreateData = {
+    body: CardioPreview;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/workouts/{id}/cardio-preview/';
+};
+
+export type WorkoutsCardioPreviewCreateResponses = {
+    200: CardioPreview;
+};
+
+export type WorkoutsCardioPreviewCreateResponse = WorkoutsCardioPreviewCreateResponses[keyof WorkoutsCardioPreviewCreateResponses];
+
+export type WorkoutsCardioReferenceRetrieveData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/workouts/{id}/cardio-reference/';
+};
+
+export type WorkoutsCardioReferenceRetrieveResponses = {
+    200: CardioReference;
+};
+
+export type WorkoutsCardioReferenceRetrieveResponse = WorkoutsCardioReferenceRetrieveResponses[keyof WorkoutsCardioReferenceRetrieveResponses];
+
+export type WorkoutsCardioSessionPartialUpdateData = {
+    body?: PatchedCardioSession;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/workouts/{id}/cardio-session/';
+};
+
+export type WorkoutsCardioSessionPartialUpdateResponses = {
+    200: WorkoutDetail;
+};
+
+export type WorkoutsCardioSessionPartialUpdateResponse = WorkoutsCardioSessionPartialUpdateResponses[keyof WorkoutsCardioSessionPartialUpdateResponses];
+
+export type WorkoutsCardioSessionCreateData = {
+    body: CardioSession;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/workouts/{id}/cardio-session/';
+};
+
+export type WorkoutsCardioSessionCreateResponses = {
+    200: WorkoutDetail;
+};
+
+export type WorkoutsCardioSessionCreateResponse = WorkoutsCardioSessionCreateResponses[keyof WorkoutsCardioSessionCreateResponses];
+
 export type WorkoutsDeclineEncounterCreateData = {
     body?: WorkoutDetailWritable;
     path: {
@@ -1971,6 +2106,21 @@ export type WorkoutsFinishCreateResponses = {
 };
 
 export type WorkoutsFinishCreateResponse = WorkoutsFinishCreateResponses[keyof WorkoutsFinishCreateResponses];
+
+export type WorkoutsFinishCardioCreateData = {
+    body?: CardioWorkoutFinish;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/workouts/{id}/finish-cardio/';
+};
+
+export type WorkoutsFinishCardioCreateResponses = {
+    200: WorkoutFinishResult;
+};
+
+export type WorkoutsFinishCardioCreateResponse = WorkoutsFinishCardioCreateResponses[keyof WorkoutsFinishCardioCreateResponses];
 
 export type WorkoutsProofCreateData = {
     body: WorkoutProof;

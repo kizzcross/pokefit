@@ -13,6 +13,7 @@ import MorePage from '@/js/pages/more/MorePage';
 import PokemonDetailPage from '@/js/pages/pokemon/PokemonDetailPage';
 import RankingPage from '@/js/pages/ranking/RankingPage';
 import TeamPage from '@/js/pages/team/TeamPage';
+import CardioWorkoutPage from '@/js/pages/workout/CardioWorkoutPage';
 import WorkoutDetailPage from '@/js/pages/workout/WorkoutDetailPage';
 import WorkoutsListPage from '@/js/pages/workout/WorkoutsListPage';
 import WorkoutNewPage from '@/js/pages/workout/WorkoutNewPage';
@@ -43,6 +44,7 @@ const router = createBrowserRouter([
       { index: true, Component: DashboardPage },
       { path: 'workouts', Component: WorkoutsListPage },
       { path: 'workout/new', Component: WorkoutNewPage },
+      { path: 'workout/cardio/:id', Component: CardioWorkoutPage },
       { path: 'workout/:id', Component: WorkoutDetailPage },
       { path: 'encounter', Component: EncounterPage },
       { path: 'capture', Component: CapturePage },

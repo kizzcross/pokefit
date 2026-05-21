@@ -21,8 +21,18 @@ AUTH_USER_MODEL = "users.User"
 
 ALLOWED_HOSTS = []
 
+def _configure_default_database():
+    """Resolve sqlite paths under BASE_DIR so migrate/runserver use the same file."""
+    db = config("DATABASE_URL", cast=db_url)
+    if db.get("ENGINE") == "django.db.backends.sqlite3":
+        name = db.get("NAME", "")
+        if name and not os.path.isabs(name):
+            db["NAME"] = base_dir_join(name)
+    return db
+
+
 DATABASES = {
-    "default": config("DATABASE_URL", cast=db_url),
+    "default": _configure_default_database(),
 }
 
 INSTALLED_APPS = [

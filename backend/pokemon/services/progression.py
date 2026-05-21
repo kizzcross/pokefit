@@ -39,10 +39,14 @@ def affection_progress_percent(pokemon: UserPokemon) -> int:
 
 
 def xp_gain_for_workout(workout) -> int:
+    from workouts.choices import WorkoutType
+
     exercise_count = workout.exercises.count()
     effort = workout.perceived_effort if workout.perceived_effort is not None else 5
     quality = workout.quality_score or 0
     progress = workout.progress_score or 0
+    if workout.workout_type == WorkoutType.CARDIO:
+        return 35 + 6 * quality // 10 + 5 * progress // 10 + 5 * effort
     return (
         40
         + 8 * exercise_count

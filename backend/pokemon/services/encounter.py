@@ -5,7 +5,7 @@ import random
 from pokemon.choices import Rarity
 from pokemon.models import PokemonSpecies, UserPokemon
 from pokemon.services.encounter_level import roll_encounter_level
-from workouts.choices import EncounterStatus
+from workouts.choices import EncounterStatus, WorkoutType
 from workouts.models import Workout
 
 SHINY_CHANCE = 0.02
@@ -24,7 +24,30 @@ def _effort_bonus(workout: Workout) -> int:
     return min(35, quality // 4 + progress // 6)
 
 
+def _cardio_rarity_weights(workout: Workout) -> dict[str, int]:
+    """Rarity roll driven by pace vs last cardio (or 6:00/km baseline)."""
+    score = workout.progress_score or 0
+    weights = dict(RARITY_BASE_WEIGHTS)
+    if score < 35:
+        weights[Rarity.COMMON] += 18
+        weights[Rarity.LEGENDARY] = max(1, weights[Rarity.LEGENDARY] - 2)
+    elif score >= 75:
+        bonus = min(28, (score - 50) // 2)
+        weights[Rarity.RARE] += bonus // 2
+        weights[Rarity.SUPER_RARE] += bonus // 2 + 2
+        weights[Rarity.LEGENDARY] += max(2, bonus // 3)
+    elif score >= 55:
+        bonus = 8
+        weights[Rarity.RARE] += bonus // 2
+        weights[Rarity.SUPER_RARE] += bonus // 3
+        weights[Rarity.LEGENDARY] += 1
+    return weights
+
+
 def _rarity_weights(workout: Workout) -> dict[str, int]:
+    if workout.workout_type == WorkoutType.CARDIO:
+        return _cardio_rarity_weights(workout)
+
     bonus = _effort_bonus(workout)
     weights = dict(RARITY_BASE_WEIGHTS)
     weights[Rarity.RARE] += bonus // 3

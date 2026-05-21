@@ -7,10 +7,14 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .choices import EncounterStatus, WorkoutStatus
+from .choices import EncounterStatus, WorkoutStatus, WorkoutType
 from .models import Exercise, Workout, WorkoutExercise
 from .permissions import IsAdminOrReadOnly
 from .serializers import (
+    CardioPreviewSerializer,
+    CardioReferenceSerializer,
+    CardioSessionSerializer,
+    CardioWorkoutFinishSerializer,
     ExerciseListSerializer,
     ExerciseSerializer,
     LastWorkoutByTypeSerializer,
@@ -26,6 +30,7 @@ from .serializers import (
     WorkoutListSerializer,
     WorkoutProofSerializer,
 )
+from .services.cardio import cardio_performance_summary, format_pace, get_last_finished_cardio, get_reference_pace_seconds
 from .services.calendar import build_calendar_month
 
 
@@ -91,6 +96,14 @@ class WorkoutViewSet(viewsets.ModelViewSet):
             return LastWorkoutByTypeSerializer
         if self.action == "finish":
             return WorkoutFinishSerializer
+        if self.action == "finish_cardio":
+            return CardioWorkoutFinishSerializer
+        if self.action == "save_cardio_session":
+            return CardioSessionSerializer
+        if self.action == "cardio_reference":
+            return CardioReferenceSerializer
+        if self.action == "cardio_preview":
+            return CardioPreviewSerializer
         if self.action == "pending_encounter":
             return PendingEncounterSerializer
         if self.action == "upload_proof":
@@ -298,11 +311,8 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         data = build_calendar_month(request.user, year, month, include_proof_photos=True)
         return Response(data)
 
-    @extend_schema(request=WorkoutFinishSerializer, responses=WorkoutFinishResultSerializer)
-    @action(detail=True, methods=["post"], url_path="finish")
-    def finish(self, request, pk=None):
-        workout = self.get_object()
-        serializer = self.get_serializer(
+    def _finish_workout(self, request, workout, serializer_class):
+        serializer = serializer_class(
             data=request.data,
             context={**self.get_serializer_context(), "workout": workout},
         )
@@ -318,10 +328,101 @@ class WorkoutViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
 
-        return Response(
-            WorkoutFinishResultSerializer(result, context={"request": request}).data,
-            status=status.HTTP_200_OK,
+        payload = {
+            "workout": WorkoutDetailSerializer(result.workout, context={"request": request}).data,
+            "team_rewards": result.team_rewards,
+        }
+        cardio_summary = getattr(result, "cardio_summary", None)
+        if cardio_summary is not None:
+            payload["cardio_summary"] = cardio_summary
+        return Response(payload, status=status.HTTP_200_OK)
+
+    @extend_schema(request=WorkoutFinishSerializer, responses=WorkoutFinishResultSerializer)
+    @action(detail=True, methods=["post"], url_path="finish")
+    def finish(self, request, pk=None):
+        workout = self.get_object()
+        if workout.workout_type == WorkoutType.CARDIO:
+            return self._finish_workout(request, workout, CardioWorkoutFinishSerializer)
+        return self._finish_workout(request, workout, WorkoutFinishSerializer)
+
+    @extend_schema(request=CardioWorkoutFinishSerializer, responses=WorkoutFinishResultSerializer)
+    @action(detail=True, methods=["post"], url_path="finish-cardio")
+    def finish_cardio(self, request, pk=None):
+        workout = self.get_object()
+        if workout.workout_type != WorkoutType.CARDIO:
+            return Response(
+                {"detail": "Este endpoint é apenas para treinos de cardio."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return self._finish_workout(request, workout, CardioWorkoutFinishSerializer)
+
+    @extend_schema(request=CardioSessionSerializer, responses=WorkoutDetailSerializer)
+    @action(detail=True, methods=["post", "patch"], url_path="cardio-session")
+    def save_cardio_session(self, request, pk=None):
+        workout = self.get_object()
+        if workout.workout_type != WorkoutType.CARDIO:
+            return Response(
+                {"detail": "Só treinos de cardio aceitam sessão de pace."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if workout.status != WorkoutStatus.DRAFT:
+            return Response(
+                {"detail": "Só é possível editar cardio em rascunho."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        serializer = CardioSessionSerializer(
+            data=request.data,
+            context={**self.get_serializer_context(), "workout": workout},
         )
+        serializer.is_valid(raise_exception=True)
+        workout = serializer.save()
+        output = WorkoutDetailSerializer(workout, context={"request": request})
+        return Response(output.data)
+
+    @extend_schema(responses=CardioReferenceSerializer)
+    @action(detail=True, methods=["get"], url_path="cardio-reference")
+    def cardio_reference(self, request, pk=None):
+        workout = self.get_object()
+        if workout.workout_type != WorkoutType.CARDIO:
+            return Response(
+                {"detail": "Referência de pace só para treinos de cardio."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        last = get_last_finished_cardio(workout.user, exclude_workout_id=workout.pk)
+        reference_pace = get_reference_pace_seconds(workout.user, exclude_workout_id=workout.pk)
+        data = {
+            "reference_pace_seconds_per_km": reference_pace,
+            "reference_pace_display": format_pace(reference_pace),
+            "has_previous_cardio": last is not None,
+            "last_cardio_ended_at": last.ended_at if last else None,
+            "last_cardio_duration_minutes": last.cardio_duration_minutes if last else None,
+            "last_cardio_pace_display": (
+                format_pace(last.cardio_pace_seconds_per_km)
+                if last and last.cardio_pace_seconds_per_km
+                else None
+            ),
+        }
+        return Response(CardioReferenceSerializer(data).data)
+
+    @extend_schema(request=CardioPreviewSerializer, responses=CardioPreviewSerializer)
+    @action(detail=True, methods=["post"], url_path="cardio-preview")
+    def cardio_preview(self, request, pk=None):
+        workout = self.get_object()
+        if workout.workout_type != WorkoutType.CARDIO:
+            return Response(
+                {"detail": "Preview de pace só para treinos de cardio."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        serializer = CardioPreviewSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        reference_pace = get_reference_pace_seconds(workout.user, exclude_workout_id=workout.pk)
+        has_previous = get_last_finished_cardio(workout.user, exclude_workout_id=workout.pk) is not None
+        summary = cardio_performance_summary(
+            current_pace=serializer.validated_data["cardio_pace_seconds_per_km"],
+            reference_pace=reference_pace,
+            has_previous_cardio=has_previous,
+        )
+        return Response(summary)
 
     @action(detail=True, methods=["post"], url_path="decline-encounter")
     def decline_encounter(self, request, pk=None):

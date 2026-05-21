@@ -9,6 +9,7 @@ import PixelCard from '@/js/components/ui/PixelCard';
 import { isQueryRefetching } from '@/js/hooks/useQueryLoading';
 import PixelLink from '@/js/components/ui/PixelLink';
 import { formatDate } from '@/js/lib/utils';
+import { workoutDetailPath } from '@/js/lib/cardio';
 import { workoutTypeLabel } from '@/js/lib/workout-labels';
 import { cn } from '@/js/lib/utils';
 
@@ -32,7 +33,10 @@ const WorkoutsListPage = () => {
     <>
       <MobileHeader backTo="/" title="Meus treinos" subtitle="Histórico completo" />
       <main className="space-y-4 px-4 pb-28 pt-4">
-        <PixelLink fullWidth to={drafts[0]?.id ? `/workout/${drafts[0].id}` : '/workout/new'}>
+        <PixelLink
+          fullWidth
+          to={drafts[0]?.id ? workoutDetailPath(drafts[0]) : '/workout/new'}
+        >
           <GameIcon name="workout" size={18} />
           <span>{drafts[0]?.id ? 'Continuar treino ativo' : 'Novo treino'}</span>
         </PixelLink>
@@ -90,6 +94,8 @@ function WorkoutListItem({
     exercise_count?: number;
     total_volume?: string | number;
     duration_minutes?: number | null;
+    cardio_pace_display?: string | null;
+    cardio_duration_minutes?: number | null;
   };
 }) {
   const status = workout.status ?? 'draft';
@@ -101,7 +107,7 @@ function WorkoutListItem({
         isDraft && 'border-[var(--color-game-info)]',
         status === 'finished' && 'border-[var(--color-game-success)]/50',
       )}
-      to={`/workout/${workout.id}`}
+      to={workoutDetailPath(workout)}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
@@ -123,13 +129,24 @@ function WorkoutListItem({
           {STATUS_LABELS[status] ?? status}
         </span>
       </div>
-      <div className="mt-3 flex gap-4 text-xs text-[var(--color-game-muted)]">
-        <span>{workout.exercise_count ?? 0} exercícios</span>
-        {workout.total_volume != null ? <span>Vol. {workout.total_volume}</span> : null}
-        {workout.duration_minutes ? <span>{workout.duration_minutes} min</span> : null}
+      <div className="mt-3 flex flex-wrap gap-4 text-xs text-[var(--color-game-muted)]">
+        {workout.workout_type === 'cardio' ? (
+          <>
+            {workout.cardio_pace_display ? <span>{workout.cardio_pace_display}/km</span> : null}
+            {(workout.cardio_duration_minutes ?? workout.duration_minutes) ? (
+              <span>{workout.cardio_duration_minutes ?? workout.duration_minutes} min</span>
+            ) : null}
+          </>
+        ) : (
+          <>
+            <span>{workout.exercise_count ?? 0} exercícios</span>
+            {workout.total_volume != null ? <span>Vol. {workout.total_volume}</span> : null}
+            {workout.duration_minutes ? <span>{workout.duration_minutes} min</span> : null}
+          </>
+        )}
       </div>
       <p className="mt-2 text-[10px] font-bold uppercase text-[var(--color-game-info)]">
-        Ver exercícios →
+        {workout.workout_type === 'cardio' ? 'Ver cardio →' : 'Ver exercícios →'}
       </p>
     </Link>
   );

@@ -174,6 +174,16 @@ class Workout(IndexedTimeStampedModel):
     )
     proof_caption = models.CharField(max_length=140, blank=True, default="")
     proof_uploaded_at = models.DateTimeField(null=True, blank=True)
+    cardio_duration_minutes = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text=_("Duration of the cardio session in minutes."),
+    )
+    cardio_pace_seconds_per_km = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text=_("Average pace in seconds per kilometer (lower is faster)."),
+    )
 
     class Meta:
         verbose_name = _("workout")
@@ -204,6 +214,18 @@ class Workout(IndexedTimeStampedModel):
         return min(100, exercise_count * 15)
 
     def _compute_progress_score(self) -> int:
+        if self.workout_type == WorkoutType.CARDIO:
+            from .services.cardio import compute_cardio_progress_score, get_reference_pace_seconds
+
+            pace = self.cardio_pace_seconds_per_km
+            if not pace:
+                return 0
+            reference = get_reference_pace_seconds(
+                self.user,
+                exclude_workout_id=self.pk,
+            )
+            return compute_cardio_progress_score(pace, reference)
+
         total = self.total_volume
         if total <= 0:
             return 0
@@ -216,9 +238,12 @@ class Workout(IndexedTimeStampedModel):
         if not self.ended_at:
             self.ended_at = timezone.now()
 
-        duration = self._compute_duration_minutes()
-        if duration is not None:
-            self.duration_minutes = duration
+        if self.workout_type == WorkoutType.CARDIO and self.cardio_duration_minutes:
+            self.duration_minutes = self.cardio_duration_minutes
+        else:
+            duration = self._compute_duration_minutes()
+            if duration is not None:
+                self.duration_minutes = duration
 
         self.quality_score = self._compute_quality_score()
         self.progress_score = self._compute_progress_score()

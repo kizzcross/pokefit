@@ -35,6 +35,13 @@ local_kill_ports:
 		fi; \
 	done
 
+local_migrate:
+	cd backend && ../.venv/bin/poetry run python manage.py migrate --noinput
+
+local_api_types:
+	cd backend && ../.venv/bin/poetry run python manage.py spectacular --color --file schema.yml
+	pnpm run openapi-ts
+
 local_backend: local_kill_port_8001
 	cd backend && ../.venv/bin/poetry run python manage.py runserver 8001
 

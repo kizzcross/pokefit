@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
 import { exercisesList, workoutsFinishCreate, workoutsRetrieve } from '@/js/api';
@@ -64,6 +64,13 @@ const WorkoutDetailPage = () => {
   const workout = workoutQuery.data;
   const workoutType = workout?.workout_type ?? '';
   const isDraft = workout?.status === 'draft';
+
+  useEffect(() => {
+    if (workout?.workout_type === 'cardio' && Number.isFinite(workoutId)) {
+      navigate(`/workout/cardio/${workoutId}`, { replace: true });
+    }
+  }, [workout?.workout_type, workoutId, navigate]);
+
   const sessionExercises = workout?.exercises ?? [];
   const exerciseCount = sessionExercises.length;
   const sessionExerciseIds = new Set(
@@ -257,6 +264,10 @@ const WorkoutDetailPage = () => {
     updateExerciseMutation.isPending ||
     deleteExerciseMutation.isPending ||
     deleteWorkoutMutation.isPending;
+
+  if (workout?.workout_type === 'cardio') {
+    return null;
+  }
 
   return (
     <>
