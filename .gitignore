@@ -6,6 +6,9 @@ db.sqlite3-journal
 **/settings/local.py
 /staticfiles/*
 /mediafiles/*
+backend/mediafiles/
+openapi-ts-error-*.log
+*.bak
 __pycache__/
 /.vscode/
 
@@ -33,7 +36,8 @@ npm-debug.log
 *.map
 
 # General
-/{{project_name}}-venv/
+/pokefit-venv/
+/.venv/
 /venv/
 /env/
 /output/

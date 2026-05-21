@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from common.models import IndexedTimeStampedModel
 
 from .managers import UserManager
+from .trainer_sprites import DEFAULT_TRAINER_SPRITE
 
 
 class User(AbstractBaseUser, PermissionsMixin, IndexedTimeStampedModel):
@@ -18,6 +19,11 @@ class User(AbstractBaseUser, PermissionsMixin, IndexedTimeStampedModel):
             "Designates whether this user should be treated as "
             "active. Unselect this instead of deleting accounts."
         ),
+    )
+    trainer_sprite = models.CharField(
+        max_length=128,
+        default=DEFAULT_TRAINER_SPRITE,
+        help_text=_("Slug do sprite de treinador (Pokémon Showdown)."),
     )
 
     objects = UserManager()

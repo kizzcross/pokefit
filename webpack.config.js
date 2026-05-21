@@ -9,9 +9,11 @@ const BundleTracker = require('webpack-bundle-tracker');
 module.exports = (env, argv) => {
   const isDev = argv.mode === 'development';
   const nodeModulesDir = path.resolve(__dirname, 'node_modules');
+  // Same-origin path so Django (or ngrok HTTPS) can serve/proxy bundles without mixed content.
+  const devPublicPath = '/frontend/webpack_bundles/';
   const localhostOutput = {
     path: path.resolve('./frontend/webpack_bundles/'),
-    publicPath: 'http://localhost:3000/frontend/webpack_bundles/',
+    publicPath: devPublicPath,
     filename: '[name].js',
   };
   const productionOutput = {
@@ -27,9 +29,13 @@ module.exports = (env, argv) => {
     devServer: {
       hot: true,
       historyApiFallback: true,
-      host: '0.0.0.0',
+      host: '127.0.0.1',
       port: 3000,
-      // Allow CORS requests from the Django dev server domain:
+      allowedHosts: 'all',
+      devMiddleware: {
+        publicPath: devPublicPath,
+      },
+      // Allow CORS when loading assets directly from :3000 (optional):
       headers: { 'Access-Control-Allow-Origin': '*' },
     },
     context: __dirname,

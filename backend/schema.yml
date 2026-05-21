@@ -1,0 +1,1913 @@
+openapi: 3.0.3
+info:
+  title: Vinta Boilerplate API
+  version: 0.1.0
+  description: A Django project boilerplate with Vinta's best practices
+paths:
+  /api/exercises/:
+    get:
+      operationId: exercises_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - exercises
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedExerciseListList'
+          description: ''
+    post:
+      operationId: exercises_create
+      tags:
+      - exercises
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Exercise'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Exercise'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Exercise'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercise'
+          description: ''
+  /api/exercises/{id}/:
+    get:
+      operationId: exercises_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this exercise.
+        required: true
+      tags:
+      - exercises
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercise'
+          description: ''
+    put:
+      operationId: exercises_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this exercise.
+        required: true
+      tags:
+      - exercises
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Exercise'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Exercise'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Exercise'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercise'
+          description: ''
+    patch:
+      operationId: exercises_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this exercise.
+        required: true
+      tags:
+      - exercises
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedExercise'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedExercise'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedExercise'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercise'
+          description: ''
+    delete:
+      operationId: exercises_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this exercise.
+        required: true
+      tags:
+      - exercises
+      security:
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/my-pokemon/:
+    get:
+      operationId: my_pokemon_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - my-pokemon
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserPokemonListList'
+          description: ''
+  /api/my-pokemon/{id}/:
+    get:
+      operationId: my_pokemon_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - my-pokemon
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPokemonDetail'
+          description: ''
+  /api/my-pokemon/{id}/team-slot/:
+    patch:
+      operationId: my_pokemon_team_slot_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - my-pokemon
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserPokemonTeamUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserPokemonTeamUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserPokemonTeamUpdate'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPokemonTeamUpdate'
+          description: ''
+  /api/my-pokemon/random-encounter/:
+    get:
+      operationId: my_pokemon_random_encounter_retrieve
+      tags:
+      - my-pokemon
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PokemonSpecies'
+          description: ''
+  /api/my-pokemon/team/:
+    get:
+      operationId: my_pokemon_team_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - my-pokemon
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserPokemonListList'
+          description: ''
+  /api/pokemon-species/:
+    get:
+      operationId: pokemon_species_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - pokemon-species
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPokemonSpeciesList'
+          description: ''
+  /api/pokemon-species/{pokedex_id}/:
+    get:
+      operationId: pokemon_species_retrieve
+      parameters:
+      - in: path
+        name: pokedex_id
+        schema:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        required: true
+      tags:
+      - pokemon-species
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PokemonSpecies'
+          description: ''
+  /api/rest/rest-check/:
+    get:
+      operationId: rest_rest_check_retrieve
+      description: This endpoint checks if the REST API is working.
+      summary: Check REST API
+      tags:
+      - rest
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+              examples:
+                SuccessfulResponse:
+                  value:
+                    message: This message comes from the backend. If you're seeing
+                      this, the REST API is working!
+                  summary: Successful Response
+          description: ''
+  /api/users/:
+    get:
+      operationId: users_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - users
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserList'
+          description: ''
+    post:
+      operationId: users_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/{id}/:
+    get:
+      operationId: users_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: users_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: users_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    delete:
+      operationId: users_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      security:
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/users/login/:
+    post:
+      operationId: users_login_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/logout/:
+    post:
+      operationId: users_logout_create
+      tags:
+      - users
+      security:
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/users/me/:
+    get:
+      operationId: users_me_retrieve
+      tags:
+      - users
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/register/:
+    post:
+      operationId: users_register_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/workouts/:
+    get:
+      operationId: workouts_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - workouts
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedWorkoutListList'
+          description: ''
+    post:
+      operationId: workouts_create
+      tags:
+      - workouts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkoutCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WorkoutCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WorkoutCreate'
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutCreate'
+          description: ''
+  /api/workouts/{id}/:
+    get:
+      operationId: workouts_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - workouts
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutDetail'
+          description: ''
+  /api/workouts/{id}/exercises/:
+    post:
+      operationId: workouts_exercises_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - workouts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkoutExerciseCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WorkoutExerciseCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WorkoutExerciseCreate'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutExerciseCreate'
+          description: ''
+  /api/workouts/{id}/finish/:
+    post:
+      operationId: workouts_finish_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - workouts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkoutFinish'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WorkoutFinish'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WorkoutFinish'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutFinish'
+          description: ''
+components:
+  schemas:
+    BlankEnum:
+      enum:
+      - ''
+    DifficultyEnum:
+      enum:
+      - beginner
+      - intermediate
+      - advanced
+      type: string
+      description: |-
+        * `beginner` - Beginner
+        * `intermediate` - Intermediate
+        * `advanced` - Advanced
+    Exercise:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+          maxLength: 255
+        instructions:
+          type: string
+          description: Step-by-step guidance shown to the user.
+        muscle_group:
+          $ref: '#/components/schemas/MuscleGroupEnum'
+        difficulty:
+          $ref: '#/components/schemas/DifficultyEnum'
+        equipment:
+          type: string
+          description: e.g. barbell, dumbbell, bodyweight
+          maxLength: 128
+        image:
+          type: string
+          format: uri
+          nullable: true
+          description: Demonstration image (max 5 MB, JPG/PNG/WebP).
+          pattern: (?:jpg|jpeg|png|webp)$
+        image_url:
+          type: string
+          nullable: true
+          readOnly: true
+        video_url:
+          type: string
+          format: uri
+          description: Optional external video demonstrating the movement.
+          maxLength: 512
+        is_active:
+          type: boolean
+          description: Inactive exercises are hidden from users but kept for history.
+        created_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_by_email:
+          type: string
+          format: email
+          readOnly: true
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        modified:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created
+      - created_by
+      - created_by_email
+      - id
+      - image_url
+      - modified
+      - name
+      - slug
+    ExerciseList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+          readOnly: true
+        muscle_group:
+          allOf:
+          - $ref: '#/components/schemas/MuscleGroupEnum'
+          readOnly: true
+        difficulty:
+          allOf:
+          - $ref: '#/components/schemas/DifficultyEnum'
+          readOnly: true
+        equipment:
+          type: string
+          readOnly: true
+          description: e.g. barbell, dumbbell, bodyweight
+        image_url:
+          type: string
+          nullable: true
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+          description: Inactive exercises are hidden from users but kept for history.
+      required:
+      - description
+      - difficulty
+      - equipment
+      - id
+      - image_url
+      - is_active
+      - muscle_group
+      - name
+      - slug
+    ExerciseSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+          readOnly: true
+        instructions:
+          type: string
+          readOnly: true
+          description: Step-by-step guidance shown to the user.
+        muscle_group:
+          allOf:
+          - $ref: '#/components/schemas/MuscleGroupEnum'
+          readOnly: true
+        difficulty:
+          allOf:
+          - $ref: '#/components/schemas/DifficultyEnum'
+          readOnly: true
+        equipment:
+          type: string
+          readOnly: true
+          description: e.g. barbell, dumbbell, bodyweight
+        image_url:
+          type: string
+          nullable: true
+          readOnly: true
+        video_url:
+          type: string
+          format: uri
+          readOnly: true
+          description: Optional external video demonstrating the movement.
+      required:
+      - description
+      - difficulty
+      - equipment
+      - id
+      - image_url
+      - instructions
+      - muscle_group
+      - name
+      - slug
+      - video_url
+    Message:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+      - message
+    MuscleGroupEnum:
+      enum:
+      - chest
+      - back
+      - legs
+      - shoulders
+      - arms
+      - core
+      - cardio
+      - full_body
+      - mobility
+      type: string
+      description: |-
+        * `chest` - Chest
+        * `back` - Back
+        * `legs` - Legs
+        * `shoulders` - Shoulders
+        * `arms` - Arms
+        * `core` - Core
+        * `cardio` - Cardio
+        * `full_body` - Full body
+        * `mobility` - Mobility
+    NatureEnum:
+      enum:
+      - hardy
+      - lonely
+      - brave
+      - adamant
+      - naughty
+      - bold
+      - docile
+      - relaxed
+      - impish
+      - lax
+      - timid
+      - hasty
+      - serious
+      - jolly
+      - naive
+      - modest
+      - mild
+      - quiet
+      - bashful
+      - rash
+      - calm
+      - gentle
+      - sassy
+      - careful
+      - quirky
+      type: string
+      description: |-
+        * `hardy` - Hardy
+        * `lonely` - Lonely
+        * `brave` - Brave
+        * `adamant` - Adamant
+        * `naughty` - Naughty
+        * `bold` - Bold
+        * `docile` - Docile
+        * `relaxed` - Relaxed
+        * `impish` - Impish
+        * `lax` - Lax
+        * `timid` - Timid
+        * `hasty` - Hasty
+        * `serious` - Serious
+        * `jolly` - Jolly
+        * `naive` - Naive
+        * `modest` - Modest
+        * `mild` - Mild
+        * `quiet` - Quiet
+        * `bashful` - Bashful
+        * `rash` - Rash
+        * `calm` - Calm
+        * `gentle` - Gentle
+        * `sassy` - Sassy
+        * `careful` - Careful
+        * `quirky` - Quirky
+    PaginatedExerciseListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExerciseList'
+    PaginatedPokemonSpeciesList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PokemonSpecies'
+    PaginatedUserList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    PaginatedUserPokemonListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserPokemonList'
+    PaginatedWorkoutListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkoutList'
+    PatchedExercise:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+          maxLength: 255
+        instructions:
+          type: string
+          description: Step-by-step guidance shown to the user.
+        muscle_group:
+          $ref: '#/components/schemas/MuscleGroupEnum'
+        difficulty:
+          $ref: '#/components/schemas/DifficultyEnum'
+        equipment:
+          type: string
+          description: e.g. barbell, dumbbell, bodyweight
+          maxLength: 128
+        image:
+          type: string
+          format: uri
+          nullable: true
+          description: Demonstration image (max 5 MB, JPG/PNG/WebP).
+          pattern: (?:jpg|jpeg|png|webp)$
+        image_url:
+          type: string
+          nullable: true
+          readOnly: true
+        video_url:
+          type: string
+          format: uri
+          description: Optional external video demonstrating the movement.
+          maxLength: 512
+        is_active:
+          type: boolean
+          description: Inactive exercises are hidden from users but kept for history.
+        created_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_by_email:
+          type: string
+          format: email
+          readOnly: true
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        modified:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        is_active:
+          type: boolean
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        is_staff:
+          type: boolean
+          readOnly: true
+          description: Designates whether the user can log into this admin site.
+        is_superuser:
+          type: boolean
+          readOnly: true
+          title: Superuser status
+          description: Designates that this user has all permissions without explicitly
+            assigning them.
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        modified:
+          type: string
+          format: date-time
+          readOnly: true
+        last_login:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+    PatchedUserPokemonTeamUpdate:
+      type: object
+      properties:
+        active_team_slot:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+          description: Team position 1-6 when assigned to the active roster.
+    PokemonIV:
+      type: object
+      properties:
+        hp:
+          type: integer
+          maximum: 31
+          minimum: 0
+        attack:
+          type: integer
+          maximum: 31
+          minimum: 0
+        defense:
+          type: integer
+          maximum: 31
+          minimum: 0
+        sp_attack:
+          type: integer
+          maximum: 31
+          minimum: 0
+        sp_defense:
+          type: integer
+          maximum: 31
+          minimum: 0
+        speed:
+          type: integer
+          maximum: 31
+          minimum: 0
+      required:
+      - attack
+      - defense
+      - hp
+      - sp_attack
+      - sp_defense
+      - speed
+    PokemonSpecies:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        pokedex_id:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        name:
+          type: string
+          maxLength: 64
+        type_1:
+          $ref: '#/components/schemas/Type1Enum'
+        type_2:
+          oneOf:
+          - $ref: '#/components/schemas/Type2Enum'
+          - $ref: '#/components/schemas/BlankEnum'
+        base_hp:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        base_attack:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        base_defense:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        base_sp_attack:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        base_sp_defense:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        base_speed:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        sprite_url:
+          type: string
+          format: uri
+          maxLength: 512
+        official_artwork_url:
+          type: string
+          format: uri
+          maxLength: 512
+        rarity:
+          $ref: '#/components/schemas/RarityEnum'
+        image_url:
+          type: string
+          readOnly: true
+      required:
+      - base_attack
+      - base_defense
+      - base_hp
+      - base_sp_attack
+      - base_sp_defense
+      - base_speed
+      - id
+      - image_url
+      - name
+      - pokedex_id
+      - type_1
+    RarityEnum:
+      enum:
+      - common
+      - rare
+      - super_rare
+      - legendary
+      type: string
+      description: |-
+        * `common` - Common
+        * `rare` - Rare
+        * `super_rare` - Super Rare
+        * `legendary` - Legendary
+    StatusEnum:
+      enum:
+      - draft
+      - finished
+      - cancelled
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `finished` - Finished
+        * `cancelled` - Cancelled
+    Type1Enum:
+      enum:
+      - normal
+      - fire
+      - water
+      - electric
+      - grass
+      - ice
+      - fighting
+      - poison
+      - ground
+      - flying
+      - psychic
+      - bug
+      - rock
+      - ghost
+      - dragon
+      - dark
+      - steel
+      - fairy
+      type: string
+      description: |-
+        * `normal` - Normal
+        * `fire` - Fire
+        * `water` - Water
+        * `electric` - Electric
+        * `grass` - Grass
+        * `ice` - Ice
+        * `fighting` - Fighting
+        * `poison` - Poison
+        * `ground` - Ground
+        * `flying` - Flying
+        * `psychic` - Psychic
+        * `bug` - Bug
+        * `rock` - Rock
+        * `ghost` - Ghost
+        * `dragon` - Dragon
+        * `dark` - Dark
+        * `steel` - Steel
+        * `fairy` - Fairy
+    Type2Enum:
+      enum:
+      - normal
+      - fire
+      - water
+      - electric
+      - grass
+      - ice
+      - fighting
+      - poison
+      - ground
+      - flying
+      - psychic
+      - bug
+      - rock
+      - ghost
+      - dragon
+      - dark
+      - steel
+      - fairy
+      type: string
+      description: |-
+        * `normal` - Normal
+        * `fire` - Fire
+        * `water` - Water
+        * `electric` - Electric
+        * `grass` - Grass
+        * `ice` - Ice
+        * `fighting` - Fighting
+        * `poison` - Poison
+        * `ground` - Ground
+        * `flying` - Flying
+        * `psychic` - Psychic
+        * `bug` - Bug
+        * `rock` - Rock
+        * `ghost` - Ghost
+        * `dragon` - Dragon
+        * `dark` - Dark
+        * `steel` - Steel
+        * `fairy` - Fairy
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        is_active:
+          type: boolean
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        is_staff:
+          type: boolean
+          readOnly: true
+          description: Designates whether the user can log into this admin site.
+        is_superuser:
+          type: boolean
+          readOnly: true
+          title: Superuser status
+          description: Designates that this user has all permissions without explicitly
+            assigning them.
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        modified:
+          type: string
+          format: date-time
+          readOnly: true
+        last_login:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - created
+      - email
+      - id
+      - is_staff
+      - is_superuser
+      - last_login
+      - modified
+    UserPokemonDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        species:
+          allOf:
+          - $ref: '#/components/schemas/PokemonSpecies'
+          readOnly: true
+        nickname:
+          type: string
+          maxLength: 64
+        display_name:
+          type: string
+          readOnly: true
+        level:
+          type: integer
+          maximum: 100
+          minimum: 1
+        experience:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        nature:
+          $ref: '#/components/schemas/NatureEnum'
+        shiny:
+          type: boolean
+        active_team_slot:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+          description: Team position 1-6 when assigned to the active roster.
+        affection:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        captured_at:
+          type: string
+          format: date-time
+        ivs:
+          allOf:
+          - $ref: '#/components/schemas/PokemonIV'
+          readOnly: true
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        modified:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - captured_at
+      - created
+      - display_name
+      - id
+      - ivs
+      - modified
+      - species
+    UserPokemonList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        species:
+          allOf:
+          - $ref: '#/components/schemas/PokemonSpecies'
+          readOnly: true
+        nickname:
+          type: string
+          maxLength: 64
+        display_name:
+          type: string
+          readOnly: true
+        level:
+          type: integer
+          maximum: 100
+          minimum: 1
+        experience:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        nature:
+          $ref: '#/components/schemas/NatureEnum'
+        shiny:
+          type: boolean
+        active_team_slot:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+          description: Team position 1-6 when assigned to the active roster.
+        affection:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        captured_at:
+          type: string
+          format: date-time
+      required:
+      - captured_at
+      - display_name
+      - id
+      - species
+    UserPokemonTeamUpdate:
+      type: object
+      properties:
+        active_team_slot:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+          description: Team position 1-6 when assigned to the active roster.
+    ValidationTypeEnum:
+      enum:
+      - manual
+      - health_app
+      - location
+      - wearable_location
+      type: string
+      description: |-
+        * `manual` - Manual
+        * `health_app` - Health app
+        * `location` - Location
+        * `wearable_location` - Wearable + location
+    WorkoutCreate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        workout_type:
+          $ref: '#/components/schemas/WorkoutTypeEnum'
+        started_at:
+          type: string
+          format: date-time
+        perceived_effort:
+          type: integer
+          maximum: 10
+          minimum: 1
+          nullable: true
+          description: Rate of perceived exertion from 1 to 10.
+        validation_type:
+          $ref: '#/components/schemas/ValidationTypeEnum'
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          readOnly: true
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        modified:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created
+      - id
+      - modified
+      - status
+    WorkoutDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        workout_type:
+          allOf:
+          - $ref: '#/components/schemas/WorkoutTypeEnum'
+          readOnly: true
+        started_at:
+          type: string
+          format: date-time
+          readOnly: true
+        ended_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        duration_minutes:
+          type: integer
+          readOnly: true
+          nullable: true
+        perceived_effort:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: Rate of perceived exertion from 1 to 10.
+        validation_type:
+          allOf:
+          - $ref: '#/components/schemas/ValidationTypeEnum'
+          readOnly: true
+        quality_score:
+          type: integer
+          readOnly: true
+        progress_score:
+          type: integer
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          readOnly: true
+        exercises:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkoutExercise'
+          readOnly: true
+        total_volume:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        modified:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created
+      - duration_minutes
+      - ended_at
+      - exercises
+      - id
+      - modified
+      - perceived_effort
+      - progress_score
+      - quality_score
+      - started_at
+      - status
+      - total_volume
+      - validation_type
+      - workout_type
+    WorkoutExercise:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        exercise:
+          allOf:
+          - $ref: '#/components/schemas/ExerciseSummary'
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+          description: Snapshot of the catalog name at the time of the workout.
+        sets:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        reps:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        weight:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        volume:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        is_pr:
+          type: boolean
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        modified:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created
+      - exercise
+      - id
+      - modified
+      - name
+      - reps
+      - sets
+      - volume
+    WorkoutExerciseCreate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        exercise:
+          type: integer
+        sets:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        reps:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        weight:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        is_pr:
+          type: boolean
+        volume:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+          description: Snapshot of the catalog name at the time of the workout.
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        modified:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created
+      - exercise
+      - id
+      - modified
+      - name
+      - reps
+      - sets
+      - volume
+    WorkoutFinish:
+      type: object
+      properties:
+        perceived_effort:
+          type: integer
+          maximum: 10
+          minimum: 1
+          nullable: true
+    WorkoutList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        workout_type:
+          allOf:
+          - $ref: '#/components/schemas/WorkoutTypeEnum'
+          readOnly: true
+        started_at:
+          type: string
+          format: date-time
+          readOnly: true
+        ended_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        duration_minutes:
+          type: integer
+          readOnly: true
+          nullable: true
+        perceived_effort:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: Rate of perceived exertion from 1 to 10.
+        validation_type:
+          allOf:
+          - $ref: '#/components/schemas/ValidationTypeEnum'
+          readOnly: true
+        quality_score:
+          type: integer
+          readOnly: true
+        progress_score:
+          type: integer
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          readOnly: true
+        exercise_count:
+          type: integer
+          readOnly: true
+        total_volume:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        modified:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created
+      - duration_minutes
+      - ended_at
+      - exercise_count
+      - id
+      - modified
+      - perceived_effort
+      - progress_score
+      - quality_score
+      - started_at
+      - status
+      - total_volume
+      - validation_type
+      - workout_type
+    WorkoutTypeEnum:
+      enum:
+      - chest_triceps
+      - back_biceps
+      - legs
+      - shoulders
+      - arms
+      - cardio
+      - full_body
+      - mobility
+      type: string
+      description: |-
+        * `chest_triceps` - Chest & triceps
+        * `back_biceps` - Back & biceps
+        * `legs` - Legs
+        * `shoulders` - Shoulders
+        * `arms` - Arms
+        * `cardio` - Cardio
+        * `full_body` - Full body
+        * `mobility` - Mobility
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

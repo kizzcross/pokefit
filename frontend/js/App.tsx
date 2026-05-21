@@ -1,22 +1,15 @@
 import * as Sentry from '@sentry/react';
-import { parse as cookieParse } from 'cookie';
 import { RouterProvider } from 'react-router/dom';
 
-import { client } from '@/js/api/client.gen';
-import router from '@/js/routes';
-
-client.instance.interceptors.request.use((request) => {
-  const { csrftoken } = cookieParse(document.cookie);
-  if (request.headers && csrftoken) {
-    request.headers['X-CSRFTOKEN'] = csrftoken;
-  }
-  return request;
-});
+import AppProviders from '@/js/app/AppProviders';
+import router from '@/js/routes/index';
 
 const App = () => (
-  <Sentry.ErrorBoundary fallback={<p>An error has occurred</p>}>
-    <RouterProvider router={router} />
-  </Sentry.ErrorBoundary>
+  <AppProviders>
+    <Sentry.ErrorBoundary fallback={<p className="p-4 text-white">Um erro ocorreu no app.</p>}>
+      <RouterProvider router={router} />
+    </Sentry.ErrorBoundary>
+  </AppProviders>
 );
 
 export default App;
