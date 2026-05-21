@@ -213,11 +213,8 @@ class WorkoutCreateSerializer(serializers.ModelSerializer):
 
 
 class WorkoutFinishResultSerializer(serializers.Serializer):
-    workout = serializers.SerializerMethodField()
-    team_rewards = serializers.DictField()
-
-    def get_workout(self, obj):
-        return WorkoutDetailSerializer(obj.workout, context=self.context).data
+    workout = WorkoutDetailSerializer(read_only=True)
+    team_rewards = WorkoutTeamRewardsSerializer(read_only=True)
 
 
 class WorkoutFinishSerializer(serializers.Serializer):

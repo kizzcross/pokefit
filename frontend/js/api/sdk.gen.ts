@@ -634,8 +634,8 @@ export const usersTimelineRetrieve = <ThrowOnError extends boolean = false>(opti
     });
 };
 
-export const usersGiftRecipientsList = <ThrowOnError extends boolean = false>(options?: Options<UsersGiftRecipientsListData, ThrowOnError>) => {
-    return (options?.client ?? client).get<UsersGiftRecipientsListResponses, unknown, ThrowOnError>({
+export const usersGiftRecipientsList = <ThrowOnError extends boolean = false>(options: Options<UsersGiftRecipientsListData, ThrowOnError>) => {
+    return (options.client ?? client).get<UsersGiftRecipientsListResponses, unknown, ThrowOnError>({
         responseType: 'json',
         security: [
             {

@@ -20,6 +20,14 @@ export type DifficultyEnum = 'beginner' | 'intermediate' | 'advanced';
  */
 export type EncounterStatusEnum = 'pending' | 'captured' | 'fled';
 
+export type EvolutionPreview = {
+    species_name: string;
+    pokedex_id: number;
+    trigger: string;
+    requires_level?: number | null;
+    requires_affection?: number | null;
+};
+
 export type Exercise = {
     readonly id: number;
     name: string;
@@ -94,9 +102,17 @@ export type ExerciseSummary = {
     readonly video_url: string;
 };
 
+/**
+ * E-mail ou nickname: use `identifier` ou o campo legado `email`.
+ */
 export type FriendRequestCreate = {
     email?: string;
     identifier?: string;
+};
+
+export type FriendRequestsResponse = {
+    incoming: Array<Friendship>;
+    outgoing: Array<Friendship>;
 };
 
 export type Friendship = {
@@ -116,6 +132,54 @@ export type Friendship = {
  */
 export type FriendshipStatusEnum = 'pending' | 'accepted' | 'declined' | 'blocked';
 
+export type GiftClaim = {
+    species_id?: number | null;
+};
+
+/**
+ * * `direct` - Presente direto
+ * * `choice` - Escolher um Pokémon
+ */
+export type GiftKindEnum = 'direct' | 'choice';
+
+export type GiftNotification = {
+    readonly id: number;
+    readonly batch_id: string;
+    readonly message: string;
+    gift_kind: GiftKindEnum;
+    status: GiftNotificationStatusEnum;
+    readonly is_pending: string;
+    readonly sender_display: string;
+    readonly species_options: Array<GiftSpeciesOption>;
+    readonly claimed_at: string | null;
+    readonly created: string;
+};
+
+/**
+ * * `pending` - Pendente
+ * * `claimed` - Resgatado
+ */
+export type GiftNotificationStatusEnum = 'pending' | 'claimed';
+
+export type GiftSend = {
+    recipient_ids: Array<number>;
+    message: string;
+    gift_kind: GiftKindEnum;
+    species_ids: Array<number>;
+};
+
+export type GiftSendResult = {
+    sent_count: number;
+    batch_id: string;
+    notifications: Array<GiftNotification>;
+};
+
+export type GiftSpeciesOption = {
+    readonly id: number;
+    species: PokemonSpecies;
+    sort_order?: number;
+};
+
 export type LastWorkoutByType = {
     readonly id: number;
     workout_type: WorkoutTypeEnum;
@@ -123,6 +187,11 @@ export type LastWorkoutByType = {
     readonly duration_minutes: number | null;
     readonly total_volume: string;
     readonly exercises: Array<WorkoutExercise>;
+};
+
+export type Login = {
+    email: string;
+    password: string;
 };
 
 export type Message = {
@@ -250,6 +319,10 @@ export type PatchedExercise = {
 export type PatchedUser = {
     readonly id?: number;
     email?: string;
+    /**
+     * Apelido único visível no app (3–24 caracteres, a-z, 0-9, _).
+     */
+    nickname?: string;
     readonly display_name?: string;
     /**
      * Slug do sprite de treinador (Pokémon Showdown).
@@ -299,6 +372,10 @@ export type PatchedWorkoutDetail = {
     encounter_status?: EncounterStatusEnum;
     encounter_species?: PokemonSpecies | null;
     /**
+     * Level of the wild Pokémon for this encounter.
+     */
+    readonly encounter_level?: number | null;
+    /**
      * Encontro lendário/ultra raro por bater a meta semanal neste treino.
      */
     readonly weekly_goal_reward?: boolean;
@@ -321,6 +398,8 @@ export type PatchedWorkoutExerciseUpdate = {
 export type PendingEncounter = {
     workout_id: number;
     encounter_status: string;
+    encounter_level: number | null;
+    weekly_goal_reward: boolean;
     readonly species: string;
 };
 
@@ -337,7 +416,7 @@ export type PokemonSpecies = {
     readonly id: number;
     pokedex_id: number;
     name: string;
-    type_1: Type1Enum;
+    type_1: Type2Enum;
     type_2?: Type2Enum | BlankEnum;
     base_hp: number;
     base_attack: number;
@@ -359,6 +438,12 @@ export type PokemonSpecies = {
  */
 export type RarityEnum = 'common' | 'rare' | 'super_rare' | 'legendary';
 
+export type Register = {
+    email: string;
+    nickname: string;
+    trainer_sprite?: string;
+};
+
 export type SaveWeeklyGoal = {
     target: number;
 };
@@ -370,27 +455,58 @@ export type SaveWeeklyGoal = {
  */
 export type Status31eEnum = 'draft' | 'finished' | 'cancelled';
 
-/**
- * * `normal` - Normal
- * * `fire` - Fire
- * * `water` - Water
- * * `electric` - Electric
- * * `grass` - Grass
- * * `ice` - Ice
- * * `fighting` - Fighting
- * * `poison` - Poison
- * * `ground` - Ground
- * * `flying` - Flying
- * * `psychic` - Psychic
- * * `bug` - Bug
- * * `rock` - Rock
- * * `ghost` - Ghost
- * * `dragon` - Dragon
- * * `dark` - Dark
- * * `steel` - Steel
- * * `fairy` - Fairy
- */
-export type Type1Enum = 'normal' | 'fire' | 'water' | 'electric' | 'grass' | 'ice' | 'fighting' | 'poison' | 'ground' | 'flying' | 'psychic' | 'bug' | 'rock' | 'ghost' | 'dragon' | 'dark' | 'steel' | 'fairy';
+export type TeamPokemonGain = {
+    pokemon_id: number;
+    display_name: string;
+    xp_added: number;
+    affection_added: number;
+    level_before: number;
+    level_after: number;
+    evolved: boolean;
+    evolved_to?: EvolutionPreview | null;
+};
+
+export type TimelineEncounter = {
+    species_name: string;
+    species_pokedex_id: number;
+    species_sprite?: string;
+    status?: string;
+    captured?: boolean;
+    shiny?: boolean;
+};
+
+export type TimelineEvent = {
+    type: string;
+    at: string;
+    actor: UserBrief;
+    workout?: TimelineWorkout | null;
+    encounter?: TimelineEncounter | null;
+    pokemon?: TimelinePokemon | null;
+};
+
+export type TimelineFeed = {
+    results: Array<TimelineEvent>;
+    count: number;
+};
+
+export type TimelinePokemon = {
+    id: number;
+    display_name: string;
+    species_name: string;
+    species_pokedex_id: number;
+    species_sprite?: string;
+    shiny?: boolean;
+};
+
+export type TimelineWorkout = {
+    id: number;
+    workout_type: string;
+    total_volume?: string;
+    perceived_effort?: number | null;
+    proof_photo_url?: string | null;
+    proof_caption?: string;
+    duration_minutes?: number | null;
+};
 
 /**
  * * `normal` - Normal
@@ -417,6 +533,9 @@ export type Type2Enum = 'normal' | 'fire' | 'water' | 'electric' | 'grass' | 'ic
 export type User = {
     readonly id: number;
     email: string;
+    /**
+     * Apelido único visível no app (3–24 caracteres, a-z, 0-9, _).
+     */
     nickname: string;
     readonly display_name: string;
     /**
@@ -446,6 +565,9 @@ export type User = {
 export type UserBrief = {
     readonly id: number;
     readonly email: string;
+    /**
+     * Apelido único visível no app (3–24 caracteres, a-z, 0-9, _).
+     */
     readonly nickname: string;
     readonly display_name: string;
     /**
@@ -489,6 +611,8 @@ export type UserPokemonList = {
     readonly display_name: string;
     level?: number;
     experience?: number;
+    readonly experience_to_next_level: number;
+    readonly experience_progress_percent: number;
     nature?: NatureEnum;
     shiny?: boolean;
     /**
@@ -496,6 +620,10 @@ export type UserPokemonList = {
      */
     active_team_slot?: number | null;
     affection?: number;
+    readonly affection_max: number;
+    readonly affection_progress_percent: number;
+    readonly can_evolve: boolean;
+    next_evolution: EvolutionPreview | null;
     captured_at: string;
 };
 
@@ -565,6 +693,10 @@ export type WorkoutDetail = {
     encounter_status: EncounterStatusEnum;
     encounter_species: PokemonSpecies | null;
     /**
+     * Level of the wild Pokémon for this encounter.
+     */
+    readonly encounter_level: number | null;
+    /**
      * Encontro lendário/ultra raro por bater a meta semanal neste treino.
      */
     readonly weekly_goal_reward: boolean;
@@ -624,6 +756,11 @@ export type WorkoutFinish = {
     perceived_effort?: number | null;
 };
 
+export type WorkoutFinishResult = {
+    workout: WorkoutDetail;
+    team_rewards: WorkoutTeamRewards;
+};
+
 export type WorkoutList = {
     readonly id: number;
     workout_type: WorkoutTypeEnum;
@@ -647,6 +784,11 @@ export type WorkoutList = {
 export type WorkoutProof = {
     photo: string;
     caption?: string;
+};
+
+export type WorkoutTeamRewards = {
+    gains: Array<TeamPokemonGain>;
+    empty_team: boolean;
 };
 
 /**
@@ -686,6 +828,19 @@ export type ExerciseWritable = {
      * Inactive exercises are hidden from users but kept for history.
      */
     is_active?: boolean;
+};
+
+export type FriendRequestsResponseWritable = {
+    incoming: Array<unknown>;
+    outgoing: Array<unknown>;
+};
+
+export type GiftNotificationWritable = {
+    [key: string]: unknown;
+};
+
+export type GiftSpeciesOptionWritable = {
+    sort_order?: number;
 };
 
 export type LastWorkoutByTypeWritable = {
@@ -742,6 +897,9 @@ export type PatchedExerciseWritable = {
 
 export type PatchedUserWritable = {
     email?: string;
+    /**
+     * Apelido único visível no app (3–24 caracteres, a-z, 0-9, _).
+     */
     nickname?: string;
     /**
      * Slug do sprite de treinador (Pokémon Showdown).
@@ -760,12 +918,14 @@ export type PatchedWorkoutDetailWritable = {
 export type PendingEncounterWritable = {
     workout_id: number;
     encounter_status: string;
+    encounter_level: number | null;
+    weekly_goal_reward: boolean;
 };
 
 export type PokemonSpeciesWritable = {
     pokedex_id: number;
     name: string;
-    type_1: Type1Enum;
+    type_1: Type2Enum;
     type_2?: Type2Enum | BlankEnum;
     base_hp: number;
     base_attack: number;
@@ -778,9 +938,27 @@ export type PokemonSpeciesWritable = {
     rarity?: RarityEnum;
 };
 
+export type RegisterWritable = {
+    email: string;
+    nickname: string;
+    password: string;
+    trainer_sprite?: string;
+};
+
+export type TimelineEventWritable = {
+    type: string;
+    at: string;
+    workout?: TimelineWorkout | null;
+    encounter?: TimelineEncounter | null;
+    pokemon?: TimelinePokemon | null;
+};
+
 export type UserWritable = {
     email: string;
-    nickname?: string;
+    /**
+     * Apelido único visível no app (3–24 caracteres, a-z, 0-9, _).
+     */
+    nickname: string;
     /**
      * Slug do sprite de treinador (Pokémon Showdown).
      */
@@ -846,6 +1024,10 @@ export type WorkoutExerciseCreateWritable = {
     reps: number;
     weight?: string;
     is_pr?: boolean;
+};
+
+export type WorkoutFinishResultWritable = {
+    [key: string]: unknown;
 };
 
 export type ExercisesListData = {
@@ -959,57 +1141,66 @@ export type ExercisesUpdateResponses = {
 export type ExercisesUpdateResponse = ExercisesUpdateResponses[keyof ExercisesUpdateResponses];
 
 export type FriendsAcceptCreateData = {
-    body?: never;
+    body?: UserBrief;
     path: {
-        id: string;
+        /**
+         * A unique integer value identifying this friendship.
+         */
+        id: number;
     };
     query?: never;
     url: '/api/friends/{id}/accept/';
 };
 
 export type FriendsAcceptCreateResponses = {
-    /**
-     * No response body
-     */
-    200: unknown;
+    200: UserBrief;
 };
 
+export type FriendsAcceptCreateResponse = FriendsAcceptCreateResponses[keyof FriendsAcceptCreateResponses];
+
 export type FriendsBlockCreateData = {
-    body?: never;
+    body?: UserBrief;
     path: {
-        id: string;
+        /**
+         * A unique integer value identifying this friendship.
+         */
+        id: number;
     };
     query?: never;
     url: '/api/friends/{id}/block/';
 };
 
 export type FriendsBlockCreateResponses = {
-    /**
-     * No response body
-     */
-    200: unknown;
+    200: UserBrief;
 };
 
+export type FriendsBlockCreateResponse = FriendsBlockCreateResponses[keyof FriendsBlockCreateResponses];
+
 export type FriendsDeclineCreateData = {
-    body?: never;
+    body?: UserBrief;
     path: {
-        id: string;
+        /**
+         * A unique integer value identifying this friendship.
+         */
+        id: number;
     };
     query?: never;
     url: '/api/friends/{id}/decline/';
 };
 
 export type FriendsDeclineCreateResponses = {
-    /**
-     * No response body
-     */
-    200: unknown;
+    200: UserBrief;
 };
+
+export type FriendsDeclineCreateResponse = FriendsDeclineCreateResponses[keyof FriendsDeclineCreateResponses];
 
 export type FriendsRemoveDestroyData = {
     body?: never;
     path: {
-        id: string;
+        /**
+         * A unique integer value identifying this friendship.
+         */
+        id: number;
     };
     query?: never;
     url: '/api/friends/{id}/remove/';
@@ -1054,14 +1245,13 @@ export type FriendsRequestsRetrieveData = {
 };
 
 export type FriendsRequestsRetrieveResponses = {
-    /**
-     * No response body
-     */
-    200: unknown;
+    200: FriendRequestsResponse;
 };
 
+export type FriendsRequestsRetrieveResponse = FriendsRequestsRetrieveResponses[keyof FriendsRequestsRetrieveResponses];
+
 export type FriendsRequestsSendCreateData = {
-    body: FriendRequestCreate;
+    body?: FriendRequestCreate;
     path?: never;
     query?: never;
     url: '/api/friends/requests/send/';
@@ -1072,6 +1262,77 @@ export type FriendsRequestsSendCreateResponses = {
 };
 
 export type FriendsRequestsSendCreateResponse = FriendsRequestsSendCreateResponses[keyof FriendsRequestsSendCreateResponses];
+
+export type GiftsListData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/gifts/';
+};
+
+export type GiftsListResponses = {
+    200: Array<GiftNotification>;
+};
+
+export type GiftsListResponse = GiftsListResponses[keyof GiftsListResponses];
+
+export type GiftsRetrieveData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/gifts/{id}/';
+};
+
+export type GiftsRetrieveResponses = {
+    200: GiftNotification;
+};
+
+export type GiftsRetrieveResponse = GiftsRetrieveResponses[keyof GiftsRetrieveResponses];
+
+export type GiftsClaimCreateData = {
+    body?: GiftClaim;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/gifts/{id}/claim/';
+};
+
+export type GiftsClaimCreateResponses = {
+    200: UserPokemonDetail;
+};
+
+export type GiftsClaimCreateResponse = GiftsClaimCreateResponses[keyof GiftsClaimCreateResponses];
+
+export type GiftsPendingCountRetrieveData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/gifts/pending-count/';
+};
+
+export type GiftsPendingCountRetrieveResponses = {
+    200: {
+        count?: number;
+    };
+};
+
+export type GiftsPendingCountRetrieveResponse = GiftsPendingCountRetrieveResponses[keyof GiftsPendingCountRetrieveResponses];
+
+export type GiftsSendCreateData = {
+    body: GiftSend;
+    path?: never;
+    query?: never;
+    url: '/api/gifts/send/';
+};
+
+export type GiftsSendCreateResponses = {
+    200: GiftSendResult;
+};
+
+export type GiftsSendCreateResponse = GiftsSendCreateResponses[keyof GiftsSendCreateResponses];
 
 export type MyPokemonListData = {
     body?: never;
@@ -1241,19 +1502,18 @@ export type RestRestCheckRetrieveResponses = {
 
 export type RestRestCheckRetrieveResponse = RestRestCheckRetrieveResponses[keyof RestRestCheckRetrieveResponses];
 
-export type TimelineRetrieveData = {
+export type TimelineListData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/api/timeline/';
 };
 
-export type TimelineRetrieveResponses = {
-    /**
-     * No response body
-     */
-    200: unknown;
+export type TimelineListResponses = {
+    200: Array<TimelineFeed>;
 };
+
+export type TimelineListResponse = TimelineListResponses[keyof TimelineListResponses];
 
 export type UsersListData = {
     body?: never;
@@ -1401,8 +1661,34 @@ export type UsersTimelineRetrieveResponses = {
 
 export type UsersTimelineRetrieveResponse = UsersTimelineRetrieveResponses[keyof UsersTimelineRetrieveResponses];
 
+export type UsersGiftRecipientsListData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Number of results to return per page.
+         */
+        limit?: number;
+        /**
+         * The initial index from which to return the results.
+         */
+        offset?: number;
+        /**
+         * Nickname or e-mail fragment (min. 1 character).
+         */
+        q: string;
+    };
+    url: '/api/users/gift-recipients/';
+};
+
+export type UsersGiftRecipientsListResponses = {
+    200: PaginatedUserBriefList;
+};
+
+export type UsersGiftRecipientsListResponse = UsersGiftRecipientsListResponses[keyof UsersGiftRecipientsListResponses];
+
 export type UsersLoginCreateData = {
-    body: UserWritable;
+    body: Login;
     path?: never;
     query?: never;
     url: '/api/users/login/';
@@ -1457,14 +1743,14 @@ export type UsersMePartialUpdateResponses = {
 export type UsersMePartialUpdateResponse = UsersMePartialUpdateResponses[keyof UsersMePartialUpdateResponses];
 
 export type UsersRegisterCreateData = {
-    body: UserWritable;
+    body: RegisterWritable;
     path?: never;
     query?: never;
     url: '/api/users/register/';
 };
 
 export type UsersRegisterCreateResponses = {
-    200: User;
+    201: User;
 };
 
 export type UsersRegisterCreateResponse = UsersRegisterCreateResponses[keyof UsersRegisterCreateResponses];
@@ -1681,7 +1967,7 @@ export type WorkoutsFinishCreateData = {
 };
 
 export type WorkoutsFinishCreateResponses = {
-    200: WorkoutDetail;
+    200: WorkoutFinishResult;
 };
 
 export type WorkoutsFinishCreateResponse = WorkoutsFinishCreateResponses[keyof WorkoutsFinishCreateResponses];

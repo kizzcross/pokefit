@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from pokemon.services.progression import EvolutionPreview
@@ -25,21 +26,27 @@ class PokemonProgressMixin(serializers.Serializer):
     can_evolve = serializers.SerializerMethodField()
     next_evolution = serializers.SerializerMethodField()
 
+    @extend_schema_field(serializers.IntegerField())
     def get_experience_to_next_level(self, obj):
         return get_progress_metadata_for(obj)["experience_to_next_level"]
 
+    @extend_schema_field(serializers.FloatField())
     def get_experience_progress_percent(self, obj):
         return get_progress_metadata_for(obj)["experience_progress_percent"]
 
+    @extend_schema_field(serializers.IntegerField())
     def get_affection_max(self, obj):
         return get_progress_metadata_for(obj)["affection_max"]
 
+    @extend_schema_field(serializers.FloatField())
     def get_affection_progress_percent(self, obj):
         return get_progress_metadata_for(obj)["affection_progress_percent"]
 
+    @extend_schema_field(serializers.BooleanField())
     def get_can_evolve(self, obj):
         return get_progress_metadata_for(obj)["can_evolve"]
 
+    @extend_schema_field(EvolutionPreviewSerializer(allow_null=True))
     def get_next_evolution(self, obj):
         preview = get_progress_metadata_for(obj)["next_evolution"]
         if preview is None:

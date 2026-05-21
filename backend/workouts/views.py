@@ -298,7 +298,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         data = build_calendar_month(request.user, year, month, include_proof_photos=True)
         return Response(data)
 
-    @extend_schema(request=WorkoutFinishSerializer, responses=WorkoutDetailSerializer)
+    @extend_schema(request=WorkoutFinishSerializer, responses=WorkoutFinishResultSerializer)
     @action(detail=True, methods=["post"], url_path="finish")
     def finish(self, request, pk=None):
         workout = self.get_object()
@@ -308,18 +308,20 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         )
         serializer.is_valid(raise_exception=True)
         try:
-            workout = serializer.save()
+            result = serializer.save()
         except ValueError as exc:
             return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not workout.encounter_species_id:
+        if not result.workout.encounter_species_id:
             return Response(
                 {"detail": "Catálogo de Pokémon vazio. Rode import_pokemon ou seed_gen1_pokemon."},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
 
-        output = WorkoutDetailSerializer(workout, context={"request": request})
-        return Response(output.data)
+        return Response(
+            WorkoutFinishResultSerializer(result, context={"request": request}).data,
+            status=status.HTTP_200_OK,
+        )
 
     @action(detail=True, methods=["post"], url_path="decline-encounter")
     def decline_encounter(self, request, pk=None):

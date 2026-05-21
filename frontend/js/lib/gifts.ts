@@ -79,11 +79,14 @@ export async function searchGiftRecipients(query: string) {
     },
   );
   if (response.status >= 400) {
+    const payload = response.data;
     const detail =
-      typeof response.data === 'object' &&
-      response.data !== null &&
-      typeof response.data.detail === 'string'
-        ? response.data.detail
+      payload &&
+      typeof payload === 'object' &&
+      !Array.isArray(payload) &&
+      'detail' in payload &&
+      typeof payload.detail === 'string'
+        ? payload.detail
         : 'Não foi possível buscar usuários.';
     const error = new Error(detail) as Error & { response?: typeof response };
     error.response = response;

@@ -335,6 +335,116 @@ paths:
               schema:
                 $ref: '#/components/schemas/Friendship'
           description: ''
+  /api/gifts/:
+    get:
+      operationId: gifts_list
+      tags:
+      - gifts
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GiftNotification'
+          description: ''
+  /api/gifts/{id}/:
+    get:
+      operationId: gifts_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - gifts
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GiftNotification'
+          description: ''
+  /api/gifts/{id}/claim/:
+    post:
+      operationId: gifts_claim_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - gifts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GiftClaim'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GiftClaim'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GiftClaim'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPokemonDetail'
+          description: ''
+  /api/gifts/pending-count/:
+    get:
+      operationId: gifts_pending_count_retrieve
+      tags:
+      - gifts
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+          description: ''
+  /api/gifts/send/:
+    post:
+      operationId: gifts_send_create
+      tags:
+      - gifts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GiftSend'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GiftSend'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GiftSend'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GiftSendResult'
+          description: ''
   /api/my-pokemon/:
     get:
       operationId: my_pokemon_list
@@ -524,12 +634,6 @@ paths:
         description: The initial index from which to return the results.
         schema:
           type: integer
-      - name: search
-        required: false
-        in: query
-        description: Filter by name or Pokédex number (partial match).
-        schema:
-          type: string
       tags:
       - pokemon-species
       security:
@@ -797,6 +901,39 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
           description: ''
+  /api/users/gift-recipients/:
+    get:
+      operationId: users_gift_recipients_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - in: query
+        name: q
+        schema:
+          type: string
+        description: Nickname or e-mail fragment (min. 1 character).
+        required: true
+      tags:
+      - users
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserBriefList'
+          description: ''
   /api/users/login/:
     post:
       operationId: users_login_create
@@ -856,13 +993,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedUserProfileUpdate'
+              $ref: '#/components/schemas/PatchedUser'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedUserProfileUpdate'
+              $ref: '#/components/schemas/PatchedUser'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedUserProfileUpdate'
+              $ref: '#/components/schemas/PatchedUser'
       security:
       - cookieAuth: []
       responses:
@@ -1368,6 +1505,25 @@ components:
         * `pending` - Pending
         * `captured` - Captured
         * `fled` - Fled
+    EvolutionPreview:
+      type: object
+      properties:
+        species_name:
+          type: string
+        pokedex_id:
+          type: integer
+        trigger:
+          type: string
+        requires_level:
+          type: integer
+          nullable: true
+        requires_affection:
+          type: integer
+          nullable: true
+      required:
+      - pokedex_id
+      - species_name
+      - trigger
     Exercise:
       type: object
       properties:
@@ -1603,6 +1759,139 @@ components:
         * `accepted` - Accepted
         * `declined` - Declined
         * `blocked` - Blocked
+    GiftClaim:
+      type: object
+      properties:
+        species_id:
+          type: integer
+          nullable: true
+    GiftKindEnum:
+      enum:
+      - direct
+      - choice
+      type: string
+      description: |-
+        * `direct` - Presente direto
+        * `choice` - Escolher um Pokémon
+    GiftNotification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        batch_id:
+          type: string
+          format: uuid
+          readOnly: true
+        message:
+          type: string
+          readOnly: true
+        gift_kind:
+          allOf:
+          - $ref: '#/components/schemas/GiftKindEnum'
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/GiftNotificationStatusEnum'
+          readOnly: true
+        is_pending:
+          type: string
+          readOnly: true
+        sender_display:
+          type: string
+          readOnly: true
+        species_options:
+          type: array
+          items:
+            $ref: '#/components/schemas/GiftSpeciesOption'
+          readOnly: true
+        claimed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - batch_id
+      - claimed_at
+      - created
+      - gift_kind
+      - id
+      - is_pending
+      - message
+      - sender_display
+      - species_options
+      - status
+    GiftNotificationStatusEnum:
+      enum:
+      - pending
+      - claimed
+      type: string
+      description: |-
+        * `pending` - Pendente
+        * `claimed` - Resgatado
+    GiftSend:
+      type: object
+      properties:
+        recipient_ids:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+          maxItems: 50
+        message:
+          type: string
+          maxLength: 500
+        gift_kind:
+          $ref: '#/components/schemas/GiftKindEnum'
+        species_ids:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+          maxItems: 3
+      required:
+      - gift_kind
+      - message
+      - recipient_ids
+      - species_ids
+    GiftSendResult:
+      type: object
+      properties:
+        sent_count:
+          type: integer
+        batch_id:
+          type: string
+          format: uuid
+        notifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/GiftNotification'
+      required:
+      - batch_id
+      - notifications
+      - sent_count
+    GiftSpeciesOption:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        species:
+          allOf:
+          - $ref: '#/components/schemas/PokemonSpecies'
+          readOnly: true
+        sort_order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+      required:
+      - id
+      - species
     LastWorkoutByType:
       type: object
       properties:
@@ -1639,6 +1928,17 @@ components:
       - id
       - total_volume
       - workout_type
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+      - email
+      - password
     Message:
       type: object
       properties:
@@ -2033,6 +2333,11 @@ components:
           - $ref: '#/components/schemas/PokemonSpecies'
           readOnly: true
           nullable: true
+        encounter_level:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: Level of the wild Pokémon for this encounter.
         weekly_goal_reward:
           type: boolean
           readOnly: true
@@ -2099,10 +2404,10 @@ components:
         weekly_goal_reward:
           type: boolean
         species:
-          allOf:
-          - $ref: '#/components/schemas/PokemonSpecies'
+          type: string
           readOnly: true
       required:
+      - encounter_level
       - encounter_status
       - species
       - weekly_goal_reward
@@ -2228,6 +2533,25 @@ components:
         * `rare` - Rare
         * `super_rare` - Super Rare
         * `legendary` - Legendary
+    Register:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        nickname:
+          type: string
+          maxLength: 24
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+        trainer_sprite:
+          type: string
+      required:
+      - email
+      - nickname
+      - password
     SaveWeeklyGoal:
       type: object
       properties:
@@ -2247,6 +2571,35 @@ components:
         * `draft` - Draft
         * `finished` - Finished
         * `cancelled` - Cancelled
+    TeamPokemonGain:
+      type: object
+      properties:
+        pokemon_id:
+          type: integer
+        display_name:
+          type: string
+        xp_added:
+          type: integer
+        affection_added:
+          type: integer
+        level_before:
+          type: integer
+        level_after:
+          type: integer
+        evolved:
+          type: boolean
+        evolved_to:
+          allOf:
+          - $ref: '#/components/schemas/EvolutionPreview'
+          nullable: true
+      required:
+      - affection_added
+      - display_name
+      - evolved
+      - level_after
+      - level_before
+      - pokemon_id
+      - xp_added
     TimelineEncounter:
       type: object
       properties:
@@ -2385,47 +2738,6 @@ components:
         * `dark` - Dark
         * `steel` - Steel
         * `fairy` - Fairy
-    Login:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-        password:
-          type: string
-      required:
-      - email
-      - password
-    Register:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-        nickname:
-          type: string
-          maxLength: 24
-        password:
-          type: string
-          minLength: 8
-          writeOnly: true
-        trainer_sprite:
-          type: string
-      required:
-      - email
-      - nickname
-      - password
-    PatchedUserProfileUpdate:
-      type: object
-      properties:
-        nickname:
-          type: string
-          description: Apelido único visível no app (3–24 caracteres, a-z, 0-9, _).
-          maxLength: 24
-        trainer_sprite:
-          type: string
-          description: Slug do sprite de treinador (Pokémon Showdown).
-          maxLength: 128
     User:
       type: object
       properties:
@@ -2560,13 +2872,6 @@ components:
           maximum: 9223372036854775807
           minimum: 0
           format: int64
-        experience_to_next_level:
-          type: integer
-          nullable: true
-          readOnly: true
-        experience_progress_percent:
-          type: integer
-          readOnly: true
         nature:
           $ref: '#/components/schemas/NatureEnum'
         shiny:
@@ -2583,20 +2888,6 @@ components:
           maximum: 9223372036854775807
           minimum: 0
           format: int64
-        affection_max:
-          type: integer
-          readOnly: true
-        affection_progress_percent:
-          type: integer
-          readOnly: true
-        can_evolve:
-          type: boolean
-          readOnly: true
-        next_evolution:
-          allOf:
-          - $ref: '#/components/schemas/EvolutionPreview'
-          nullable: true
-          readOnly: true
         captured_at:
           type: string
           format: date-time
@@ -2620,76 +2911,6 @@ components:
       - ivs
       - modified
       - species
-    EvolutionPreview:
-      type: object
-      properties:
-        species_name:
-          type: string
-        pokedex_id:
-          type: integer
-        trigger:
-          type: string
-        requires_level:
-          type: integer
-          nullable: true
-        requires_affection:
-          type: integer
-          nullable: true
-      required:
-      - pokedex_id
-      - species_name
-      - trigger
-    TeamPokemonGain:
-      type: object
-      properties:
-        pokemon_id:
-          type: integer
-        display_name:
-          type: string
-        xp_added:
-          type: integer
-        affection_added:
-          type: integer
-        level_before:
-          type: integer
-        level_after:
-          type: integer
-        evolved:
-          type: boolean
-        evolved_to:
-          allOf:
-          - $ref: '#/components/schemas/EvolutionPreview'
-          nullable: true
-      required:
-      - affection_added
-      - display_name
-      - evolved
-      - level_after
-      - level_before
-      - pokemon_id
-      - xp_added
-    WorkoutTeamRewards:
-      type: object
-      properties:
-        gains:
-          type: array
-          items:
-            $ref: '#/components/schemas/TeamPokemonGain'
-        empty_team:
-          type: boolean
-      required:
-      - empty_team
-      - gains
-    WorkoutFinishResult:
-      type: object
-      properties:
-        workout:
-          $ref: '#/components/schemas/WorkoutDetail'
-        team_rewards:
-          $ref: '#/components/schemas/WorkoutTeamRewards'
-      required:
-      - team_rewards
-      - workout
     UserPokemonList:
       type: object
       properties:
@@ -2717,10 +2938,10 @@ components:
           format: int64
         experience_to_next_level:
           type: integer
-          nullable: true
           readOnly: true
         experience_progress_percent:
-          type: integer
+          type: number
+          format: double
           readOnly: true
         nature:
           $ref: '#/components/schemas/NatureEnum'
@@ -2742,7 +2963,8 @@ components:
           type: integer
           readOnly: true
         affection_progress_percent:
-          type: integer
+          type: number
+          format: double
           readOnly: true
         can_evolve:
           type: boolean
@@ -2756,9 +2978,15 @@ components:
           type: string
           format: date-time
       required:
+      - affection_max
+      - affection_progress_percent
+      - can_evolve
       - captured_at
       - display_name
+      - experience_progress_percent
+      - experience_to_next_level
       - id
+      - next_evolution
       - species
     UserPokemonTeamUpdate:
       type: object
@@ -2927,6 +3155,11 @@ components:
           - $ref: '#/components/schemas/PokemonSpecies'
           readOnly: true
           nullable: true
+        encounter_level:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: Level of the wild Pokémon for this encounter.
         weekly_goal_reward:
           type: boolean
           readOnly: true
@@ -2964,6 +3197,7 @@ components:
       required:
       - created
       - duration_minutes
+      - encounter_level
       - encounter_species
       - encounter_status
       - ended_at
@@ -3123,6 +3357,20 @@ components:
           maximum: 10
           minimum: 1
           nullable: true
+    WorkoutFinishResult:
+      type: object
+      properties:
+        workout:
+          allOf:
+          - $ref: '#/components/schemas/WorkoutDetail'
+          readOnly: true
+        team_rewards:
+          allOf:
+          - $ref: '#/components/schemas/WorkoutTeamRewards'
+          readOnly: true
+      required:
+      - team_rewards
+      - workout
     WorkoutList:
       type: object
       properties:
@@ -3208,6 +3456,18 @@ components:
           maxLength: 140
       required:
       - photo
+    WorkoutTeamRewards:
+      type: object
+      properties:
+        gains:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamPokemonGain'
+        empty_team:
+          type: boolean
+      required:
+      - empty_team
+      - gains
     WorkoutTypeEnum:
       enum:
       - chest_triceps
