@@ -77,12 +77,33 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
+      - name: Validate deploy secrets
+        run: |
+          set -euo pipefail
+          if [ -z "${{ secrets.DEPLOY_HOST }}" ]; then
+            echo "::error::Configure repository secret DEPLOY_HOST (ex: 178.105.169.230)"
+            exit 1
+          fi
+          if [ -z "${{ secrets.DEPLOY_USER }}" ]; then
+            echo "::error::Configure repository secret DEPLOY_USER (ex: root)"
+            exit 1
+          fi
+          if [ -z "${{ secrets.DEPLOY_SSH_KEY }}" ]; then
+            echo "::error::Configure repository secret DEPLOY_SSH_KEY with the full PRIVATE key"
+            exit 1
+          fi
+          if ! printf '%s' "${{ secrets.DEPLOY_SSH_KEY }}" | grep -q "BEGIN.*PRIVATE KEY"; then
+            echo "::error::DEPLOY_SSH_KEY must be the private key (BEGIN ... PRIVATE KEY), not the .pub file"
+            exit 1
+          fi
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: 22
           script_stop: true
           command_timeout: 30m
           script: |
