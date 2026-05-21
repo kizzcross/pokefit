@@ -25,6 +25,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+    @extend_schema(request=LoginSerializer, responses={200: UserSerializer})
     @action(detail=False, methods=["post"], permission_classes=[AllowAny], url_path="login")
     def login(self, request):
         serializer = LoginSerializer(data=request.data)
@@ -114,6 +115,7 @@ class UserViewSet(viewsets.ModelViewSet):
         ]
         return Response({"results": results, "count": len(results)})
 
+    @extend_schema(request=RegisterSerializer, responses={201: UserSerializer})
     @action(detail=False, methods=["post"], permission_classes=[AllowAny], url_path="register")
     def register(self, request):
         serializer = RegisterSerializer(data=request.data)

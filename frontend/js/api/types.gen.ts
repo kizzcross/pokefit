@@ -446,6 +446,28 @@ export type TimelineWorkout = {
  */
 export type Type2Enum = 'normal' | 'fire' | 'water' | 'electric' | 'grass' | 'ice' | 'fighting' | 'poison' | 'ground' | 'flying' | 'psychic' | 'bug' | 'rock' | 'ghost' | 'dragon' | 'dark' | 'steel' | 'fairy';
 
+export type Login = {
+    email: string;
+    password: string;
+};
+
+export type Register = {
+    email: string;
+    nickname: string;
+    trainer_sprite?: string;
+};
+
+export type PatchedUserProfileUpdate = {
+    /**
+     * Apelido único visível no app (3–24 caracteres, a-z, 0-9, _).
+     */
+    nickname?: string;
+    /**
+     * Slug do sprite de treinador (Pokémon Showdown).
+     */
+    trainer_sprite?: string;
+};
+
 export type User = {
     readonly id: number;
     email: string;
@@ -830,6 +852,13 @@ export type TimelineEventWritable = {
     workout?: TimelineWorkout | null;
     encounter?: TimelineEncounter | null;
     pokemon?: TimelinePokemon | null;
+};
+
+export type RegisterWritable = {
+    email: string;
+    nickname: string;
+    password: string;
+    trainer_sprite?: string;
 };
 
 export type UserWritable = {
@@ -1466,7 +1495,7 @@ export type UsersTimelineRetrieveResponses = {
 export type UsersTimelineRetrieveResponse = UsersTimelineRetrieveResponses[keyof UsersTimelineRetrieveResponses];
 
 export type UsersLoginCreateData = {
-    body: UserWritable;
+    body: Login;
     path?: never;
     query?: never;
     url: '/api/users/login/';
@@ -1508,7 +1537,7 @@ export type UsersMeRetrieveResponses = {
 export type UsersMeRetrieveResponse = UsersMeRetrieveResponses[keyof UsersMeRetrieveResponses];
 
 export type UsersMePartialUpdateData = {
-    body?: PatchedUserWritable;
+    body?: PatchedUserProfileUpdate;
     path?: never;
     query?: never;
     url: '/api/users/me/';
@@ -1521,14 +1550,14 @@ export type UsersMePartialUpdateResponses = {
 export type UsersMePartialUpdateResponse = UsersMePartialUpdateResponses[keyof UsersMePartialUpdateResponses];
 
 export type UsersRegisterCreateData = {
-    body: UserWritable;
+    body: RegisterWritable;
     path?: never;
     query?: never;
     url: '/api/users/register/';
 };
 
 export type UsersRegisterCreateResponses = {
-    200: User;
+    201: User;
 };
 
 export type UsersRegisterCreateResponse = UsersRegisterCreateResponses[keyof UsersRegisterCreateResponses];

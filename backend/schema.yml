@@ -800,13 +800,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/Login'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/Login'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/Login'
         required: true
       security:
       - cookieAuth: []
@@ -850,13 +850,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedUser'
+              $ref: '#/components/schemas/PatchedUserProfileUpdate'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedUser'
+              $ref: '#/components/schemas/PatchedUserProfileUpdate'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedUser'
+              $ref: '#/components/schemas/PatchedUserProfileUpdate'
       security:
       - cookieAuth: []
       responses:
@@ -875,19 +875,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/Register'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/Register'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/Register'
         required: true
       security:
       - cookieAuth: []
       - {}
       responses:
-        '200':
+        '201':
           content:
             application/json:
               schema:
@@ -2372,6 +2372,47 @@ components:
         * `dark` - Dark
         * `steel` - Steel
         * `fairy` - Fairy
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+      - email
+      - password
+    Register:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        nickname:
+          type: string
+          maxLength: 24
+        password:
+          type: string
+          minLength: 8
+          writeOnly: true
+        trainer_sprite:
+          type: string
+      required:
+      - email
+      - nickname
+      - password
+    PatchedUserProfileUpdate:
+      type: object
+      properties:
+        nickname:
+          type: string
+          description: Apelido único visível no app (3–24 caracteres, a-z, 0-9, _).
+          maxLength: 24
+        trainer_sprite:
+          type: string
+          description: Slug do sprite de treinador (Pokémon Showdown).
+          maxLength: 128
     User:
       type: object
       properties:
