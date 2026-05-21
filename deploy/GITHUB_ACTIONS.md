@@ -15,6 +15,8 @@ Repositório → **Settings → Secrets and variables → Actions → New reposi
 | `DEPLOY_USER` | `root` (usuário SSH do VPS) | Sim |
 | `DEPLOY_SSH_KEY` | chave privada SSH (conteúdo de `id_ed25519`) | Sim |
 
+Use **Repository secrets** (não precisa duplicar em Environment, a menos que use approval no environment `production`).
+
 ### Gerar chave só para deploy (no Mac)
 
 ```bash
