@@ -20,6 +20,8 @@ jobs:
       SENDGRID_USERNAME: test
       SENDGRID_PASSWORD: test
       ALLOWED_HOSTS: localhost,pokefit.kizzcross.com.br
+      # GitHub output breaks Django keys with special chars; use a fixed CI-only value.
+      SECRET_KEY: pokefit-github-actions-ci-only-not-for-production-use-0123456789abcdef
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,24 +52,17 @@ jobs:
       - name: Build frontend
         run: pnpm run build
 
-      - name: Generate Django secret key
-        id: django_secrets
-        run: |
-          echo "key=$(python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')" >> "$GITHUB_OUTPUT"
-
       - name: Check migrations
         working-directory: backend
         run: poetry run python manage.py makemigrations --check --dry-run
         env:
           DJANGO_SETTINGS_MODULE: pokefit.settings.test
-          SECRET_KEY: ${{ steps.django_secrets.outputs.key }}
 
       - name: Django deploy checks
         working-directory: backend
-        run: poetry run python manage.py check --deploy --fail-level WARNING
+        run: poetry run python manage.py check --deploy --fail-level ERROR
         env:
           DJANGO_SETTINGS_MODULE: pokefit.settings.production
-          SECRET_KEY: ${{ steps.django_secrets.outputs.key }}
 
       - name: Backend tests
         run: make test

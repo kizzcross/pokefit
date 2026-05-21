@@ -123,10 +123,14 @@ REST_FRAMEWORK = {
 
 # drf-spectacular
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Vinta Boilerplate API",
-    "DESCRIPTION": "A Django project boilerplate with Vinta's best practices",
+    "TITLE": "Pokefit API",
+    "DESCRIPTION": "Gamified workout tracker with Pokémon encounters and social features.",
     "VERSION": "0.1.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "ENUM_NAME_OVERRIDES": {
+        "Status31eEnum": "workouts.choices.WorkoutStatus",
+        "Type2Enum": "pokemon.choices.PokemonType",
+    },
 }
 
 LANGUAGE_CODE = "en-us"

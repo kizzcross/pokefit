@@ -1,21 +1,21 @@
 # GitHub Actions — CI + deploy automático
 
-Push na branch **`main`** dispara:
+Push na branch `**main**` dispara:
 
-1. **CI** — build frontend, testes, ruff, migrations check  
+1. **CI** — build frontend, testes, ruff, migrations check
 2. **Deploy** — SSH no Hetzner, `git pull` + `docker compose up -d --build`
 
 ## Secrets no GitHub
 
 Repositório → **Settings → Secrets and variables → Actions → New repository secret**
 
-| Secret | Exemplo | Obrigatório |
-|--------|---------|-------------|
-| `DEPLOY_HOST` | `178.105.169.230` | Sim |
-| `DEPLOY_USER` | `root` (usuário SSH do VPS) | Sim |
-| `DEPLOY_SSH_KEY` | chave privada SSH (conteúdo de `id_ed25519`) | Sim |
 
-Use **Repository secrets** (não precisa duplicar em Environment, a menos que use approval no environment `production`).
+| Secret           | Exemplo                                      | Obrigatório |
+| ---------------- | -------------------------------------------- | ----------- |
+| `DEPLOY_HOST`    | `178.105.169.230`                            | Sim         |
+| `DEPLOY_USER`    | `root`                                       | Sim         |
+| `DEPLOY_SSH_KEY` | chave privada SSH (conteúdo de `id_ed25519`) | Sim         |
+
 
 ### Gerar chave só para deploy (no Mac)
 
@@ -61,3 +61,4 @@ No servidor após deploy:
 cd /opt/pokefit/deploy
 docker compose -f docker-compose.prod.yml logs --tail=80 web
 ```
+

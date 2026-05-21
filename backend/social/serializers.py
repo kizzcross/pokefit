@@ -36,6 +36,53 @@ class FriendshipSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
+class FriendRequestsResponseSerializer(serializers.Serializer):
+    incoming = FriendshipSerializer(many=True)
+    outgoing = FriendshipSerializer(many=True)
+
+
+class TimelineWorkoutSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    workout_type = serializers.CharField()
+    total_volume = serializers.CharField(required=False, allow_blank=True)
+    perceived_effort = serializers.IntegerField(required=False, allow_null=True)
+    proof_photo_url = serializers.CharField(required=False, allow_null=True)
+    proof_caption = serializers.CharField(required=False, allow_blank=True)
+    duration_minutes = serializers.IntegerField(required=False, allow_null=True)
+
+
+class TimelineEncounterSerializer(serializers.Serializer):
+    species_name = serializers.CharField()
+    species_pokedex_id = serializers.IntegerField()
+    species_sprite = serializers.CharField(required=False, allow_blank=True)
+    status = serializers.CharField(required=False, allow_blank=True)
+    captured = serializers.BooleanField(required=False)
+    shiny = serializers.BooleanField(required=False)
+
+
+class TimelinePokemonSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    display_name = serializers.CharField()
+    species_name = serializers.CharField()
+    species_pokedex_id = serializers.IntegerField()
+    species_sprite = serializers.CharField(required=False, allow_blank=True)
+    shiny = serializers.BooleanField(required=False)
+
+
+class TimelineEventSerializer(serializers.Serializer):
+    type = serializers.CharField()
+    at = serializers.CharField()
+    actor = UserBriefSerializer()
+    workout = TimelineWorkoutSerializer(required=False, allow_null=True)
+    encounter = TimelineEncounterSerializer(required=False, allow_null=True)
+    pokemon = TimelinePokemonSerializer(required=False, allow_null=True)
+
+
+class TimelineFeedSerializer(serializers.Serializer):
+    results = TimelineEventSerializer(many=True)
+    count = serializers.IntegerField()
+
+
 class FriendRequestCreateSerializer(serializers.Serializer):
     email = serializers.EmailField()
 

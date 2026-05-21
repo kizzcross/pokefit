@@ -10,7 +10,9 @@ from social.choices import FriendshipStatus
 from social.models import Friendship
 from social.serializers import (
     FriendRequestCreateSerializer,
+    FriendRequestsResponseSerializer,
     FriendshipSerializer,
+    TimelineFeedSerializer,
     UserBriefSerializer,
 )
 from social.services.friends import accepted_friend_ids, display_name
@@ -21,6 +23,8 @@ User = get_user_model()
 
 class FriendViewSet(viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
+    serializer_class = UserBriefSerializer
+    queryset = Friendship.objects.all()
 
     @extend_schema(responses=UserBriefSerializer(many=True))
     @action(detail=False, methods=["get"], url_path="list")
@@ -30,6 +34,7 @@ class FriendViewSet(viewsets.GenericViewSet):
         serializer = UserBriefSerializer(friends, many=True)
         return Response(serializer.data)
 
+    @extend_schema(responses=FriendRequestsResponseSerializer)
     @action(detail=False, methods=["get"], url_path="requests")
     def requests(self, request):
         incoming = Friendship.objects.filter(
@@ -120,7 +125,9 @@ class FriendViewSet(viewsets.GenericViewSet):
 
 class TimelineViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
+    serializer_class = TimelineFeedSerializer
 
+    @extend_schema(responses=TimelineFeedSerializer)
     def list(self, request):
         events = build_feed_timeline_events(request.user, include_proof_photos=True, limit=40)
         return Response({"results": events, "count": len(events)})
