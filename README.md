@@ -136,7 +136,18 @@ App em http://localhost:8000. Logs: `make docker_logs backend`.
 
 ## Deploy
 
-Há suporte a [Render.com](https://render.com) via `render.yaml` e `render_build.sh` (herdado do boilerplate). Ajuste `ALLOWED_HOSTS`, `SECRET_KEY` e variáveis de ambiente conforme o ambiente.
+### Hetzner (produção)
+
+| | |
+|--|--|
+| Domínio | `pokefit.kizzcross.com.br` |
+| IP | `178.105.169.230` |
+
+Guia passo a passo: **[deploy/HETZNER.md](deploy/HETZNER.md)** (Docker Compose + Nginx + Certbot).
+
+### Render.com
+
+Há suporte a [Render.com](https://render.com) via `render.yaml` e `render_build.sh`. Ajuste `ALLOWED_HOSTS`, `SECRET_KEY` e variáveis de ambiente conforme o ambiente.
 
 ---
 

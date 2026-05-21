@@ -133,8 +133,15 @@ LOGGING = {
 
 JS_REVERSE_EXCLUDE_NAMESPACES = ["admin"]
 
+# Sprites externos (PokéAPI CDN + Showdown trainers)
+CSP_IMG_SRC += [
+    "https://raw.githubusercontent.com",
+    "https://play.pokemonshowdown.com",
+]
+
 # Sentry
-sentry_sdk.init(dsn=SENTRY_DSN, integrations=[DjangoIntegration()], release=COMMIT_SHA)
+if SENTRY_DSN:
+    sentry_sdk.init(dsn=SENTRY_DSN, integrations=[DjangoIntegration()], release=COMMIT_SHA)
 
 # Admin Env Label
 ADMIN_ENVIRONMENT_LABEL = config("ADMIN_ENVIRONMENT_LABEL", default="")
