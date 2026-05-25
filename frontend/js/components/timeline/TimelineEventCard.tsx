@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import GameIcon from '@/js/components/game/GameIcon';
 import TrainerAvatar from '@/js/components/game/TrainerAvatar';
 import PokemonSprite from '@/js/components/game/PokemonSprite';
+import { userProfilePath } from '@/js/components/social/UserLink';
 import PixelCard from '@/js/components/ui/PixelCard';
 import { useAuth } from '@/js/hooks/useAuth';
 import type { TimelineEvent } from '@/js/lib/timeline';
@@ -27,20 +28,27 @@ const TimelineEventCard = ({ event, showActor = false }: TimelineEventCardProps)
   const { user } = useAuth();
   const isOwnEvent = user?.id === event.actor.id;
 
+  const actorHeader = showActor ? (
+    <Link
+      className="mb-2 flex items-center gap-2 no-underline"
+      to={userProfilePath(event.actor.id)}
+    >
+      <TrainerAvatar
+        alt={event.actor.display_name}
+        size="xs"
+        slug={event.actor.trainer_sprite}
+        src={event.actor.trainer_sprite_url}
+      />
+      <p className="text-xs font-semibold text-[var(--color-game-info)] hover:underline">
+        {event.actor.display_name}
+      </p>
+    </Link>
+  ) : null;
+
   if (event.type === 'pokemon_captured' && event.pokemon) {
     return (
       <PixelCard className="border-[var(--color-game-success)]">
-        {showActor ? (
-          <div className="mb-2 flex items-center gap-2">
-            <TrainerAvatar
-              alt={event.actor.display_name}
-              size="xs"
-              slug={event.actor.trainer_sprite}
-              src={event.actor.trainer_sprite_url}
-            />
-            <p className="text-xs text-[var(--color-game-muted)]">{event.actor.display_name}</p>
-          </div>
-        ) : null}
+        {actorHeader}
         <div className="flex items-center gap-3">
           <PokemonSprite
             alt={event.pokemon.display_name}
@@ -64,17 +72,7 @@ const TimelineEventCard = ({ event, showActor = false }: TimelineEventCardProps)
 
   return (
     <PixelCard>
-      {showActor ? (
-        <div className="mb-2 flex items-center gap-2">
-          <TrainerAvatar
-            alt={event.actor.display_name}
-            size="xs"
-            slug={event.actor.trainer_sprite}
-            src={event.actor.trainer_sprite_url}
-          />
-          <p className="text-xs text-[var(--color-game-muted)]">{event.actor.display_name}</p>
-        </div>
-      ) : null}
+      {actorHeader}
       <div className="flex gap-3">
         {workout.proof_photo_url ? (
           <img
@@ -123,7 +121,7 @@ const TimelineEventCard = ({ event, showActor = false }: TimelineEventCardProps)
           ) : (
             <Link
               className="mt-2 inline-block text-[10px] font-bold uppercase text-[var(--color-game-info)] no-underline"
-              to={`/friends/${event.actor.id}`}
+              to={userProfilePath(event.actor.id)}
             >
               Ver perfil
             </Link>

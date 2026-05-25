@@ -42,7 +42,12 @@ export function useAuth() {
   });
 
   const registerMutation = useMutation({
-    mutationFn: async (payload: { email: string; password: string; nickname: string }) => {
+    mutationFn: async (payload: {
+      email: string;
+      password: string;
+      nickname: string;
+      invite_code?: string;
+    }) => {
       const response = await usersRegisterCreate({
         body: { ...payload, nickname: payload.nickname },
         throwOnError: true,

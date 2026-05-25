@@ -4,11 +4,14 @@ import { Link } from 'react-router';
 
 import GameIcon from '@/js/components/game/GameIcon';
 import TrainerAvatar from '@/js/components/game/TrainerAvatar';
+import InviteCard from '@/js/components/invite/InviteCard';
 import MobileHeader from '@/js/components/layout/MobileHeader';
+import UserLink, { userProfilePath } from '@/js/components/social/UserLink';
 import PixelButton from '@/js/components/ui/PixelButton';
 import { PageLoading, QueryRefetchBar } from '@/js/components/ui/GameLoading';
 import PixelCard from '@/js/components/ui/PixelCard';
 import { mergeQueryState } from '@/js/hooks/useQueryLoading';
+import { useAuth } from '@/js/hooks/useAuth';
 import { getApiErrorMessage } from '@/js/lib/api-errors';
 import {
   acceptFriendRequest,
@@ -21,6 +24,7 @@ import {
 
 const FriendsPage = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [identifier, setIdentifier] = useState('');
   const [error, setError] = useState<string | null>(null);
 
@@ -75,6 +79,8 @@ const FriendsPage = () => {
           <PageLoading label="Carregando amigos..." />
         ) : (
         <>
+        <InviteCard inviteCode={user?.invite_code} />
+
         <PixelCard className="space-y-3 border-[var(--color-game-info)]">
           <h2 className="text-game-title text-[var(--color-game-info)]">Adicionar amigo</h2>
           <p className="text-xs text-[var(--color-game-muted)]">
@@ -106,15 +112,12 @@ const FriendsPage = () => {
                 key={req.id}
                 className="flex items-center justify-between gap-2 border-2 border-[var(--color-game-border)] p-3"
               >
-                <div className="flex min-w-0 items-center gap-2">
-                  <TrainerAvatar
-                    alt={req.from_user.display_name}
-                    size="xs"
-                    slug={req.from_user.trainer_sprite}
-                    src={req.from_user.trainer_sprite_url}
-                  />
-                  <span className="text-sm font-semibold">{req.from_user.display_name}</span>
-                </div>
+                <UserLink
+                  avatarSize="xs"
+                  className="min-w-0 flex-1 text-sm"
+                  showAvatar
+                  user={req.from_user}
+                />
                 <div className="flex gap-1">
                   <PixelButton
                     className="min-h-9 px-2 text-[10px]"
@@ -140,9 +143,11 @@ const FriendsPage = () => {
         {outgoing.length > 0 ? (
           <PixelCard>
             <h2 className="text-game-title">Aguardando resposta</h2>
-            <ul className="mt-2 space-y-1 text-sm text-[var(--color-game-muted)]">
+            <ul className="mt-2 space-y-1 text-sm">
               {outgoing.map((req) => (
-                <li key={req.id}>{req.to_user.display_name}</li>
+                <li key={req.id}>
+                  <UserLink avatarSize="xs" showAvatar user={req.to_user} />
+                </li>
               ))}
             </ul>
           </PixelCard>
@@ -164,7 +169,7 @@ const FriendsPage = () => {
                 >
                   <Link
                     className="flex min-w-0 flex-1 items-center gap-2 font-semibold text-[var(--color-game-text)] no-underline"
-                    to={`/friends/${friend.id}`}
+                    to={userProfilePath(friend.id)}
                   >
                     <TrainerAvatar
                       alt={friend.display_name}

@@ -16,7 +16,7 @@ def _nickname() -> str:
 class UserViewSetTest(TestCaseUtils, APITestCase):
     def test_list_users(self):
         for _ in range(5):
-            baker.make(User, nickname=_nickname(), _fill_optional=True)
+            baker.make(User, nickname=_nickname(), invited_by=None, _fill_optional=True)
 
         response = self.auth_client.get(reverse("user-list"))
 
@@ -39,7 +39,7 @@ class UserViewSetTest(TestCaseUtils, APITestCase):
         self.assertEqual(user.email, data["email"])
 
     def test_retrieve_user(self):
-        user = baker.make(User, nickname=_nickname(), _fill_optional=True)
+        user = baker.make(User, nickname=_nickname(), invited_by=None, _fill_optional=True)
 
         response = self.auth_client.get(reverse("user-detail", args=[user.id]))
 
@@ -48,7 +48,7 @@ class UserViewSetTest(TestCaseUtils, APITestCase):
         self.assertEqual(response.data["email"], user.email)
 
     def test_put_update_user(self):
-        user = baker.make(User, email="testuser@test.com", nickname="testuser01", _fill_optional=True)
+        user = baker.make(User, email="testuser@test.com", nickname="testuser01", invited_by=None, _fill_optional=True)
         data = {
             "email": "user@test.com",
             "nickname": "usertest01",
@@ -64,7 +64,7 @@ class UserViewSetTest(TestCaseUtils, APITestCase):
         self.assertEqual(user.email, data["email"])
 
     def test_patch_update_user(self):
-        user = baker.make(User, email="testuser@test.com", nickname="testuser02", _fill_optional=True)
+        user = baker.make(User, email="testuser@test.com", nickname="testuser02", invited_by=None, _fill_optional=True)
         data = {
             "email": "user@test.com",
             "nickname": "usertest02",
@@ -79,7 +79,7 @@ class UserViewSetTest(TestCaseUtils, APITestCase):
         self.assertEqual(user.email, data["email"])
 
     def test_delete_user(self):
-        user = baker.make(User, nickname=_nickname(), _fill_optional=True)
+        user = baker.make(User, nickname=_nickname(), invited_by=None, _fill_optional=True)
 
         response = self.auth_client.delete(reverse("user-detail", args=[user.id]))
 
@@ -104,7 +104,7 @@ class UserViewSetTest(TestCaseUtils, APITestCase):
 
     def test_patch_me_rejects_taken_nickname(self):
         taken = _nickname()
-        baker.make(User, nickname=taken, _fill_optional=True)
+        baker.make(User, nickname=taken, invited_by=None, _fill_optional=True)
 
         response = self.auth_client.patch(
             reverse("user-me"),
@@ -123,6 +123,7 @@ class UserViewSetTest(TestCaseUtils, APITestCase):
             email="player@test.com",
             nickname="playerone",
             is_active=True,
+            invited_by=None,
             _fill_optional=True,
         )
 
@@ -157,6 +158,7 @@ class UserViewSetTest(TestCaseUtils, APITestCase):
             email="gifted@test.com",
             nickname="giftedone",
             is_active=True,
+            invited_by=None,
             _fill_optional=True,
         )
 
@@ -170,7 +172,7 @@ class UserViewSetTest(TestCaseUtils, APITestCase):
         self.assertEqual(response.data[0]["id"], target.id)
 
     def test_gift_recipients_forbidden_for_regular_user(self):
-        other = baker.make(User, nickname=_nickname(), is_active=True, _fill_optional=True)
+        other = baker.make(User, nickname=_nickname(), is_active=True, invited_by=None, _fill_optional=True)
 
         response = self.auth_client.get(
             reverse("user-gift-recipients"),

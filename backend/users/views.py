@@ -9,7 +9,13 @@ from rest_framework.response import Response
 
 from gifts.permissions import IsGiftAdmin
 from social.serializers import UserBriefSerializer
-from social.services.friends import are_friends, display_name, is_blocked, user_public_profile
+from social.services.friends import (
+    accepted_friend_ids,
+    are_friends,
+    display_name,
+    resolve_friend_or_self,
+    user_public_profile,
+)
 from workouts.services.calendar import build_calendar_month
 from workouts.services.timeline import build_timeline_events
 
@@ -161,18 +167,167 @@ class UserViewSet(viewsets.ModelViewSet):
         login(request, user)
         return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="code",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=True,
+                description="Código de convite a ser validado.",
+            ),
+        ],
+        responses={
+            200: {
+                "type": "object",
+                "properties": {
+                    "id": {"type": "integer"},
+                    "nickname": {"type": "string"},
+                    "display_name": {"type": "string"},
+                    "trainer_sprite": {"type": "string"},
+                    "trainer_sprite_url": {"type": "string"},
+                },
+            },
+        },
+    )
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=[AllowAny],
+        url_path="invite-info",
+    )
+    def invite_info(self, request):
+        from users.services.invite import find_inviter
+        from users.trainer_sprites import trainer_sprite_for_user
+
+        code = request.query_params.get("code", "")
+        inviter = find_inviter(code)
+        if inviter is None:
+            return Response(
+                {"detail": "Convite inválido."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        sprite_slug = trainer_sprite_for_user(inviter)
+        return Response(
+            {
+                "id": inviter.pk,
+                "nickname": inviter.nickname or "",
+                "display_name": display_name(inviter),
+                "trainer_sprite": sprite_slug,
+                "trainer_sprite_url": trainer_sprite_url(sprite_slug) or "",
+            },
+        )
+
     def _friend_or_self(self, request, pk):
-        if int(pk) == request.user.pk:
-            return request.user, True
-        try:
-            target = User.objects.get(pk=pk)
-        except User.DoesNotExist:
-            return None, False
-        if is_blocked(request.user, target):
-            return None, False
-        if not are_friends(request.user, target):
-            return None, False
-        return target, False
+        return resolve_friend_or_self(request.user, pk)
+
+    @extend_schema(
+        responses={
+            200: {
+                "type": "object",
+                "properties": {
+                    "user": {"type": "object"},
+                    "is_self": {"type": "boolean"},
+                    "is_friend": {"type": "boolean"},
+                    "friend_count": {"type": "integer"},
+                    "pokemon_count": {"type": "integer"},
+                    "team_count": {"type": "integer"},
+                    "current_streak": {"type": "integer"},
+                    "joined_at": {"type": "string", "format": "date-time", "nullable": True},
+                },
+            },
+        },
+    )
+    @action(detail=True, methods=["get"], permission_classes=[IsAuthenticated], url_path="profile")
+    def user_profile(self, request, pk=None):
+        from pokemon.models import UserPokemon
+
+        target, is_self = self._friend_or_self(request, pk)
+        if target is None:
+            return Response(
+                {"detail": "Perfil indisponível ou vocês não são amigos."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        friend_ids = accepted_friend_ids(target)
+        pokemon_qs = UserPokemon.objects.filter(user=target)
+        pokemon_count = pokemon_qs.count()
+        team_count = pokemon_qs.filter(active_team_slot__isnull=False).count()
+
+        current_streak = 0
+        joined_at = getattr(target, "date_joined", None) or getattr(target, "created", None)
+        profile = getattr(target, "profile", None)
+        if profile is not None:
+            current_streak = getattr(profile, "current_streak", 0) or 0
+
+        return Response(
+            {
+                "user": user_public_profile(target, include_email=is_self),
+                "is_self": is_self,
+                "is_friend": is_self or are_friends(request.user, target),
+                "friend_count": len(friend_ids),
+                "pokemon_count": pokemon_count,
+                "team_count": team_count,
+                "current_streak": current_streak,
+                "joined_at": joined_at.isoformat() if joined_at else None,
+            },
+        )
+
+    @extend_schema(responses=UserBriefSerializer(many=True))
+    @action(detail=True, methods=["get"], permission_classes=[IsAuthenticated], url_path="friends")
+    def user_friends(self, request, pk=None):
+        target, _is_self = self._friend_or_self(request, pk)
+        if target is None:
+            return Response(
+                {"detail": "Perfil indisponível ou vocês não são amigos."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        friend_ids = accepted_friend_ids(target)
+        friends = (
+            User.objects.filter(pk__in=friend_ids, is_active=True)
+            .order_by("nickname", "email")
+        )
+        serializer = UserBriefSerializer(friends, many=True, context={"request": request})
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["get"], permission_classes=[IsAuthenticated], url_path="pokemon")
+    def user_pokemon(self, request, pk=None):
+        from pokemon.models import UserPokemon
+        from pokemon.serializers import UserPokemonListSerializer
+
+        target, _is_self = self._friend_or_self(request, pk)
+        if target is None:
+            return Response(
+                {"detail": "Perfil indisponível ou vocês não são amigos."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        queryset = (
+            UserPokemon.objects.filter(user=target)
+            .select_related("species")
+            .prefetch_related("ivs", "evs")
+            .order_by("-captured_at")
+        )
+        serializer = UserPokemonListSerializer(queryset, many=True, context={"request": request})
+        return Response({"results": serializer.data, "count": queryset.count()})
+
+    @action(detail=True, methods=["get"], permission_classes=[IsAuthenticated], url_path="team")
+    def user_team(self, request, pk=None):
+        from pokemon.models import UserPokemon
+        from pokemon.serializers import UserPokemonListSerializer
+
+        target, _is_self = self._friend_or_self(request, pk)
+        if target is None:
+            return Response(
+                {"detail": "Perfil indisponível ou vocês não são amigos."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        queryset = (
+            UserPokemon.objects.filter(user=target, active_team_slot__isnull=False)
+            .select_related("species")
+            .order_by("active_team_slot")
+        )
+        serializer = UserPokemonListSerializer(queryset, many=True, context={"request": request})
+        return Response({"results": serializer.data, "count": queryset.count()})
 
     @action(detail=True, methods=["get"], permission_classes=[IsAuthenticated], url_path="timeline")
     def user_timeline(self, request, pk=None):

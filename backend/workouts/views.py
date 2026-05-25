@@ -1,5 +1,6 @@
 from django.db.models import Count
 from django.utils import timezone
+
 from drf_spectacular.utils import extend_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -30,8 +31,17 @@ from .serializers import (
     WorkoutListSerializer,
     WorkoutProofSerializer,
 )
-from .services.cardio import cardio_performance_summary, format_pace, get_last_finished_cardio, get_reference_pace_seconds
 from .services.calendar import build_calendar_month
+from .services.cardio import (
+    cardio_performance_summary,
+    format_pace,
+    get_last_finished_cardio,
+    get_reference_pace_seconds,
+)
+from .services.seed_exercises import SeedStatus, ingest_exercises_list
+
+
+MAX_BULK_IMPORT_EXERCISES = 500
 
 
 class ExerciseViewSet(viewsets.ModelViewSet):
@@ -68,6 +78,148 @@ class ExerciseViewSet(viewsets.ModelViewSet):
             instance.save(update_fields=["is_active", "modified"])
         else:
             instance.delete()
+
+    @extend_schema(
+        request={
+            "application/json": {
+                "oneOf": [
+                    {
+                        "type": "array",
+                        "items": {"type": "object"},
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "exercises": {
+                                "type": "array",
+                                "items": {"type": "object"},
+                            },
+                            "create_only": {"type": "boolean"},
+                            "dry_run": {"type": "boolean"},
+                        },
+                    },
+                ],
+            },
+        },
+        responses={
+            200: {
+                "type": "object",
+                "properties": {
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {"type": "string"},
+                                "status": {"type": "string"},
+                                "reason": {"type": "string"},
+                            },
+                        },
+                    },
+                    "summary": {
+                        "type": "object",
+                        "properties": {
+                            "created": {"type": "integer"},
+                            "updated": {"type": "integer"},
+                            "skipped": {"type": "integer"},
+                            "failed": {"type": "integer"},
+                            "total": {"type": "integer"},
+                        },
+                    },
+                    "dry_run": {"type": "boolean"},
+                },
+            },
+            400: {
+                "type": "object",
+                "properties": {"detail": {"type": "string"}},
+            },
+        },
+    )
+    @action(detail=False, methods=["post"], url_path="import")
+    def bulk_import(self, request):
+        """Importação em massa de exercícios (staff only).
+
+        Aceita o payload em dois formatos:
+
+        - Lista direta: `[{...}, {...}]`
+        - Objeto com opções: `{"exercises": [...], "create_only": false, "dry_run": false}`
+
+        Cada item deve seguir o mesmo shape de `seed_exercises` (name,
+        muscle_group, difficulty obrigatórios; slug/description/instructions/
+        equipment/video_url/is_active opcionais).
+        """
+        payload = request.data
+
+        if isinstance(payload, list):
+            entries = payload
+            create_only = False
+            dry_run = False
+        elif isinstance(payload, dict):
+            entries = payload.get("exercises", [])
+            create_only = bool(payload.get("create_only", False))
+            dry_run = bool(payload.get("dry_run", False))
+        else:
+            return Response(
+                {"detail": "Payload deve ser lista de exercícios ou objeto com 'exercises'."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not isinstance(entries, list):
+            return Response(
+                {"detail": "'exercises' deve ser uma lista."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not entries:
+            return Response(
+                {"detail": "Lista vazia. Envie pelo menos 1 exercício."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if len(entries) > MAX_BULK_IMPORT_EXERCISES:
+            return Response(
+                {
+                    "detail": (
+                        f"Máximo de {MAX_BULK_IMPORT_EXERCISES} exercícios por importação "
+                        f"(recebido: {len(entries)})."
+                    ),
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            results = ingest_exercises_list(
+                entries,
+                update_existing=not create_only,
+                dry_run=dry_run,
+            )
+        except ValueError as exc:
+            return Response(
+                {"detail": str(exc)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        created = sum(1 for r in results if r.status == SeedStatus.CREATED)
+        updated = sum(1 for r in results if r.status == SeedStatus.UPDATED)
+        skipped = sum(1 for r in results if r.status == SeedStatus.SKIPPED)
+        failed = sum(1 for r in results if r.status == SeedStatus.FAILED)
+
+        return Response(
+            {
+                "results": [
+                    {"name": r.name, "status": r.status.value, "reason": r.reason}
+                    for r in results
+                ],
+                "summary": {
+                    "created": created,
+                    "updated": updated,
+                    "skipped": skipped,
+                    "failed": failed,
+                    "total": len(results),
+                },
+                "dry_run": dry_run,
+            }
+        )
 
 
 class WorkoutViewSet(viewsets.ModelViewSet):

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router';
 import GameIcon from '@/js/components/game/GameIcon';
 import PokemonSprite from '@/js/components/game/PokemonSprite';
 import MobileHeader from '@/js/components/layout/MobileHeader';
+import UserLink from '@/js/components/social/UserLink';
 import PixelButton from '@/js/components/ui/PixelButton';
 import PixelCard from '@/js/components/ui/PixelCard';
 import { PageLoading, QueryRefetchBar } from '@/js/components/ui/GameLoading';
@@ -44,7 +45,12 @@ const GiftClaimCard = ({
         <div className="min-w-0 flex-1">
           <p className="text-game-title text-[var(--color-game-accent)]">Presente!</p>
           <p className="text-[10px] text-[var(--color-game-muted)]">
-            De {gift.sender_display.display_name}
+            De{' '}
+            <UserLink
+              className="text-[10px] font-semibold"
+              fallbackLabel={gift.sender_display.display_name}
+              user={gift.sender_display}
+            />
           </p>
         </div>
       </div>
@@ -162,7 +168,12 @@ const GiftsInboxPage = () => {
                 {claimed.slice(0, 10).map((gift) => (
                   <PixelCard key={gift.id} className="opacity-80">
                     <p className="text-xs text-[var(--color-game-muted)]">
-                      {gift.sender_display.display_name} · resgatado
+                      <UserLink
+                        className="text-xs font-semibold"
+                        fallbackLabel={gift.sender_display.display_name}
+                        user={gift.sender_display}
+                      />{' '}
+                      · resgatado
                     </p>
                     <p className="mt-1 line-clamp-2 text-sm">{gift.message}</p>
                   </PixelCard>

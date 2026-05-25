@@ -156,6 +156,85 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/exercises/import/:
+    post:
+      operationId: exercises_import_create
+      description: |-
+        Importação em massa de exercícios (staff only).
+
+        Aceita o payload em dois formatos:
+
+        - Lista direta: `[{...}, {...}]`
+        - Objeto com opções: `{"exercises": [...], "create_only": false, "dry_run": false}`
+
+        Cada item deve seguir o mesmo shape de `seed_exercises` (name,
+        muscle_group, difficulty obrigatórios; slug/description/instructions/
+        equipment/video_url/is_active opcionais).
+      tags:
+      - exercises
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: array
+                items:
+                  type: object
+              - type: object
+                properties:
+                  exercises:
+                    type: array
+                    items:
+                      type: object
+                  create_only:
+                    type: boolean
+                  dry_run:
+                    type: boolean
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        status:
+                          type: string
+                        reason:
+                          type: string
+                  summary:
+                    type: object
+                    properties:
+                      created:
+                        type: integer
+                      updated:
+                        type: integer
+                      skipped:
+                        type: integer
+                      failed:
+                        type: integer
+                      total:
+                        type: integer
+                  dry_run:
+                    type: boolean
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+          description: ''
   /api/friends/{id}/accept/:
     post:
       operationId: friends_accept_create
@@ -880,6 +959,121 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
           description: ''
+  /api/users/{id}/friends/:
+    get:
+      operationId: users_friends_list
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - users
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserBriefList'
+          description: ''
+  /api/users/{id}/pokemon/:
+    get:
+      operationId: users_pokemon_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/{id}/profile/:
+    get:
+      operationId: users_profile_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                  is_self:
+                    type: boolean
+                  is_friend:
+                    type: boolean
+                  friend_count:
+                    type: integer
+                  pokemon_count:
+                    type: integer
+                  team_count:
+                    type: integer
+                  current_streak:
+                    type: integer
+                  joined_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+          description: ''
+  /api/users/{id}/team/:
+    get:
+      operationId: users_team_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
   /api/users/{id}/timeline/:
     get:
       operationId: users_timeline_retrieve
@@ -933,6 +1127,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedUserBriefList'
+          description: ''
+  /api/users/invite-info/:
+    get:
+      operationId: users_invite_info_retrieve
+      parameters:
+      - in: query
+        name: code
+        schema:
+          type: string
+        description: Código de convite a ser validado.
+        required: true
+      tags:
+      - users
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  nickname:
+                    type: string
+                  display_name:
+                    type: string
+                  trainer_sprite:
+                    type: string
+                  trainer_sprite_url:
+                    type: string
           description: ''
   /api/users/login/:
     post:
@@ -2505,6 +2732,11 @@ components:
         trainer_sprite_url:
           type: string
           readOnly: true
+        invite_code:
+          type: string
+          readOnly: true
+          description: Código pessoal de convite. Quem se cadastrar com este código
+            vira amigo e dá um presente ao dono.
         is_active:
           type: boolean
           description: Designates whether this user should be treated as active. Unselect
@@ -2821,6 +3053,10 @@ components:
           minLength: 8
         trainer_sprite:
           type: string
+        invite_code:
+          type: string
+          writeOnly: true
+          maxLength: 12
       required:
       - email
       - nickname
@@ -3035,6 +3271,11 @@ components:
         trainer_sprite_url:
           type: string
           readOnly: true
+        invite_code:
+          type: string
+          readOnly: true
+          description: Código pessoal de convite. Quem se cadastrar com este código
+            vira amigo e dá um presente ao dono.
         is_active:
           type: boolean
           description: Designates whether this user should be treated as active. Unselect
@@ -3067,6 +3308,7 @@ components:
       - display_name
       - email
       - id
+      - invite_code
       - is_staff
       - is_superuser
       - last_login

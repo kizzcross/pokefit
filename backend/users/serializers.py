@@ -24,6 +24,7 @@ class UserSerializer(serializers.ModelSerializer):
             "display_name",
             "trainer_sprite",
             "trainer_sprite_url",
+            "invite_code",
             "is_active",
             "is_staff",
             "is_superuser",
@@ -40,6 +41,7 @@ class UserSerializer(serializers.ModelSerializer):
             "is_superuser",
             "trainer_sprite_url",
             "display_name",
+            "invite_code",
         )
 
     def get_trainer_sprite_url(self, obj) -> str:
@@ -86,6 +88,12 @@ class RegisterSerializer(serializers.Serializer):
     nickname = serializers.CharField(max_length=24)
     password = serializers.CharField(min_length=8, write_only=True)
     trainer_sprite = serializers.CharField(required=False, allow_blank=True)
+    invite_code = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=12,
+        write_only=True,
+    )
 
     def validate_nickname(self, value):
         try:
@@ -106,8 +114,10 @@ class RegisterSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         from profiles.services.weekly_goal import get_or_create_profile
+        from users.services.invite import apply_invite
 
         trainer_sprite = validated_data.pop("trainer_sprite", DEFAULT_TRAINER_SPRITE)
+        invite_code = (validated_data.pop("invite_code", "") or "").strip()
         user = User.objects.create_user(
             email=validated_data["email"],
             password=validated_data["password"],
@@ -115,4 +125,6 @@ class RegisterSerializer(serializers.Serializer):
             trainer_sprite=trainer_sprite,
         )
         get_or_create_profile(user)
+        if invite_code:
+            apply_invite(user, invite_code)
         return user

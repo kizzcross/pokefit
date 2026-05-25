@@ -63,3 +63,30 @@ def count_accepted_friends(user) -> int:
 
 def can_send_friend_request(user) -> bool:
     return count_accepted_friends(user) < MAX_FRIENDS
+
+
+def resolve_friend_or_self(viewer, target_pk: int) -> tuple[object | None, bool]:
+    """Return `(target_user, is_self)` if `viewer` may see `target_pk`'s profile.
+
+    Returns `(None, False)` when the target does not exist, is blocked, or is
+    not an accepted friend (and not the viewer itself).
+    """
+    try:
+        target_pk_int = int(target_pk)
+    except (TypeError, ValueError):
+        return None, False
+
+    if target_pk_int == viewer.pk:
+        return viewer, True
+
+    try:
+        target = User.objects.get(pk=target_pk_int)
+    except User.DoesNotExist:
+        return None, False
+
+    if is_blocked(viewer, target):
+        return None, False
+    if not are_friends(viewer, target):
+        return None, False
+
+    return target, False

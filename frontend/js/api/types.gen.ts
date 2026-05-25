@@ -373,6 +373,10 @@ export type PatchedUser = {
     trainer_sprite?: string;
     readonly trainer_sprite_url?: string;
     /**
+     * Código pessoal de convite. Quem se cadastrar com este código vira amigo e dá um presente ao dono.
+     */
+    readonly invite_code?: string;
+    /**
      * Designates whether this user should be treated as active. Unselect this instead of deleting accounts.
      */
     is_active?: boolean;
@@ -595,6 +599,10 @@ export type User = {
      */
     trainer_sprite?: string;
     readonly trainer_sprite_url: string;
+    /**
+     * Código pessoal de convite. Quem se cadastrar com este código vira amigo e dá um presente ao dono.
+     */
+    readonly invite_code: string;
     /**
      * Designates whether this user should be treated as active. Unselect this instead of deleting accounts.
      */
@@ -1016,6 +1024,7 @@ export type RegisterWritable = {
     nickname: string;
     password: string;
     trainer_sprite?: string;
+    invite_code?: string;
 };
 
 export type TimelineEventWritable = {
@@ -1214,6 +1223,49 @@ export type ExercisesUpdateResponses = {
 };
 
 export type ExercisesUpdateResponse = ExercisesUpdateResponses[keyof ExercisesUpdateResponses];
+
+export type ExercisesImportCreateData = {
+    body?: Array<{
+        [key: string]: unknown;
+    }> | {
+        exercises?: Array<{
+            [key: string]: unknown;
+        }>;
+        create_only?: boolean;
+        dry_run?: boolean;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/exercises/import/';
+};
+
+export type ExercisesImportCreateErrors = {
+    400: {
+        detail?: string;
+    };
+};
+
+export type ExercisesImportCreateError = ExercisesImportCreateErrors[keyof ExercisesImportCreateErrors];
+
+export type ExercisesImportCreateResponses = {
+    200: {
+        results?: Array<{
+            name?: string;
+            status?: string;
+            reason?: string;
+        }>;
+        summary?: {
+            created?: number;
+            updated?: number;
+            skipped?: number;
+            failed?: number;
+            total?: number;
+        };
+        dry_run?: boolean;
+    };
+};
+
+export type ExercisesImportCreateResponse = ExercisesImportCreateResponses[keyof ExercisesImportCreateResponses];
 
 export type FriendsAcceptCreateData = {
     body?: UserBrief;
@@ -1718,6 +1770,98 @@ export type UsersCalendarRetrieveResponses = {
 
 export type UsersCalendarRetrieveResponse = UsersCalendarRetrieveResponses[keyof UsersCalendarRetrieveResponses];
 
+export type UsersFriendsListData = {
+    body?: never;
+    path: {
+        /**
+         * A unique integer value identifying this user.
+         */
+        id: number;
+    };
+    query?: {
+        /**
+         * Number of results to return per page.
+         */
+        limit?: number;
+        /**
+         * The initial index from which to return the results.
+         */
+        offset?: number;
+    };
+    url: '/api/users/{id}/friends/';
+};
+
+export type UsersFriendsListResponses = {
+    200: PaginatedUserBriefList;
+};
+
+export type UsersFriendsListResponse = UsersFriendsListResponses[keyof UsersFriendsListResponses];
+
+export type UsersPokemonRetrieveData = {
+    body?: never;
+    path: {
+        /**
+         * A unique integer value identifying this user.
+         */
+        id: number;
+    };
+    query?: never;
+    url: '/api/users/{id}/pokemon/';
+};
+
+export type UsersPokemonRetrieveResponses = {
+    200: User;
+};
+
+export type UsersPokemonRetrieveResponse = UsersPokemonRetrieveResponses[keyof UsersPokemonRetrieveResponses];
+
+export type UsersProfileRetrieveData = {
+    body?: never;
+    path: {
+        /**
+         * A unique integer value identifying this user.
+         */
+        id: number;
+    };
+    query?: never;
+    url: '/api/users/{id}/profile/';
+};
+
+export type UsersProfileRetrieveResponses = {
+    200: {
+        user?: {
+            [key: string]: unknown;
+        };
+        is_self?: boolean;
+        is_friend?: boolean;
+        friend_count?: number;
+        pokemon_count?: number;
+        team_count?: number;
+        current_streak?: number;
+        joined_at?: string | null;
+    };
+};
+
+export type UsersProfileRetrieveResponse = UsersProfileRetrieveResponses[keyof UsersProfileRetrieveResponses];
+
+export type UsersTeamRetrieveData = {
+    body?: never;
+    path: {
+        /**
+         * A unique integer value identifying this user.
+         */
+        id: number;
+    };
+    query?: never;
+    url: '/api/users/{id}/team/';
+};
+
+export type UsersTeamRetrieveResponses = {
+    200: User;
+};
+
+export type UsersTeamRetrieveResponse = UsersTeamRetrieveResponses[keyof UsersTeamRetrieveResponses];
+
 export type UsersTimelineRetrieveData = {
     body?: never;
     path: {
@@ -1761,6 +1905,30 @@ export type UsersGiftRecipientsListResponses = {
 };
 
 export type UsersGiftRecipientsListResponse = UsersGiftRecipientsListResponses[keyof UsersGiftRecipientsListResponses];
+
+export type UsersInviteInfoRetrieveData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Código de convite a ser validado.
+         */
+        code: string;
+    };
+    url: '/api/users/invite-info/';
+};
+
+export type UsersInviteInfoRetrieveResponses = {
+    200: {
+        id?: number;
+        nickname?: string;
+        display_name?: string;
+        trainer_sprite?: string;
+        trainer_sprite_url?: string;
+    };
+};
+
+export type UsersInviteInfoRetrieveResponse = UsersInviteInfoRetrieveResponses[keyof UsersInviteInfoRetrieveResponses];
 
 export type UsersLoginCreateData = {
     body: Login;

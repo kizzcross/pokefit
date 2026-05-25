@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ExercisesCreateData, ExercisesCreateResponses, ExercisesDestroyData, ExercisesDestroyResponses, ExercisesListData, ExercisesListResponses, ExercisesPartialUpdateData, ExercisesPartialUpdateResponses, ExercisesRetrieveData, ExercisesRetrieveResponses, ExercisesUpdateData, ExercisesUpdateResponses, FriendsAcceptCreateData, FriendsAcceptCreateResponses, FriendsBlockCreateData, FriendsBlockCreateResponses, FriendsDeclineCreateData, FriendsDeclineCreateResponses, FriendsListListData, FriendsListListResponses, FriendsRemoveDestroyData, FriendsRemoveDestroyResponses, FriendsRequestsRetrieveData, FriendsRequestsRetrieveResponses, FriendsRequestsSendCreateData, FriendsRequestsSendCreateResponses, GiftsClaimCreateData, GiftsClaimCreateResponses, GiftsListData, GiftsListResponses, GiftsPendingCountRetrieveData, GiftsPendingCountRetrieveResponses, GiftsRetrieveData, GiftsRetrieveResponses, GiftsSendCreateData, GiftsSendCreateResponses, MyPokemonCaptureCreateData, MyPokemonCaptureCreateResponses, MyPokemonListData, MyPokemonListResponses, MyPokemonRandomEncounterRetrieveData, MyPokemonRandomEncounterRetrieveResponses, MyPokemonReleaseCreateData, MyPokemonReleaseCreateResponses, MyPokemonRetrieveData, MyPokemonRetrieveResponses, MyPokemonTeamListData, MyPokemonTeamListResponses, MyPokemonTeamSlotPartialUpdateData, MyPokemonTeamSlotPartialUpdateResponses, PokemonSpeciesListData, PokemonSpeciesListResponses, PokemonSpeciesRetrieveData, PokemonSpeciesRetrieveResponses, RestRestCheckRetrieveData, RestRestCheckRetrieveResponses, TimelineListData, TimelineListResponses, UsersCalendarRetrieveData, UsersCalendarRetrieveResponses, UsersCreateData, UsersCreateResponses, UsersDestroyData, UsersDestroyResponses, UsersGiftRecipientsListData, UsersGiftRecipientsListResponses, UsersListData, UsersListResponses, UsersLoginCreateData, UsersLoginCreateResponses, UsersLogoutCreateData, UsersLogoutCreateResponses, UsersMePartialUpdateData, UsersMePartialUpdateResponses, UsersMeRetrieveData, UsersMeRetrieveResponses, UsersPartialUpdateData, UsersPartialUpdateResponses, UsersRegisterCreateData, UsersRegisterCreateResponses, UsersRetrieveData, UsersRetrieveResponses, UsersTimelineRetrieveData, UsersTimelineRetrieveResponses, UsersTrainerSpritesRetrieveData, UsersTrainerSpritesRetrieveResponses, UsersUpdateData, UsersUpdateResponses, WeeklyGoalCreateData, WeeklyGoalCreateResponses, WeeklyGoalListData, WeeklyGoalListResponses, WorkoutsActiveDraftRetrieveData, WorkoutsActiveDraftRetrieveResponses, WorkoutsCalendarRetrieveData, WorkoutsCalendarRetrieveResponses, WorkoutsCardioPreviewCreateData, WorkoutsCardioPreviewCreateResponses, WorkoutsCardioReferenceRetrieveData, WorkoutsCardioReferenceRetrieveResponses, WorkoutsCardioSessionCreateData, WorkoutsCardioSessionCreateResponses, WorkoutsCardioSessionPartialUpdateData, WorkoutsCardioSessionPartialUpdateResponses, WorkoutsCreateData, WorkoutsCreateResponses, WorkoutsDeclineEncounterCreateData, WorkoutsDeclineEncounterCreateResponses, WorkoutsDestroyData, WorkoutsDestroyResponses, WorkoutsExercisesBulkCreateData, WorkoutsExercisesBulkCreateResponses, WorkoutsExercisesCreateData, WorkoutsExercisesCreateResponses, WorkoutsExercisesDestroyData, WorkoutsExercisesDestroyResponses, WorkoutsExercisesPartialUpdateData, WorkoutsExercisesPartialUpdateResponses, WorkoutsFinishCardioCreateData, WorkoutsFinishCardioCreateResponses, WorkoutsFinishCreateData, WorkoutsFinishCreateResponses, WorkoutsLastByTypeRetrieveData, WorkoutsLastByTypeRetrieveResponses, WorkoutsListData, WorkoutsListResponses, WorkoutsPartialUpdateData, WorkoutsPartialUpdateResponses, WorkoutsPendingEncounterRetrieveData, WorkoutsPendingEncounterRetrieveResponses, WorkoutsProofCreateData, WorkoutsProofCreateResponses, WorkoutsRetrieveData, WorkoutsRetrieveResponses } from './types.gen';
+import type { ExercisesCreateData, ExercisesCreateResponses, ExercisesDestroyData, ExercisesDestroyResponses, ExercisesImportCreateData, ExercisesImportCreateErrors, ExercisesImportCreateResponses, ExercisesListData, ExercisesListResponses, ExercisesPartialUpdateData, ExercisesPartialUpdateResponses, ExercisesRetrieveData, ExercisesRetrieveResponses, ExercisesUpdateData, ExercisesUpdateResponses, FriendsAcceptCreateData, FriendsAcceptCreateResponses, FriendsBlockCreateData, FriendsBlockCreateResponses, FriendsDeclineCreateData, FriendsDeclineCreateResponses, FriendsListListData, FriendsListListResponses, FriendsRemoveDestroyData, FriendsRemoveDestroyResponses, FriendsRequestsRetrieveData, FriendsRequestsRetrieveResponses, FriendsRequestsSendCreateData, FriendsRequestsSendCreateResponses, GiftsClaimCreateData, GiftsClaimCreateResponses, GiftsListData, GiftsListResponses, GiftsPendingCountRetrieveData, GiftsPendingCountRetrieveResponses, GiftsRetrieveData, GiftsRetrieveResponses, GiftsSendCreateData, GiftsSendCreateResponses, MyPokemonCaptureCreateData, MyPokemonCaptureCreateResponses, MyPokemonListData, MyPokemonListResponses, MyPokemonRandomEncounterRetrieveData, MyPokemonRandomEncounterRetrieveResponses, MyPokemonReleaseCreateData, MyPokemonReleaseCreateResponses, MyPokemonRetrieveData, MyPokemonRetrieveResponses, MyPokemonTeamListData, MyPokemonTeamListResponses, MyPokemonTeamSlotPartialUpdateData, MyPokemonTeamSlotPartialUpdateResponses, PokemonSpeciesListData, PokemonSpeciesListResponses, PokemonSpeciesRetrieveData, PokemonSpeciesRetrieveResponses, RestRestCheckRetrieveData, RestRestCheckRetrieveResponses, TimelineListData, TimelineListResponses, UsersCalendarRetrieveData, UsersCalendarRetrieveResponses, UsersCreateData, UsersCreateResponses, UsersDestroyData, UsersDestroyResponses, UsersFriendsListData, UsersFriendsListResponses, UsersGiftRecipientsListData, UsersGiftRecipientsListResponses, UsersInviteInfoRetrieveData, UsersInviteInfoRetrieveResponses, UsersListData, UsersListResponses, UsersLoginCreateData, UsersLoginCreateResponses, UsersLogoutCreateData, UsersLogoutCreateResponses, UsersMePartialUpdateData, UsersMePartialUpdateResponses, UsersMeRetrieveData, UsersMeRetrieveResponses, UsersPartialUpdateData, UsersPartialUpdateResponses, UsersPokemonRetrieveData, UsersPokemonRetrieveResponses, UsersProfileRetrieveData, UsersProfileRetrieveResponses, UsersRegisterCreateData, UsersRegisterCreateResponses, UsersRetrieveData, UsersRetrieveResponses, UsersTeamRetrieveData, UsersTeamRetrieveResponses, UsersTimelineRetrieveData, UsersTimelineRetrieveResponses, UsersTrainerSpritesRetrieveData, UsersTrainerSpritesRetrieveResponses, UsersUpdateData, UsersUpdateResponses, WeeklyGoalCreateData, WeeklyGoalCreateResponses, WeeklyGoalListData, WeeklyGoalListResponses, WorkoutsActiveDraftRetrieveData, WorkoutsActiveDraftRetrieveResponses, WorkoutsCalendarRetrieveData, WorkoutsCalendarRetrieveResponses, WorkoutsCardioPreviewCreateData, WorkoutsCardioPreviewCreateResponses, WorkoutsCardioReferenceRetrieveData, WorkoutsCardioReferenceRetrieveResponses, WorkoutsCardioSessionCreateData, WorkoutsCardioSessionCreateResponses, WorkoutsCardioSessionPartialUpdateData, WorkoutsCardioSessionPartialUpdateResponses, WorkoutsCreateData, WorkoutsCreateResponses, WorkoutsDeclineEncounterCreateData, WorkoutsDeclineEncounterCreateResponses, WorkoutsDestroyData, WorkoutsDestroyResponses, WorkoutsExercisesBulkCreateData, WorkoutsExercisesBulkCreateResponses, WorkoutsExercisesCreateData, WorkoutsExercisesCreateResponses, WorkoutsExercisesDestroyData, WorkoutsExercisesDestroyResponses, WorkoutsExercisesPartialUpdateData, WorkoutsExercisesPartialUpdateResponses, WorkoutsFinishCardioCreateData, WorkoutsFinishCardioCreateResponses, WorkoutsFinishCreateData, WorkoutsFinishCreateResponses, WorkoutsLastByTypeRetrieveData, WorkoutsLastByTypeRetrieveResponses, WorkoutsListData, WorkoutsListResponses, WorkoutsPartialUpdateData, WorkoutsPartialUpdateResponses, WorkoutsPendingEncounterRetrieveData, WorkoutsPendingEncounterRetrieveResponses, WorkoutsProofCreateData, WorkoutsProofCreateResponses, WorkoutsRetrieveData, WorkoutsRetrieveResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -115,6 +115,37 @@ export const exercisesUpdate = <ThrowOnError extends boolean = false>(options: O
         headers: {
             'Content-Type': 'application/json',
             ...options.headers
+        }
+    });
+};
+
+/**
+ * Importação em massa de exercícios (staff only).
+ *
+ * Aceita o payload em dois formatos:
+ *
+ * - Lista direta: `[{...}, {...}]`
+ * - Objeto com opções: `{"exercises": [...], "create_only": false, "dry_run": false}`
+ *
+ * Cada item deve seguir o mesmo shape de `seed_exercises` (name,
+ * muscle_group, difficulty obrigatórios; slug/description/instructions/
+ * equipment/video_url/is_active opcionais).
+ */
+export const exercisesImportCreate = <ThrowOnError extends boolean = false>(options?: Options<ExercisesImportCreateData, ThrowOnError>) => {
+    return (options?.client ?? client).post<ExercisesImportCreateResponses, ExercisesImportCreateErrors, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/exercises/import/',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options?.headers
         }
     });
 };
@@ -619,6 +650,66 @@ export const usersCalendarRetrieve = <ThrowOnError extends boolean = false>(opti
     });
 };
 
+export const usersFriendsList = <ThrowOnError extends boolean = false>(options: Options<UsersFriendsListData, ThrowOnError>) => {
+    return (options.client ?? client).get<UsersFriendsListResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/users/{id}/friends/',
+        ...options
+    });
+};
+
+export const usersPokemonRetrieve = <ThrowOnError extends boolean = false>(options: Options<UsersPokemonRetrieveData, ThrowOnError>) => {
+    return (options.client ?? client).get<UsersPokemonRetrieveResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/users/{id}/pokemon/',
+        ...options
+    });
+};
+
+export const usersProfileRetrieve = <ThrowOnError extends boolean = false>(options: Options<UsersProfileRetrieveData, ThrowOnError>) => {
+    return (options.client ?? client).get<UsersProfileRetrieveResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/users/{id}/profile/',
+        ...options
+    });
+};
+
+export const usersTeamRetrieve = <ThrowOnError extends boolean = false>(options: Options<UsersTeamRetrieveData, ThrowOnError>) => {
+    return (options.client ?? client).get<UsersTeamRetrieveResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/users/{id}/team/',
+        ...options
+    });
+};
+
 export const usersTimelineRetrieve = <ThrowOnError extends boolean = false>(options: Options<UsersTimelineRetrieveData, ThrowOnError>) => {
     return (options.client ?? client).get<UsersTimelineRetrieveResponses, unknown, ThrowOnError>({
         responseType: 'json',
@@ -645,6 +736,21 @@ export const usersGiftRecipientsList = <ThrowOnError extends boolean = false>(op
             }
         ],
         url: '/api/users/gift-recipients/',
+        ...options
+    });
+};
+
+export const usersInviteInfoRetrieve = <ThrowOnError extends boolean = false>(options: Options<UsersInviteInfoRetrieveData, ThrowOnError>) => {
+    return (options.client ?? client).get<UsersInviteInfoRetrieveResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/users/invite-info/',
         ...options
     });
 };

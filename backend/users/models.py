@@ -30,6 +30,20 @@ class User(AbstractBaseUser, PermissionsMixin, IndexedTimeStampedModel):
         default=DEFAULT_TRAINER_SPRITE,
         help_text=_("Slug do sprite de treinador (Pokémon Showdown)."),
     )
+    invite_code = models.CharField(
+        max_length=12,
+        unique=True,
+        db_index=True,
+        help_text=_("Código pessoal de convite. Quem se cadastrar com este código vira amigo e dá um presente ao dono."),
+    )
+    invited_by = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="referrals",
+        help_text=_("Usuário cujo invite_code foi usado neste cadastro."),
+    )
 
     objects = UserManager()
 

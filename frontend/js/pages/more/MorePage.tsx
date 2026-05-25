@@ -13,7 +13,7 @@ import PixelBadge from '@/js/components/ui/PixelBadge';
 import { useAppNotifications } from '@/js/hooks/useAppNotifications';
 import { useGameStore } from '@/js/stores/game-store';
 
-const links: { to: string; label: string; icon: GameIconName }[] = [
+const baseLinks: { to: string; label: string; icon: GameIconName }[] = [
   { to: '/gifts', label: 'Caixa de entrada', icon: 'missions' },
   { to: '/profile', label: 'Perfil', icon: 'team' },
   { to: '/workouts', label: 'Meus treinos', icon: 'workout' },
@@ -43,6 +43,13 @@ const MorePage = () => {
   const pending = pendingQuery.data;
 
   const { giftCount: giftPendingCount, friendRequestCount } = useAppNotifications();
+
+  const links = user?.id
+    ? [
+        { to: `/users/${user.id}`, label: 'Meu perfil público', icon: 'team' as const },
+        ...baseLinks,
+      ]
+    : baseLinks;
 
   return (
     <>
@@ -118,6 +125,9 @@ const MorePage = () => {
                   Novo
                 </PixelLink>
               </div>
+              <PixelLink className="mt-2" fullWidth to="/exercises/import" variant="secondary">
+                Importar em massa (JSON)
+              </PixelLink>
             </PixelCard>
           </section>
         ) : null}

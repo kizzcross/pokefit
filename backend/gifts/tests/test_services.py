@@ -13,6 +13,7 @@ class GiftServicesTest(TestCaseUtils):
             "users.User",
             email="gift_recipient@test.com",
             nickname="gift_recipient",
+            invited_by=None,
             _fill_optional=True,
         )
         self.species_a = baker.make(

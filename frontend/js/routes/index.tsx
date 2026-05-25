@@ -19,12 +19,16 @@ import WorkoutsListPage from '@/js/pages/workout/WorkoutsListPage';
 import WorkoutNewPage from '@/js/pages/workout/WorkoutNewPage';
 import ExerciseCreatePage from '@/js/pages/exercises/ExerciseCreatePage';
 import ExerciseEditPage from '@/js/pages/exercises/ExerciseEditPage';
+import ExerciseImportPage from '@/js/pages/exercises/ExerciseImportPage';
 import ExerciseListPage from '@/js/pages/exercises/ExerciseListPage';
 import CalendarPage from '@/js/pages/calendar/CalendarPage';
 import FriendsPage from '@/js/pages/friends/FriendsPage';
-import FriendProfilePage from '@/js/pages/friends/FriendProfilePage';
 import TimelinePage from '@/js/pages/timeline/TimelinePage';
 import ProfilePage from '@/js/pages/profile/ProfilePage';
+import UserCollectionPage from '@/js/pages/profile/UserCollectionPage';
+import UserFriendsListPage from '@/js/pages/profile/UserFriendsListPage';
+import UserProfilePage from '@/js/pages/profile/UserProfilePage';
+import UserTeamPage from '@/js/pages/profile/UserTeamPage';
 import GiftsInboxPage from '@/js/pages/gifts/GiftsInboxPage';
 import GiftSendPage from '@/js/pages/gifts/GiftSendPage';
 
@@ -55,7 +59,11 @@ const router = createBrowserRouter([
       { path: 'calendar', Component: CalendarPage },
       { path: 'timeline', Component: TimelinePage },
       { path: 'friends', Component: FriendsPage },
-      { path: 'friends/:id', Component: FriendProfilePage },
+      { path: 'friends/:id', Component: UserProfilePage },
+      { path: 'users/:id', Component: UserProfilePage },
+      { path: 'users/:id/pokemon', Component: UserCollectionPage },
+      { path: 'users/:id/team', Component: UserTeamPage },
+      { path: 'users/:id/friends', Component: UserFriendsListPage },
       { path: 'missions', Component: MissionsPage },
       { path: 'ranking', Component: RankingPage },
       { path: 'more', Component: MorePage },
@@ -64,8 +72,10 @@ const router = createBrowserRouter([
       { path: 'profile', Component: ProfilePage },
       { path: 'exercises', Component: ExerciseListPage },
       { path: 'exercises/new', Component: ExerciseCreatePage },
+      { path: 'exercises/import', Component: ExerciseImportPage },
       { path: 'exercises/:id/edit', Component: ExerciseEditPage },
       { path: 'admin/exercises/new', Component: ExerciseCreatePage },
+      { path: 'admin/exercises/import', Component: ExerciseImportPage },
     ],
   },
   { path: '*', element: <Navigate replace to="/" /> },
