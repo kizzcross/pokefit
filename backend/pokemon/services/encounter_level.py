@@ -9,6 +9,7 @@ from django.db.models import Avg, Max
 from pokemon.choices import Rarity
 from pokemon.constants import MAX_ENCOUNTER_LEVEL, MAX_POKEMON_LEVEL
 from pokemon.models import PokemonSpecies, UserPokemon
+from pokemon.services.evolution_rules import get_min_capture_level
 from pokemon.services.progression import xp_total_for_level
 from workouts.choices import WorkoutStatus
 from workouts.models import Workout
@@ -73,7 +74,9 @@ def roll_encounter_level(workout: Workout, species: PokemonSpecies) -> int:
 
     raw_level = base_level + workout_bonus + rarity_bonus + weekly_bonus + jitter
     cap = _encounter_level_cap(workout.user)
-    return max(1, min(cap, raw_level))
+    floor = max(1, get_min_capture_level(species.pk))
+    capped = min(cap, raw_level)
+    return min(MAX_POKEMON_LEVEL, max(floor, capped))
 
 
 def experience_for_encounter_level(level: int) -> int:

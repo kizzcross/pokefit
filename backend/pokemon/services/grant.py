@@ -7,9 +7,11 @@ import random
 from django.utils import timezone
 
 from pokemon.choices import Nature
-from pokemon.constants import IV_MAX, IV_MIN
+from pokemon.constants import IV_MAX, IV_MIN, MAX_POKEMON_LEVEL
 from pokemon.models import PokemonIV, PokemonSpecies, UserPokemon
 from pokemon.services.encounter_level import experience_for_encounter_level
+from pokemon.services.evolution_rules import get_min_capture_level
+from pokemon.services.progression import xp_total_for_level
 
 
 def grant_pokemon_to_user(
@@ -26,6 +28,11 @@ def grant_pokemon_to_user(
 
         shiny = roll_shiny()
 
+    floor = max(1, get_min_capture_level(species.pk))
+    final_level = min(MAX_POKEMON_LEVEL, max(level or 1, floor))
+    if experience is None:
+        experience = xp_total_for_level(final_level)
+
     nature = random.choice(Nature.values)
     user_pokemon = UserPokemon.objects.create(
         user=user,
@@ -33,6 +40,8 @@ def grant_pokemon_to_user(
         nickname=nickname,
         nature=nature,
         shiny=shiny,
+        level=final_level,
+        experience=experience,
         captured_at=timezone.now(),
         source_workout=None,
     )
@@ -62,7 +71,9 @@ def grant_pokemon_from_workout_encounter(
 
         shiny = roll_shiny()
 
-    level = max(1, int(getattr(workout, "encounter_level", None) or 1))
+    floor = max(1, get_min_capture_level(species.pk))
+    raw_level = int(getattr(workout, "encounter_level", None) or 1)
+    level = min(MAX_POKEMON_LEVEL, max(floor, raw_level))
     experience = experience_for_encounter_level(level)
     nature = random.choice(Nature.values)
     user_pokemon = UserPokemon.objects.create(
