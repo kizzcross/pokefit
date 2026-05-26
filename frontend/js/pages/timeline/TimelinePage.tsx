@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useRef } from 'react';
 
 import MobileHeader from '@/js/components/layout/MobileHeader';
@@ -7,12 +7,14 @@ import { LoadingCardSkeleton, PageLoading, QueryRefetchBar } from '@/js/componen
 import PixelCard from '@/js/components/ui/PixelCard';
 import PixelLink from '@/js/components/ui/PixelLink';
 import { isQueryRefetching } from '@/js/hooks/useQueryLoading';
+import { markInteractionsSeen } from '@/js/lib/interactions';
 import { fetchMyTimeline, type TimelineFeedPage } from '@/js/lib/timeline';
 
 const PAGE_SIZE = 6;
 
 const TimelinePage = () => {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const queryClient = useQueryClient();
 
   const {
     data,
@@ -29,6 +31,19 @@ const TimelinePage = () => {
     initialPageParam: null as string | null,
     getNextPageParam: (lastPage: TimelineFeedPage) => lastPage.next_cursor ?? undefined,
   });
+
+  const markSeenMutation = useMutation({
+    mutationFn: markInteractionsSeen,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['notifications', 'interactions'] });
+    },
+  });
+
+  useEffect(() => {
+    markSeenMutation.mutate();
+    // We deliberately only mark-as-seen once on mount.
+     
+  }, []);
 
   const events = useMemo(
     () => (data?.pages ?? []).flatMap((page) => page.results),

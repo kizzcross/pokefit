@@ -7,6 +7,7 @@ import GameIcon from '@/js/components/game/GameIcon';
 import PokemonSprite from '@/js/components/game/PokemonSprite';
 import TrainerAvatar from '@/js/components/game/TrainerAvatar';
 import { userProfilePath } from '@/js/components/social/UserLink';
+import WorkoutInteractions from '@/js/components/timeline/WorkoutInteractions';
 import ImageLightbox from '@/js/components/ui/ImageLightbox';
 import PixelCard from '@/js/components/ui/PixelCard';
 import { useAuth } from '@/js/hooks/useAuth';
@@ -140,6 +141,8 @@ const TimelineEventCard = ({ event, showActor = false }: TimelineEventCardProps)
           )}
         </div>
       </div>
+      <WorkoutInteractions workoutId={workout.id} />
+
       {lightboxOpen && workout.proof_photo_url ? (
         <ImageLightbox
           alt={`Foto de ${event.actor.display_name}`}

@@ -44,6 +44,11 @@ class User(AbstractBaseUser, PermissionsMixin, IndexedTimeStampedModel):
         related_name="referrals",
         help_text=_("Usuário cujo invite_code foi usado neste cadastro."),
     )
+    interactions_last_seen_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text=_("Última vez que o usuário marcou as interações como vistas."),
+    )
 
     objects = UserManager()
 

@@ -1,11 +1,19 @@
-from rest_framework import serializers
-
 from django.utils import timezone
 
 from pokemon.serializers import PokemonSpeciesSerializer, WorkoutTeamRewardsSerializer
+from rest_framework import serializers
 
 from .choices import ValidationType, WorkoutStatus, WorkoutType
-from .models import EXERCISE_IMAGE_MAX_SIZE_BYTES, Exercise, Workout, WorkoutExercise
+from .models import (
+    EXERCISE_IMAGE_MAX_SIZE_BYTES,
+    WORKOUT_COMMENT_MAX_LENGTH,
+    WORKOUT_REACTION_EMOJIS,
+    Exercise,
+    Workout,
+    WorkoutComment,
+    WorkoutExercise,
+    WorkoutReaction,  # noqa: F401  -- re-exported for OpenAPI introspection
+)
 from .services.cardio import (
     cardio_performance_summary,
     format_pace,
@@ -581,3 +589,61 @@ class WorkoutProofSerializer(serializers.Serializer):
             ]
         )
         return workout
+
+
+class WorkoutCommentSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source="user.id", read_only=True)
+    user_display_name = serializers.SerializerMethodField()
+    user_trainer_sprite = serializers.CharField(source="user.trainer_sprite", read_only=True)
+    body = serializers.CharField(max_length=WORKOUT_COMMENT_MAX_LENGTH)
+
+    class Meta:
+        model = WorkoutComment
+        fields = [  # noqa: RUF012
+            "id",
+            "workout",
+            "body",
+            "user_id",
+            "user_display_name",
+            "user_trainer_sprite",
+            "created",
+        ]
+        read_only_fields = (  # noqa: RUF012
+            "id",
+            "workout",
+            "user_id",
+            "user_display_name",
+            "user_trainer_sprite",
+            "created",
+        )
+
+    def get_user_display_name(self, obj) -> str:
+        from social.services.friends import display_name
+
+        return display_name(obj.user)
+
+
+class WorkoutReactionSummarySerializer(serializers.Serializer):
+    counts = serializers.DictField(child=serializers.IntegerField())
+    my_reactions = serializers.ListField(child=serializers.CharField())
+    total = serializers.IntegerField()
+
+
+class WorkoutReactionToggleSerializer(serializers.Serializer):
+    emoji = serializers.CharField()
+
+    def validate_emoji(self, value: str) -> str:
+        if value not in WORKOUT_REACTION_EMOJIS:
+            raise serializers.ValidationError("Emoji não suportado.")
+        return value
+
+
+class WorkoutInteractionsSerializer(serializers.Serializer):
+    reactions = WorkoutReactionSummarySerializer()
+    comments = WorkoutCommentSerializer(many=True)
+    supported_emojis = serializers.ListField(child=serializers.CharField())
+
+
+class InteractionsNotificationSerializer(serializers.Serializer):
+    count = serializers.IntegerField()
+    last_seen_at = serializers.DateTimeField(allow_null=True)

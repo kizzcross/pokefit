@@ -260,6 +260,78 @@ class Workout(IndexedTimeStampedModel):
         )
 
 
+WORKOUT_REACTION_EMOJIS: list[str] = [
+    "🔥",
+    "💪",
+    "👏",
+    "❤️",
+    "😂",
+    "😮",
+    "👎",
+]
+WORKOUT_COMMENT_MAX_LENGTH = 500
+
+
+class WorkoutReaction(IndexedTimeStampedModel):
+    """An emoji reaction left by any logged-in user on a finished workout."""
+
+    workout = models.ForeignKey(
+        Workout,
+        on_delete=models.CASCADE,
+        related_name="reactions",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="workout_reactions",
+    )
+    emoji = models.CharField(max_length=8)
+
+    class Meta:
+        verbose_name = _("workout reaction")
+        verbose_name_plural = _("workout reactions")
+        ordering = ("-created",)
+        constraints = [
+            models.UniqueConstraint(
+                fields=["workout", "user"],
+                name="workout_reaction_unique_per_user",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=["workout", "emoji"]),
+        ]
+
+    def __str__(self):
+        return f"{self.user_id} {self.emoji} #{self.workout_id}"
+
+
+class WorkoutComment(IndexedTimeStampedModel):
+    """A short text comment from any logged-in user on a finished workout."""
+
+    workout = models.ForeignKey(
+        Workout,
+        on_delete=models.CASCADE,
+        related_name="comments",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="workout_comments",
+    )
+    body = models.CharField(max_length=WORKOUT_COMMENT_MAX_LENGTH)
+
+    class Meta:
+        verbose_name = _("workout comment")
+        verbose_name_plural = _("workout comments")
+        ordering = ("created",)
+        indexes = [
+            models.Index(fields=["workout", "created"]),
+        ]
+
+    def __str__(self):
+        return f"comment #{self.pk} on workout #{self.workout_id}"
+
+
 class WorkoutExercise(IndexedTimeStampedModel):
     workout = models.ForeignKey(
         Workout,

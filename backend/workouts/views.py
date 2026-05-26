@@ -1,4 +1,5 @@
 from django.db.models import Count
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
 from drf_spectacular.utils import extend_schema
@@ -9,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .choices import EncounterStatus, WorkoutStatus, WorkoutType
-from .models import Exercise, Workout, WorkoutExercise
+from .models import WORKOUT_REACTION_EMOJIS, Exercise, Workout, WorkoutComment, WorkoutExercise
 from .permissions import IsAdminOrReadOnly
 from .serializers import (
     CardioPreviewSerializer,
@@ -18,8 +19,10 @@ from .serializers import (
     CardioWorkoutFinishSerializer,
     ExerciseListSerializer,
     ExerciseSerializer,
+    InteractionsNotificationSerializer,
     LastWorkoutByTypeSerializer,
     PendingEncounterSerializer,
+    WorkoutCommentSerializer,
     WorkoutCreateSerializer,
     WorkoutDetailSerializer,
     WorkoutExerciseBulkCreateSerializer,
@@ -28,8 +31,10 @@ from .serializers import (
     WorkoutExerciseUpdateSerializer,
     WorkoutFinishResultSerializer,
     WorkoutFinishSerializer,
+    WorkoutInteractionsSerializer,
     WorkoutListSerializer,
     WorkoutProofSerializer,
+    WorkoutReactionToggleSerializer,
 )
 from .services.calendar import build_calendar_month
 from .services.cardio import (
@@ -37,6 +42,17 @@ from .services.cardio import (
     format_pace,
     get_last_finished_cardio,
     get_reference_pace_seconds,
+)
+from .services.interactions import (
+    InteractionError,
+    create_comment,
+    list_comments,
+    reactions_summary,
+    toggle_reaction,
+    unseen_interactions_count,
+)
+from .services.interactions import (
+    delete_comment as delete_comment_service,
 )
 from .services.seed_exercises import SeedStatus, ingest_exercises_list
 
@@ -587,3 +603,109 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         workout.encounter_status = EncounterStatus.FLED
         workout.save(update_fields=["encounter_status", "modified"])
         return Response({"detail": "O Pokémon fugiu para o mato."})
+
+    # ------------------------------------------------------------------ #
+    # Social interactions (reactions + comments) on finished workouts.
+    # Visible/usable by ANY authenticated user, not only the workout's owner,
+    # so we bypass the user-scoped queryset by fetching the workout directly.
+    # ------------------------------------------------------------------ #
+    def _get_finished_workout(self, pk):
+        return get_object_or_404(
+            Workout.objects.select_related("user"),
+            pk=pk,
+            status=WorkoutStatus.FINISHED,
+        )
+
+    @extend_schema(responses=WorkoutInteractionsSerializer)
+    @action(detail=True, methods=["get"], url_path="interactions")
+    def interactions(self, request, pk=None):
+        workout = self._get_finished_workout(pk)
+        comments_qs = list_comments(workout)
+        return Response(
+            {
+                "reactions": reactions_summary(workout, request.user),
+                "comments": WorkoutCommentSerializer(comments_qs, many=True).data,
+                "supported_emojis": WORKOUT_REACTION_EMOJIS,
+            }
+        )
+
+    @extend_schema(
+        request=WorkoutReactionToggleSerializer,
+        responses=WorkoutInteractionsSerializer,
+    )
+    @action(detail=True, methods=["post"], url_path="react")
+    def react(self, request, pk=None):
+        workout = self._get_finished_workout(pk)
+        serializer = WorkoutReactionToggleSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            toggle_reaction(workout, request.user, serializer.validated_data["emoji"])
+        except InteractionError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        comments_qs = list_comments(workout)
+        return Response(
+            {
+                "reactions": reactions_summary(workout, request.user),
+                "comments": WorkoutCommentSerializer(comments_qs, many=True).data,
+                "supported_emojis": WORKOUT_REACTION_EMOJIS,
+            }
+        )
+
+    @extend_schema(
+        request=WorkoutCommentSerializer,
+        responses=WorkoutCommentSerializer,
+    )
+    @action(detail=True, methods=["post"], url_path="comments")
+    def post_comment(self, request, pk=None):
+        workout = self._get_finished_workout(pk)
+        body = (request.data or {}).get("body", "")
+        try:
+            comment = create_comment(workout, request.user, body)
+        except InteractionError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            WorkoutCommentSerializer(comment).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+    @extend_schema(responses={204: None})
+    @action(
+        detail=True,
+        methods=["delete"],
+        url_path=r"comments/(?P<comment_id>\d+)",
+    )
+    def delete_comment(self, request, pk=None, comment_id=None):
+        workout = self._get_finished_workout(pk)
+        comment = get_object_or_404(WorkoutComment, pk=comment_id, workout=workout)
+        try:
+            delete_comment_service(comment, request.user)
+        except InteractionError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_403_FORBIDDEN)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @extend_schema(responses=InteractionsNotificationSerializer)
+    @action(detail=False, methods=["get"], url_path="interactions-notifications")
+    def interactions_notifications(self, request):
+        count = unseen_interactions_count(request.user)
+        return Response(
+            {
+                "count": count,
+                "last_seen_at": request.user.interactions_last_seen_at,
+            }
+        )
+
+    @extend_schema(
+        responses=InteractionsNotificationSerializer,
+        request=None,
+    )
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="interactions-notifications/mark-seen",
+    )
+    def mark_interactions_seen(self, request):
+        request.user.interactions_last_seen_at = timezone.now()
+        request.user.save(update_fields=["interactions_last_seen_at", "modified"])
+        return Response(
+            {"count": 0, "last_seen_at": request.user.interactions_last_seen_at}
+        )

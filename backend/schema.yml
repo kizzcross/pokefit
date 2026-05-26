@@ -1559,6 +1559,60 @@ paths:
               schema:
                 $ref: '#/components/schemas/WorkoutDetail'
           description: ''
+  /api/workouts/{id}/comments/:
+    post:
+      operationId: workouts_comments_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - workouts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkoutComment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WorkoutComment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WorkoutComment'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutComment'
+          description: ''
+  /api/workouts/{id}/comments/{comment_id}/:
+    delete:
+      operationId: workouts_comments_destroy
+      parameters:
+      - in: path
+        name: comment_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - workouts
+      security:
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/workouts/{id}/decline-encounter/:
     post:
       operationId: workouts_decline_encounter_create
@@ -1774,6 +1828,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/WorkoutFinishResult'
           description: ''
+  /api/workouts/{id}/interactions/:
+    get:
+      operationId: workouts_interactions_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - workouts
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutInteractions'
+          description: ''
   /api/workouts/{id}/proof/:
     post:
       operationId: workouts_proof_create
@@ -1806,6 +1880,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/WorkoutDetail'
           description: ''
+  /api/workouts/{id}/react/:
+    post:
+      operationId: workouts_react_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - workouts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkoutReactionToggle'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WorkoutReactionToggle'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WorkoutReactionToggle'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutInteractions'
+          description: ''
   /api/workouts/active-draft/:
     get:
       operationId: workouts_active_draft_retrieve
@@ -1834,6 +1940,34 @@ paths:
               schema:
                 type: object
                 additionalProperties: {}
+          description: ''
+  /api/workouts/interactions-notifications/:
+    get:
+      operationId: workouts_interactions_notifications_retrieve
+      tags:
+      - workouts
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InteractionsNotification'
+          description: ''
+  /api/workouts/interactions-notifications/mark-seen/:
+    post:
+      operationId: workouts_interactions_notifications_mark_seen_create
+      tags:
+      - workouts
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InteractionsNotification'
           description: ''
   /api/workouts/last-by-type/:
     get:
@@ -2359,6 +2493,18 @@ components:
       required:
       - id
       - species
+    InteractionsNotification:
+      type: object
+      properties:
+        count:
+          type: integer
+        last_seen_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - count
+      - last_seen_at
     LastWorkoutByType:
       type: object
       properties:
@@ -3597,6 +3743,39 @@ components:
       - target
       - week_end
       - week_start
+    WorkoutComment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        workout:
+          type: integer
+          readOnly: true
+        body:
+          type: string
+          maxLength: 500
+        user_id:
+          type: integer
+          readOnly: true
+        user_display_name:
+          type: string
+          readOnly: true
+        user_trainer_sprite:
+          type: string
+          readOnly: true
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - body
+      - created
+      - id
+      - user_display_name
+      - user_id
+      - user_trainer_sprite
+      - workout
     WorkoutCreate:
       type: object
       properties:
@@ -3920,6 +4099,23 @@ components:
       required:
       - team_rewards
       - workout
+    WorkoutInteractions:
+      type: object
+      properties:
+        reactions:
+          $ref: '#/components/schemas/WorkoutReactionSummary'
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkoutComment'
+        supported_emojis:
+          type: array
+          items:
+            type: string
+      required:
+      - comments
+      - reactions
+      - supported_emojis
     WorkoutList:
       type: object
       properties:
@@ -4021,6 +4217,30 @@ components:
           maxLength: 140
       required:
       - photo
+    WorkoutReactionSummary:
+      type: object
+      properties:
+        counts:
+          type: object
+          additionalProperties:
+            type: integer
+        my_reactions:
+          type: array
+          items:
+            type: string
+        total:
+          type: integer
+      required:
+      - counts
+      - my_reactions
+      - total
+    WorkoutReactionToggle:
+      type: object
+      properties:
+        emoji:
+          type: string
+      required:
+      - emoji
     WorkoutTeamRewards:
       type: object
       properties:

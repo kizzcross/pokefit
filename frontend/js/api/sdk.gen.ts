@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ExercisesCreateData, ExercisesCreateResponses, ExercisesDestroyData, ExercisesDestroyResponses, ExercisesImportCreateData, ExercisesImportCreateErrors, ExercisesImportCreateResponses, ExercisesListData, ExercisesListResponses, ExercisesPartialUpdateData, ExercisesPartialUpdateResponses, ExercisesRetrieveData, ExercisesRetrieveResponses, ExercisesUpdateData, ExercisesUpdateResponses, FriendsAcceptCreateData, FriendsAcceptCreateResponses, FriendsBlockCreateData, FriendsBlockCreateResponses, FriendsDeclineCreateData, FriendsDeclineCreateResponses, FriendsListListData, FriendsListListResponses, FriendsRemoveDestroyData, FriendsRemoveDestroyResponses, FriendsRequestsRetrieveData, FriendsRequestsRetrieveResponses, FriendsRequestsSendCreateData, FriendsRequestsSendCreateResponses, GiftsClaimCreateData, GiftsClaimCreateResponses, GiftsListData, GiftsListResponses, GiftsPendingCountRetrieveData, GiftsPendingCountRetrieveResponses, GiftsRetrieveData, GiftsRetrieveResponses, GiftsSendCreateData, GiftsSendCreateResponses, MyPokemonCaptureCreateData, MyPokemonCaptureCreateResponses, MyPokemonListData, MyPokemonListResponses, MyPokemonRandomEncounterRetrieveData, MyPokemonRandomEncounterRetrieveResponses, MyPokemonReleaseCreateData, MyPokemonReleaseCreateResponses, MyPokemonRetrieveData, MyPokemonRetrieveResponses, MyPokemonTeamListData, MyPokemonTeamListResponses, MyPokemonTeamSlotPartialUpdateData, MyPokemonTeamSlotPartialUpdateResponses, PokemonSpeciesListData, PokemonSpeciesListResponses, PokemonSpeciesRetrieveData, PokemonSpeciesRetrieveResponses, RestRestCheckRetrieveData, RestRestCheckRetrieveResponses, TimelineListData, TimelineListResponses, UsersCalendarRetrieveData, UsersCalendarRetrieveResponses, UsersCreateData, UsersCreateResponses, UsersDestroyData, UsersDestroyResponses, UsersFriendsListData, UsersFriendsListResponses, UsersGiftRecipientsListData, UsersGiftRecipientsListResponses, UsersInviteInfoRetrieveData, UsersInviteInfoRetrieveResponses, UsersListData, UsersListResponses, UsersLoginCreateData, UsersLoginCreateResponses, UsersLogoutCreateData, UsersLogoutCreateResponses, UsersMePartialUpdateData, UsersMePartialUpdateResponses, UsersMeRetrieveData, UsersMeRetrieveResponses, UsersPartialUpdateData, UsersPartialUpdateResponses, UsersPokemonRetrieveData, UsersPokemonRetrieveResponses, UsersProfileRetrieveData, UsersProfileRetrieveResponses, UsersRegisterCreateData, UsersRegisterCreateResponses, UsersRetrieveData, UsersRetrieveResponses, UsersTeamRetrieveData, UsersTeamRetrieveResponses, UsersTimelineRetrieveData, UsersTimelineRetrieveResponses, UsersTrainerSpritesRetrieveData, UsersTrainerSpritesRetrieveResponses, UsersUpdateData, UsersUpdateResponses, WeeklyGoalCreateData, WeeklyGoalCreateResponses, WeeklyGoalListData, WeeklyGoalListResponses, WorkoutsActiveDraftRetrieveData, WorkoutsActiveDraftRetrieveResponses, WorkoutsCalendarRetrieveData, WorkoutsCalendarRetrieveResponses, WorkoutsCardioPreviewCreateData, WorkoutsCardioPreviewCreateResponses, WorkoutsCardioReferenceRetrieveData, WorkoutsCardioReferenceRetrieveResponses, WorkoutsCardioSessionCreateData, WorkoutsCardioSessionCreateResponses, WorkoutsCardioSessionPartialUpdateData, WorkoutsCardioSessionPartialUpdateResponses, WorkoutsCreateData, WorkoutsCreateResponses, WorkoutsDeclineEncounterCreateData, WorkoutsDeclineEncounterCreateResponses, WorkoutsDestroyData, WorkoutsDestroyResponses, WorkoutsExercisesBulkCreateData, WorkoutsExercisesBulkCreateResponses, WorkoutsExercisesCreateData, WorkoutsExercisesCreateResponses, WorkoutsExercisesDestroyData, WorkoutsExercisesDestroyResponses, WorkoutsExercisesPartialUpdateData, WorkoutsExercisesPartialUpdateResponses, WorkoutsFinishCardioCreateData, WorkoutsFinishCardioCreateResponses, WorkoutsFinishCreateData, WorkoutsFinishCreateResponses, WorkoutsLastByTypeRetrieveData, WorkoutsLastByTypeRetrieveResponses, WorkoutsListData, WorkoutsListResponses, WorkoutsPartialUpdateData, WorkoutsPartialUpdateResponses, WorkoutsPendingEncounterRetrieveData, WorkoutsPendingEncounterRetrieveResponses, WorkoutsProofCreateData, WorkoutsProofCreateResponses, WorkoutsRetrieveData, WorkoutsRetrieveResponses } from './types.gen';
+import type { ExercisesCreateData, ExercisesCreateResponses, ExercisesDestroyData, ExercisesDestroyResponses, ExercisesImportCreateData, ExercisesImportCreateErrors, ExercisesImportCreateResponses, ExercisesListData, ExercisesListResponses, ExercisesPartialUpdateData, ExercisesPartialUpdateResponses, ExercisesRetrieveData, ExercisesRetrieveResponses, ExercisesUpdateData, ExercisesUpdateResponses, FriendsAcceptCreateData, FriendsAcceptCreateResponses, FriendsBlockCreateData, FriendsBlockCreateResponses, FriendsDeclineCreateData, FriendsDeclineCreateResponses, FriendsListListData, FriendsListListResponses, FriendsRemoveDestroyData, FriendsRemoveDestroyResponses, FriendsRequestsRetrieveData, FriendsRequestsRetrieveResponses, FriendsRequestsSendCreateData, FriendsRequestsSendCreateResponses, GiftsClaimCreateData, GiftsClaimCreateResponses, GiftsListData, GiftsListResponses, GiftsPendingCountRetrieveData, GiftsPendingCountRetrieveResponses, GiftsRetrieveData, GiftsRetrieveResponses, GiftsSendCreateData, GiftsSendCreateResponses, MyPokemonCaptureCreateData, MyPokemonCaptureCreateResponses, MyPokemonListData, MyPokemonListResponses, MyPokemonRandomEncounterRetrieveData, MyPokemonRandomEncounterRetrieveResponses, MyPokemonReleaseCreateData, MyPokemonReleaseCreateResponses, MyPokemonRetrieveData, MyPokemonRetrieveResponses, MyPokemonTeamListData, MyPokemonTeamListResponses, MyPokemonTeamSlotPartialUpdateData, MyPokemonTeamSlotPartialUpdateResponses, PokemonSpeciesListData, PokemonSpeciesListResponses, PokemonSpeciesRetrieveData, PokemonSpeciesRetrieveResponses, RestRestCheckRetrieveData, RestRestCheckRetrieveResponses, TimelineListData, TimelineListResponses, UsersCalendarRetrieveData, UsersCalendarRetrieveResponses, UsersCreateData, UsersCreateResponses, UsersDestroyData, UsersDestroyResponses, UsersFriendsListData, UsersFriendsListResponses, UsersGiftRecipientsListData, UsersGiftRecipientsListResponses, UsersInviteInfoRetrieveData, UsersInviteInfoRetrieveResponses, UsersListData, UsersListResponses, UsersLoginCreateData, UsersLoginCreateResponses, UsersLogoutCreateData, UsersLogoutCreateResponses, UsersMePartialUpdateData, UsersMePartialUpdateResponses, UsersMeRetrieveData, UsersMeRetrieveResponses, UsersPartialUpdateData, UsersPartialUpdateResponses, UsersPokemonRetrieveData, UsersPokemonRetrieveResponses, UsersProfileRetrieveData, UsersProfileRetrieveResponses, UsersRegisterCreateData, UsersRegisterCreateResponses, UsersRetrieveData, UsersRetrieveResponses, UsersTeamRetrieveData, UsersTeamRetrieveResponses, UsersTimelineRetrieveData, UsersTimelineRetrieveResponses, UsersTrainerSpritesRetrieveData, UsersTrainerSpritesRetrieveResponses, UsersUpdateData, UsersUpdateResponses, WeeklyGoalCreateData, WeeklyGoalCreateResponses, WeeklyGoalListData, WeeklyGoalListResponses, WorkoutsActiveDraftRetrieveData, WorkoutsActiveDraftRetrieveResponses, WorkoutsCalendarRetrieveData, WorkoutsCalendarRetrieveResponses, WorkoutsCardioPreviewCreateData, WorkoutsCardioPreviewCreateResponses, WorkoutsCardioReferenceRetrieveData, WorkoutsCardioReferenceRetrieveResponses, WorkoutsCardioSessionCreateData, WorkoutsCardioSessionCreateResponses, WorkoutsCardioSessionPartialUpdateData, WorkoutsCardioSessionPartialUpdateResponses, WorkoutsCommentsCreateData, WorkoutsCommentsCreateResponses, WorkoutsCommentsDestroyData, WorkoutsCommentsDestroyResponses, WorkoutsCreateData, WorkoutsCreateResponses, WorkoutsDeclineEncounterCreateData, WorkoutsDeclineEncounterCreateResponses, WorkoutsDestroyData, WorkoutsDestroyResponses, WorkoutsExercisesBulkCreateData, WorkoutsExercisesBulkCreateResponses, WorkoutsExercisesCreateData, WorkoutsExercisesCreateResponses, WorkoutsExercisesDestroyData, WorkoutsExercisesDestroyResponses, WorkoutsExercisesPartialUpdateData, WorkoutsExercisesPartialUpdateResponses, WorkoutsFinishCardioCreateData, WorkoutsFinishCardioCreateResponses, WorkoutsFinishCreateData, WorkoutsFinishCreateResponses, WorkoutsInteractionsNotificationsMarkSeenCreateData, WorkoutsInteractionsNotificationsMarkSeenCreateResponses, WorkoutsInteractionsNotificationsRetrieveData, WorkoutsInteractionsNotificationsRetrieveResponses, WorkoutsInteractionsRetrieveData, WorkoutsInteractionsRetrieveResponses, WorkoutsLastByTypeRetrieveData, WorkoutsLastByTypeRetrieveResponses, WorkoutsListData, WorkoutsListResponses, WorkoutsPartialUpdateData, WorkoutsPartialUpdateResponses, WorkoutsPendingEncounterRetrieveData, WorkoutsPendingEncounterRetrieveResponses, WorkoutsProofCreateData, WorkoutsProofCreateResponses, WorkoutsReactCreateData, WorkoutsReactCreateResponses, WorkoutsRetrieveData, WorkoutsRetrieveResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -1044,6 +1044,39 @@ export const workoutsCardioSessionCreate = <ThrowOnError extends boolean = false
     });
 };
 
+export const workoutsCommentsCreate = <ThrowOnError extends boolean = false>(options: Options<WorkoutsCommentsCreateData, ThrowOnError>) => {
+    return (options.client ?? client).post<WorkoutsCommentsCreateResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/workouts/{id}/comments/',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const workoutsCommentsDestroy = <ThrowOnError extends boolean = false>(options: Options<WorkoutsCommentsDestroyData, ThrowOnError>) => {
+    return (options.client ?? client).delete<WorkoutsCommentsDestroyResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/workouts/{id}/comments/{comment_id}/',
+        ...options
+    });
+};
+
 export const workoutsDeclineEncounterCreate = <ThrowOnError extends boolean = false>(options: Options<WorkoutsDeclineEncounterCreateData, ThrowOnError>) => {
     return (options.client ?? client).post<WorkoutsDeclineEncounterCreateResponses, unknown, ThrowOnError>({
         responseType: 'json',
@@ -1172,6 +1205,21 @@ export const workoutsFinishCardioCreate = <ThrowOnError extends boolean = false>
     });
 };
 
+export const workoutsInteractionsRetrieve = <ThrowOnError extends boolean = false>(options: Options<WorkoutsInteractionsRetrieveData, ThrowOnError>) => {
+    return (options.client ?? client).get<WorkoutsInteractionsRetrieveResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/workouts/{id}/interactions/',
+        ...options
+    });
+};
+
 export const workoutsProofCreate = <ThrowOnError extends boolean = false>(options: Options<WorkoutsProofCreateData, ThrowOnError>) => {
     return (options.client ?? client).post<WorkoutsProofCreateResponses, unknown, ThrowOnError>({
         responseType: 'json',
@@ -1183,6 +1231,25 @@ export const workoutsProofCreate = <ThrowOnError extends boolean = false>(option
             }
         ],
         url: '/api/workouts/{id}/proof/',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const workoutsReactCreate = <ThrowOnError extends boolean = false>(options: Options<WorkoutsReactCreateData, ThrowOnError>) => {
+    return (options.client ?? client).post<WorkoutsReactCreateResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/workouts/{id}/react/',
         ...options,
         headers: {
             'Content-Type': 'application/json',
@@ -1217,6 +1284,36 @@ export const workoutsCalendarRetrieve = <ThrowOnError extends boolean = false>(o
             }
         ],
         url: '/api/workouts/calendar/',
+        ...options
+    });
+};
+
+export const workoutsInteractionsNotificationsRetrieve = <ThrowOnError extends boolean = false>(options?: Options<WorkoutsInteractionsNotificationsRetrieveData, ThrowOnError>) => {
+    return (options?.client ?? client).get<WorkoutsInteractionsNotificationsRetrieveResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/workouts/interactions-notifications/',
+        ...options
+    });
+};
+
+export const workoutsInteractionsNotificationsMarkSeenCreate = <ThrowOnError extends boolean = false>(options?: Options<WorkoutsInteractionsNotificationsMarkSeenCreateData, ThrowOnError>) => {
+    return (options?.client ?? client).post<WorkoutsInteractionsNotificationsMarkSeenCreateResponses, unknown, ThrowOnError>({
+        responseType: 'json',
+        security: [
+            {
+                in: 'cookie',
+                name: 'sessionid',
+                type: 'apiKey'
+            }
+        ],
+        url: '/api/workouts/interactions-notifications/mark-seen/',
         ...options
     });
 };

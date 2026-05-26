@@ -208,6 +208,11 @@ export type GiftSpeciesOption = {
     sort_order?: number;
 };
 
+export type InteractionsNotification = {
+    count: number;
+    last_seen_at: string | null;
+};
+
 export type LastWorkoutByType = {
     readonly id: number;
     workout_type: WorkoutTypeEnum;
@@ -723,6 +728,16 @@ export type WeeklyGoalStatus = {
     goal_locked: boolean;
 };
 
+export type WorkoutComment = {
+    readonly id: number;
+    readonly workout: number;
+    body: string;
+    readonly user_id: number;
+    readonly user_display_name: string;
+    readonly user_trainer_sprite: string;
+    readonly created: string;
+};
+
 export type WorkoutCreate = {
     readonly id: number;
     workout_type?: WorkoutTypeEnum;
@@ -834,6 +849,12 @@ export type WorkoutFinishResult = {
     } | null;
 };
 
+export type WorkoutInteractions = {
+    reactions: WorkoutReactionSummary;
+    comments: Array<WorkoutComment>;
+    supported_emojis: Array<string>;
+};
+
 export type WorkoutList = {
     readonly id: number;
     workout_type: WorkoutTypeEnum;
@@ -866,6 +887,18 @@ export type WorkoutList = {
 export type WorkoutProof = {
     photo: string;
     caption?: string;
+};
+
+export type WorkoutReactionSummary = {
+    counts: {
+        [key: string]: number;
+    };
+    my_reactions: Array<string>;
+    total: number;
+};
+
+export type WorkoutReactionToggle = {
+    emoji: string;
 };
 
 export type WorkoutTeamRewards = {
@@ -1078,6 +1111,10 @@ export type UserPokemonListWritable = {
     active_team_slot?: number | null;
     affection?: number;
     captured_at: string;
+};
+
+export type WorkoutCommentWritable = {
+    body: string;
 };
 
 export type WorkoutCreateWritable = {
@@ -2190,6 +2227,40 @@ export type WorkoutsCardioSessionCreateResponses = {
 
 export type WorkoutsCardioSessionCreateResponse = WorkoutsCardioSessionCreateResponses[keyof WorkoutsCardioSessionCreateResponses];
 
+export type WorkoutsCommentsCreateData = {
+    body: WorkoutCommentWritable;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/workouts/{id}/comments/';
+};
+
+export type WorkoutsCommentsCreateResponses = {
+    200: WorkoutComment;
+};
+
+export type WorkoutsCommentsCreateResponse = WorkoutsCommentsCreateResponses[keyof WorkoutsCommentsCreateResponses];
+
+export type WorkoutsCommentsDestroyData = {
+    body?: never;
+    path: {
+        comment_id: string;
+        id: string;
+    };
+    query?: never;
+    url: '/api/workouts/{id}/comments/{comment_id}/';
+};
+
+export type WorkoutsCommentsDestroyResponses = {
+    /**
+     * No response body
+     */
+    204: void;
+};
+
+export type WorkoutsCommentsDestroyResponse = WorkoutsCommentsDestroyResponses[keyof WorkoutsCommentsDestroyResponses];
+
 export type WorkoutsDeclineEncounterCreateData = {
     body?: WorkoutDetailWritable;
     path: {
@@ -2300,6 +2371,21 @@ export type WorkoutsFinishCardioCreateResponses = {
 
 export type WorkoutsFinishCardioCreateResponse = WorkoutsFinishCardioCreateResponses[keyof WorkoutsFinishCardioCreateResponses];
 
+export type WorkoutsInteractionsRetrieveData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/workouts/{id}/interactions/';
+};
+
+export type WorkoutsInteractionsRetrieveResponses = {
+    200: WorkoutInteractions;
+};
+
+export type WorkoutsInteractionsRetrieveResponse = WorkoutsInteractionsRetrieveResponses[keyof WorkoutsInteractionsRetrieveResponses];
+
 export type WorkoutsProofCreateData = {
     body: WorkoutProof;
     path: {
@@ -2314,6 +2400,21 @@ export type WorkoutsProofCreateResponses = {
 };
 
 export type WorkoutsProofCreateResponse = WorkoutsProofCreateResponses[keyof WorkoutsProofCreateResponses];
+
+export type WorkoutsReactCreateData = {
+    body: WorkoutReactionToggle;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/workouts/{id}/react/';
+};
+
+export type WorkoutsReactCreateResponses = {
+    200: WorkoutInteractions;
+};
+
+export type WorkoutsReactCreateResponse = WorkoutsReactCreateResponses[keyof WorkoutsReactCreateResponses];
 
 export type WorkoutsActiveDraftRetrieveData = {
     body?: never;
@@ -2342,6 +2443,32 @@ export type WorkoutsCalendarRetrieveResponses = {
 };
 
 export type WorkoutsCalendarRetrieveResponse = WorkoutsCalendarRetrieveResponses[keyof WorkoutsCalendarRetrieveResponses];
+
+export type WorkoutsInteractionsNotificationsRetrieveData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/workouts/interactions-notifications/';
+};
+
+export type WorkoutsInteractionsNotificationsRetrieveResponses = {
+    200: InteractionsNotification;
+};
+
+export type WorkoutsInteractionsNotificationsRetrieveResponse = WorkoutsInteractionsNotificationsRetrieveResponses[keyof WorkoutsInteractionsNotificationsRetrieveResponses];
+
+export type WorkoutsInteractionsNotificationsMarkSeenCreateData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/workouts/interactions-notifications/mark-seen/';
+};
+
+export type WorkoutsInteractionsNotificationsMarkSeenCreateResponses = {
+    200: InteractionsNotification;
+};
+
+export type WorkoutsInteractionsNotificationsMarkSeenCreateResponse = WorkoutsInteractionsNotificationsMarkSeenCreateResponses[keyof WorkoutsInteractionsNotificationsMarkSeenCreateResponses];
 
 export type WorkoutsLastByTypeRetrieveData = {
     body?: never;
