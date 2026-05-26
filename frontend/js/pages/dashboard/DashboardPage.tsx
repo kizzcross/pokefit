@@ -1,27 +1,33 @@
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
+import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 
+import { myPokemonList, myPokemonTeamList } from '@/js/api';
+import CalendarGrid from '@/js/components/calendar/CalendarGrid';
 import GameIcon from '@/js/components/game/GameIcon';
 import TrainerAvatar from '@/js/components/game/TrainerAvatar';
 import MobileHeader from '@/js/components/layout/MobileHeader';
 import NotificationBell from '@/js/components/layout/NotificationBell';
+import { LoadingCardSkeleton, QueryRefetchBar, SectionLoading } from '@/js/components/ui/GameLoading';
 import PixelButton from '@/js/components/ui/PixelButton';
 import PixelCard from '@/js/components/ui/PixelCard';
 import PixelLink from '@/js/components/ui/PixelLink';
-import { LoadingCardSkeleton, QueryRefetchBar } from '@/js/components/ui/GameLoading';
+import WeeklyGoalCard from '@/js/components/weekly/WeeklyGoalCard';
 import { useAuth } from '@/js/hooks/useAuth';
 import { mergeQueryState } from '@/js/hooks/useQueryLoading';
-import { myPokemonList, myPokemonTeamList, workoutsList } from '@/js/api';
-import { fetchMyCalendar, localDateIso } from '@/js/lib/calendar';
-import { fetchPendingEncounter } from '@/js/lib/encounter';
+import {
+  buildMonthGrid,
+  fetchMyCalendar,
+  localDateIso,
+  type CalendarDay,
+} from '@/js/lib/calendar';
 import { workoutDetailPath } from '@/js/lib/cardio';
-import { fetchActiveDraft } from '@/js/lib/workout';
+import { fetchPendingEncounter } from '@/js/lib/encounter';
 import { fetchWeeklyGoal } from '@/js/lib/weekly-goal';
-import WeeklyGoalCard from '@/js/components/weekly/WeeklyGoalCard';
+import { fetchActiveDraft } from '@/js/lib/workout';
 import { workoutTypeLabel } from '@/js/lib/workout-labels';
 import { useGameStore } from '@/js/stores/game-store';
-import { cn } from '@/js/lib/utils';
 
 const DashboardPage = () => {
   const { user } = useAuth();
@@ -31,11 +37,6 @@ const DashboardPage = () => {
   const pendingEncounterQuery = useQuery({
     queryKey: ['workouts', 'pending-encounter'],
     queryFn: fetchPendingEncounter,
-  });
-
-  const workoutsQuery = useQuery({
-    queryKey: ['workouts', 'recent'],
-    queryFn: async () => (await workoutsList({ query: { limit: 5 } })).data,
   });
 
   const teamQuery = useQuery({
@@ -49,10 +50,18 @@ const DashboardPage = () => {
   });
 
   const now = new Date();
+  const todayIso = localDateIso(now);
+  const [selectedDay, setSelectedDay] = useState<CalendarDay | null>(null);
+
   const calendarQuery = useQuery({
     queryKey: ['calendar', now.getFullYear(), now.getMonth() + 1],
     queryFn: () => fetchMyCalendar(now.getFullYear(), now.getMonth() + 1),
   });
+
+  const calendarCells = useMemo(
+    () => buildMonthGrid(now.getFullYear(), now.getMonth() + 1, calendarQuery.data?.days),
+    [now, calendarQuery.data?.days],
+  );
 
   const activeDraftQuery = useQuery({
     queryKey: ['workouts', 'active-draft'],
@@ -68,13 +77,11 @@ const DashboardPage = () => {
     calendarQuery,
     collectionQuery,
     teamQuery,
-    workoutsQuery,
     activeDraftQuery,
   );
 
   const activeDraft = activeDraftQuery.data as { id?: number; workout_type?: string } | null;
   const pending = pendingEncounterQuery.isPending ? undefined : pendingEncounterQuery.data;
-  const recentWorkouts = workoutsQuery.data?.results ?? [];
   const team = Array.isArray(teamQuery.data) ? teamQuery.data : [];
   const collectionCount = collectionQuery.data?.count ?? (collectionQuery.data?.results?.length ?? 0);
 
@@ -159,39 +166,6 @@ const DashboardPage = () => {
               </div>
             </div>
 
-            <div className="mt-3">
-              <div className="mb-2 flex items-center justify-between">
-                <p className="text-game-label text-[var(--color-game-muted)]">Esta semana</p>
-                <Link className="text-[10px] font-bold uppercase text-[var(--color-game-info)] no-underline" to="/calendar">
-                  Ver jornada
-                </Link>
-              </div>
-              <div className="grid grid-cols-7 gap-1">
-                {Array.from({ length: 7 }).map((_, index) => {
-                  const day = new Date(now);
-                  day.setDate(now.getDate() - (6 - index));
-                  const iso = localDateIso(day);
-                  const cell = calendarQuery.data?.days.find((d) => d.date === iso);
-                  const conquered = (cell?.workout_count ?? 0) > 0;
-                  const todayIso = localDateIso(now);
-                  return (
-                    <div
-                      key={iso}
-                      className={cn(
-                        'flex min-h-9 flex-col items-center justify-center border-2 text-[10px] font-bold',
-                        conquered
-                          ? 'border-[var(--color-game-accent)] bg-[var(--color-game-accent)]/20 text-[var(--color-game-accent)]'
-                          : 'border-[var(--color-game-border)] bg-[var(--color-game-bg)] text-[var(--color-game-muted)]',
-                        iso === todayIso && 'ring-1 ring-[var(--color-game-info)]',
-                      )}
-                    >
-                      {day.getDate()}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
             <div className="mt-4 flex flex-col gap-2">
               {activeDraft?.id ? (
                 <>
@@ -235,35 +209,62 @@ const DashboardPage = () => {
 
         <PixelCard>
           <div className="flex items-center justify-between gap-2">
-            <h2 className="text-game-title text-[var(--color-game-info)]">Últimos treinos</h2>
-            <Link className="text-xs font-bold uppercase text-[var(--color-game-info)] no-underline" to="/workouts">
-              Ver todos
+            <h2 className="text-game-title text-[var(--color-game-info)]">Calendário</h2>
+            <Link
+              className="text-xs font-bold uppercase text-[var(--color-game-info)] no-underline"
+              to="/calendar"
+            >
+              Ver jornada
             </Link>
           </div>
-          <ul className="mt-3 space-y-2">
-            {workoutsQuery.isPending ? (
-              <>
-                <LoadingCardSkeleton lines={2} />
-                <LoadingCardSkeleton lines={2} />
-              </>
-            ) : recentWorkouts.length === 0 ? (
-              <li className="text-sm text-[var(--color-game-muted)]">Nenhum treino ainda. Bora começar!</li>
+
+          <div className="mt-3">
+            {calendarQuery.isPending && !calendarQuery.data ? (
+              <SectionLoading label="Carregando calendário..." />
             ) : (
-              recentWorkouts.map((workout) => (
-                <li key={workout.id}>
-                  <Link
-                    className="flex items-center justify-between rounded-sm border-2 border-[var(--color-game-border)] bg-[var(--color-game-bg)] px-3 py-3 no-underline transition hover:border-[var(--color-game-accent)]"
-                    to={workoutDetailPath(workout)}
-                  >
-                    <span className="text-sm capitalize text-[var(--color-game-text)]">
-                      {workout.workout_type?.replaceAll('_', ' ')}
-                    </span>
-                    <span className="text-xs text-[var(--color-game-muted)]">{workout.status}</span>
-                  </Link>
-                </li>
-              ))
+              <div className={calendarQuery.isFetching ? 'opacity-60 transition-opacity' : undefined}>
+                <CalendarGrid
+                  cells={calendarCells}
+                  onSelectDay={setSelectedDay}
+                  selectedDate={selectedDay?.date ?? null}
+                  todayIso={todayIso}
+                />
+              </div>
             )}
-          </ul>
+          </div>
+
+          {selectedDay ? (
+            <div className="mt-3 space-y-2 border-t-2 border-[var(--color-game-border)] pt-3">
+              <p className="text-game-label text-[var(--color-game-muted)]">
+                Dia {selectedDay.date.split('-')[2]}
+              </p>
+              {selectedDay.workout_count === 0 ? (
+                <p className="text-sm text-[var(--color-game-muted)]">
+                  {selectedDay.has_draft
+                    ? 'Treino em rascunho neste dia. Finalize com foto de prova.'
+                    : 'Nenhum treino conquistado neste dia.'}
+                </p>
+              ) : (
+                <ul className="space-y-2">
+                  {selectedDay.workouts.map((w) => (
+                    <li key={w.id}>
+                      <Link
+                        className="flex items-center justify-between gap-2 rounded-sm border-2 border-[var(--color-game-border)] bg-[var(--color-game-bg)] px-3 py-2 no-underline transition hover:border-[var(--color-game-accent)]"
+                        to={workoutDetailPath(w)}
+                      >
+                        <span className="min-w-0 truncate text-sm text-[var(--color-game-text)]">
+                          {workoutTypeLabel(w.workout_type)}
+                        </span>
+                        <span className="text-[10px] text-[var(--color-game-muted)]">
+                          Vol. {w.total_volume}
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ) : null}
         </PixelCard>
 
         <PixelCard>

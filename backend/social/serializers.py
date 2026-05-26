@@ -1,11 +1,12 @@
 from django.contrib.auth import get_user_model
-from rest_framework import serializers
 
-from social.choices import FriendshipStatus
-from social.models import Friendship, MAX_FRIENDS
+from rest_framework import serializers
 from users.nicknames import resolve_user_by_identifier
 
+from social.choices import FriendshipStatus
+from social.models import MAX_FRIENDS, Friendship
 from social.services.friends import can_send_friend_request, display_name
+
 
 User = get_user_model()
 
@@ -83,6 +84,7 @@ class TimelineEventSerializer(serializers.Serializer):
 class TimelineFeedSerializer(serializers.Serializer):
     results = TimelineEventSerializer(many=True)
     count = serializers.IntegerField()
+    next_cursor = serializers.CharField(allow_null=True, required=False)
 
 
 class FriendRequestCreateSerializer(serializers.Serializer):

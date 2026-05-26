@@ -1,10 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from drf_spectacular.utils import extend_schema
+
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from workouts.services.timeline import build_feed_timeline_events
 
 from social.choices import FriendshipStatus
 from social.models import Friendship
@@ -15,8 +17,8 @@ from social.serializers import (
     TimelineFeedSerializer,
     UserBriefSerializer,
 )
-from social.services.friends import accepted_friend_ids, display_name
-from workouts.services.timeline import build_feed_timeline_events
+from social.services.friends import accepted_friend_ids
+
 
 User = get_user_model()
 
@@ -127,7 +129,37 @@ class TimelineViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = TimelineFeedSerializer
 
-    @extend_schema(responses=TimelineFeedSerializer)
+    @extend_schema(
+        responses=TimelineFeedSerializer,
+        parameters=[
+            OpenApiParameter(
+                name="before",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="ISO datetime — retorna apenas eventos anteriores a este timestamp.",
+            ),
+            OpenApiParameter(
+                name="limit",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Máximo de eventos por página (padrão: 10, máx: 50).",
+            ),
+        ],
+    )
     def list(self, request):
-        events = build_feed_timeline_events(request.user, include_proof_photos=True, limit=40)
-        return Response({"results": events, "count": len(events)})
+        before = request.query_params.get("before") or None
+        limit_raw = request.query_params.get("limit")
+        try:
+            limit = int(limit_raw) if limit_raw else 10
+        except (TypeError, ValueError):
+            limit = 10
+
+        payload = build_feed_timeline_events(
+            request.user,
+            include_proof_photos=True,
+            limit=limit,
+            before=before,
+        )
+        return Response(payload)

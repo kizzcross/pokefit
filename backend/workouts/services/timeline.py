@@ -1,11 +1,19 @@
+from datetime import datetime
+
 from django.contrib.auth import get_user_model
+from django.utils.dateparse import parse_datetime
 
 from pokemon.models import UserPokemon
 from social.services.friends import accepted_friend_ids
+
 from workouts.choices import WorkoutStatus
 from workouts.models import Workout
 
+
 User = get_user_model()
+
+TIMELINE_DEFAULT_LIMIT = 10
+TIMELINE_MAX_LIMIT = 50
 
 
 def _actor_payload(user) -> dict:
@@ -112,21 +120,51 @@ def build_timeline_events(user, *, include_proof_photos: bool = True, limit: int
     return events[:limit]
 
 
-def build_feed_timeline_events(viewer, *, include_proof_photos: bool = True, limit: int = 40) -> list[dict]:
-    """Timeline do viewer + todos os amigos aceitos, ordenada por data."""
+def _parse_before(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    parsed = parse_datetime(value)
+    return parsed
+
+
+def build_feed_timeline_events(
+    viewer,
+    *,
+    include_proof_photos: bool = True,
+    limit: int = TIMELINE_DEFAULT_LIMIT,
+    before: datetime | str | None = None,
+) -> dict:
+    """Timeline do viewer + todos os amigos aceitos, ordenada por data.
+
+    Retorna dict com `results`, `count` e `next_cursor` (ISO datetime string ou
+    None quando não há mais páginas).
+    """
+    limit = max(1, min(TIMELINE_MAX_LIMIT, int(limit or TIMELINE_DEFAULT_LIMIT)))
+
+    if isinstance(before, str):
+        before_dt = _parse_before(before)
+    else:
+        before_dt = before
+
     user_ids = [viewer.pk, *accepted_friend_ids(viewer)]
     users_by_id = {u.pk: u for u in User.objects.filter(pk__in=user_ids)}
 
-    workouts = list(
+    workouts_qs = (
         Workout.objects.filter(user_id__in=user_ids, status=WorkoutStatus.FINISHED)
         .exclude(ended_at__isnull=True)
         .select_related("encounter_species", "user")
         .prefetch_related("exercises")
-        .order_by("-ended_at")[: limit * 2]
+        .order_by("-ended_at")
     )
+    if before_dt is not None:
+        workouts_qs = workouts_qs.filter(ended_at__lt=before_dt)
+
+    # Each workout produces 1 event (or 2 when there's a capture). Over-fetch
+    # so we always have at least `limit + 1` events to know if there's more.
+    workouts = list(workouts_qs[: limit + 1])
 
     if not workouts:
-        return []
+        return {"results": [], "count": 0, "next_cursor": None}
 
     workout_ids = [w.pk for w in workouts]
     captures = {
@@ -137,17 +175,25 @@ def build_feed_timeline_events(viewer, *, include_proof_photos: bool = True, lim
         ).select_related("species")
     }
 
+    before_iso = before_dt.isoformat() if before_dt is not None else None
+
     events: list[dict] = []
     for workout in workouts:
         owner = users_by_id.get(workout.user_id) or workout.user
-        events.extend(
-            _events_from_workout(
-                workout,
-                owner,
-                captures.get((workout.user_id, workout.pk)),
-                include_proof_photos=include_proof_photos,
-            )
-        )
+        for evt in _events_from_workout(
+            workout,
+            owner,
+            captures.get((workout.user_id, workout.pk)),
+            include_proof_photos=include_proof_photos,
+        ):
+            if before_iso is not None and evt["at"] >= before_iso:
+                continue
+            events.append(evt)
 
     events.sort(key=lambda item: item["at"], reverse=True)
-    return events[:limit]
+
+    has_more = len(workouts) > limit or len(events) > limit
+    page = events[:limit]
+    next_cursor = page[-1]["at"] if page and has_more else None
+
+    return {"results": page, "count": len(page), "next_cursor": next_cursor}

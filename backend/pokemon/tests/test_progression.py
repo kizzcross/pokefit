@@ -80,7 +80,9 @@ class ProgressionServiceTest(TestCaseUtils):
         self.assertGreater(gain, 40)
 
     def test_apply_workout_rewards_levels_up_and_evolves(self):
-        pokemon = self._make_team_pokemon()
+        pokemon = self._make_team_pokemon(
+            experience=xp_total_for_level(16) - 50,
+        )
         workout = baker.make(
             Workout,
             user=self.user,

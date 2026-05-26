@@ -543,6 +543,7 @@ export type TimelineEvent = {
 export type TimelineFeed = {
     results: Array<TimelineEvent>;
     count: number;
+    next_cursor?: string | null;
 };
 
 export type TimelinePokemon = {
@@ -1632,7 +1633,16 @@ export type RestRestCheckRetrieveResponse = RestRestCheckRetrieveResponses[keyof
 export type TimelineListData = {
     body?: never;
     path?: never;
-    query?: never;
+    query?: {
+        /**
+         * ISO datetime — retorna apenas eventos anteriores a este timestamp.
+         */
+        before?: string;
+        /**
+         * Máximo de eventos por página (padrão: 10, máx: 50).
+         */
+        limit?: number;
+    };
     url: '/api/timeline/';
 };
 

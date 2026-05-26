@@ -773,6 +773,17 @@ paths:
   /api/timeline/:
     get:
       operationId: timeline_list
+      parameters:
+      - in: query
+        name: before
+        schema:
+          type: string
+        description: ISO datetime — retorna apenas eventos anteriores a este timestamp.
+      - in: query
+        name: limit
+        schema:
+          type: integer
+        description: 'Máximo de eventos por página (padrão: 10, máx: 50).'
       tags:
       - timeline
       security:
@@ -3161,6 +3172,9 @@ components:
             $ref: '#/components/schemas/TimelineEvent'
         count:
           type: integer
+        next_cursor:
+          type: string
+          nullable: true
       required:
       - count
       - results

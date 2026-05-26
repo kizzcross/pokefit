@@ -37,11 +37,30 @@ export type TimelineEvent = {
   };
 };
 
-export async function fetchMyTimeline() {
-  const response = await client.instance.get<{ results: TimelineEvent[]; count: number }>(
-    '/api/timeline/',
-  );
-  return response.data;
+export type TimelineFeedPage = {
+  results: TimelineEvent[];
+  count: number;
+  next_cursor: string | null;
+};
+
+export type TimelineFetchParams = {
+  before?: string | null;
+  limit?: number;
+};
+
+export async function fetchMyTimeline(params: TimelineFetchParams = {}): Promise<TimelineFeedPage> {
+  const search: Record<string, string> = {};
+  if (params.before) search.before = params.before;
+  if (params.limit) search.limit = String(params.limit);
+
+  const response = await client.instance.get<TimelineFeedPage>('/api/timeline/', {
+    params: search,
+  });
+  return {
+    results: response.data.results ?? [],
+    count: response.data.count ?? 0,
+    next_cursor: response.data.next_cursor ?? null,
+  };
 }
 
 export async function fetchUserTimeline(userId: number) {

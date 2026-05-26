@@ -91,7 +91,7 @@ class EncounterLevelTest(TestCaseUtils):
             level=25,
             experience=xp_total_for_level(25),
             active_team_slot=1,
-            captured_at=novice_workout.ended_at,
+            captured_at=timezone.now(),
         )
         veteran_workout = baker.make(
             Workout,

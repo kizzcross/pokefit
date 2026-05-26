@@ -1,12 +1,15 @@
+import { useState } from 'react';
 import { Link } from 'react-router';
 
+import type { TimelineEvent } from '@/js/lib/timeline';
+
 import GameIcon from '@/js/components/game/GameIcon';
-import TrainerAvatar from '@/js/components/game/TrainerAvatar';
 import PokemonSprite from '@/js/components/game/PokemonSprite';
+import TrainerAvatar from '@/js/components/game/TrainerAvatar';
 import { userProfilePath } from '@/js/components/social/UserLink';
+import ImageLightbox from '@/js/components/ui/ImageLightbox';
 import PixelCard from '@/js/components/ui/PixelCard';
 import { useAuth } from '@/js/hooks/useAuth';
-import type { TimelineEvent } from '@/js/lib/timeline';
 import { workoutTypeLabel } from '@/js/lib/workout-labels';
 
 type TimelineEventCardProps = {
@@ -27,6 +30,7 @@ const formatWhen = (iso: string) => {
 const TimelineEventCard = ({ event, showActor = false }: TimelineEventCardProps) => {
   const { user } = useAuth();
   const isOwnEvent = user?.id === event.actor.id;
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const actorHeader = showActor ? (
     <Link
@@ -75,12 +79,20 @@ const TimelineEventCard = ({ event, showActor = false }: TimelineEventCardProps)
       {actorHeader}
       <div className="flex gap-3">
         {workout.proof_photo_url ? (
-          <img
-            alt=""
-            className="h-16 w-16 shrink-0 border-4 border-[var(--color-game-border)] object-cover"
-            src={workout.proof_photo_url}
-            style={{ imageRendering: 'pixelated' }}
-          />
+          <button
+            aria-label="Ver foto em tamanho grande"
+            className="h-16 w-16 shrink-0 cursor-zoom-in border-4 border-[var(--color-game-border)] p-0 transition hover:border-[var(--color-game-accent)]"
+            onClick={() => setLightboxOpen(true)}
+            type="button"
+          >
+            <img
+              alt=""
+              className="h-full w-full object-cover"
+              loading="lazy"
+              src={workout.proof_photo_url}
+              style={{ imageRendering: 'pixelated' }}
+            />
+          </button>
         ) : (
           <div className="flex h-16 w-16 shrink-0 items-center justify-center border-4 border-[var(--color-game-border)] bg-[var(--color-game-bg)]">
             <GameIcon name="workout" size={28} />
@@ -128,6 +140,14 @@ const TimelineEventCard = ({ event, showActor = false }: TimelineEventCardProps)
           )}
         </div>
       </div>
+      {lightboxOpen && workout.proof_photo_url ? (
+        <ImageLightbox
+          alt={`Foto de ${event.actor.display_name}`}
+          caption={workout.proof_caption ?? null}
+          onClose={() => setLightboxOpen(false)}
+          src={workout.proof_photo_url}
+        />
+      ) : null}
     </PixelCard>
   );
 };
