@@ -3,14 +3,15 @@ import { Link, useLocation, useNavigate } from 'react-router';
 
 import GameIcon, { type GameIconName } from '@/js/components/game/GameIcon';
 import MobileHeader from '@/js/components/layout/MobileHeader';
+import PokemonDisclaimer from '@/js/components/legal/PokemonDisclaimer';
+import { LoadingCardSkeleton } from '@/js/components/ui/GameLoading';
+import PixelBadge from '@/js/components/ui/PixelBadge';
 import PixelButton from '@/js/components/ui/PixelButton';
 import PixelCard from '@/js/components/ui/PixelCard';
 import PixelLink from '@/js/components/ui/PixelLink';
-import { LoadingCardSkeleton } from '@/js/components/ui/GameLoading';
+import { useAppNotifications } from '@/js/hooks/useAppNotifications';
 import { useAuth } from '@/js/hooks/useAuth';
 import { fetchPendingEncounter } from '@/js/lib/encounter';
-import PixelBadge from '@/js/components/ui/PixelBadge';
-import { useAppNotifications } from '@/js/hooks/useAppNotifications';
 import { useGameStore } from '@/js/stores/game-store';
 
 const baseLinks: { to: string; label: string; icon: GameIconName }[] = [
@@ -173,6 +174,8 @@ const MorePage = () => {
           >
             Encerrar sessão
           </button>
+
+          <PokemonDisclaimer className="mt-6" />
         </footer>
       </main>
     </>

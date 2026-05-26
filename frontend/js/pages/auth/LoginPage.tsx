@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router';
 
 import { usersInviteInfoRetrieve } from '@/js/api';
+import PokemonDisclaimer from '@/js/components/legal/PokemonDisclaimer';
 import PixelButton from '@/js/components/ui/PixelButton';
 import PixelCard from '@/js/components/ui/PixelCard';
 import { useAuth } from '@/js/hooks/useAuth';
@@ -225,6 +226,8 @@ const LoginPage = () => {
             Faça login para continuar sua jornada.
           </p>
         ) : null}
+
+        <PokemonDisclaimer className="mt-8" />
       </motion.div>
     </div>
   );
